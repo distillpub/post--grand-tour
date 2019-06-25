@@ -1,3 +1,28 @@
+
+# Visualizing Neural Networks with the Grand Tour
+
+### First time setup
+- [ ] Clone your fork or copy of this repository: `git clone …`
+- [ ] [Install `npm` (Node Packet Manager)](https://docs.npmjs.com/getting-started/installing-node#installing-npm-from-the-nodejs-site). If you're on a Mac and have `brew`: `brew install node` will do the job.
+- [ ] `cd post--example` into the root directory of this project.
+- [ ] `npm install` to install dependencies.
+- [ ] Execute `npm run dev` to run a development server that autoreloads when you make changes to the article ("hot-reloading"). The console output will link you to a hot-reloading preview of the article.
+
+
+## Acknowledgment
+
+The utility code for WebGL under js/lib/webgl_utils/ were adapted from Angel's computer graphics book supplementary: 
+https://www.cs.unm.edu/~angel/BOOK/INTERACTIVE_COMPUTER_GRAPHICS/SEVENTH_EDITION/
+
+
+
+
+
+-------------------------
+-------------------------
+
+# (Original readme of post template)
+
 # Distill post--example
 
 Distill articles depend on [distillpub/template](https://github.com/distillpub/template) for styling and some functionality such as footnotes, citations, and math rendering. We built template as a standalone library of styles and [webcomponents](https://www.webcomponents.org/) to allow you to use any web development workflow you'd like. But what if you don't have strong opinions about that and just want a starter kit that works out of the box? This is such a starter kit.
