@@ -2,7 +2,7 @@ let utils = {};
 
 // for deployment
 utils.no_cors_host = 'data-no-cors/';
-utils.cors_host = 'http://cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
+utils.cors_host = '//cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
 
 // for local debugging (with data stored in data/):
 // utils.cors_host = ''; 
