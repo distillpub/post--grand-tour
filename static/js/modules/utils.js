@@ -2,11 +2,11 @@ let utils = {};
 
 // for deployment
 utils.no_cors_host = 'data-no-cors/';
-utils.cors_host = 'http://cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
+utils.cors_host = '//cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
 
 // for local debugging (with data stored in data/):
+// utils.no_cors_host = 'data-no-cors/';
 // utils.cors_host = ''; 
-// utils.no_cors_host = ''; 
 
 utils.CLEAR_COLOR = [.97, .97, .97];
 utils.CLEAR_COLOR_SMALL_MULTIPLE = [.95, .95, .95];

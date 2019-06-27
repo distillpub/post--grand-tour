@@ -1,6 +1,6 @@
-#generated folders
+#generated or large data folders
 public/
-
+static/data/
 
 
 # Logs

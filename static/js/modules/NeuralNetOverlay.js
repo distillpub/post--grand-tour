@@ -25,7 +25,7 @@ function NeuralNetOverlay(svgid) {
       that.shouldAutoNextEpoch = false;
       let value = d3.select(this).property('value');
       that.setEpochIndex(parseInt(value));
-      that.playButton.attr('class', 'play-button fa fa-play');
+      that.playButton.attr('class', that.shouldAutoNextEpoch ? 'play-button fa fa-pause':'play-button fa fa-play');
     });
 
 
