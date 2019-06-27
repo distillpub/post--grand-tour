@@ -4,7 +4,7 @@ const nn2Figure = document.querySelector("d-figure.nn2");
 var nn2;
 nn2Figure.addEventListener("ready", function() {
   console.log('nn2Figure ready');
-  nn2 = new NeuralNetRenderer('#nn2');
+  nn2 = new NeuralNetOverlay('#nn2');
   // allViews.push(nn2);
   utils.addDatasetListener(function(){
     nn2.init();
