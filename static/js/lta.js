@@ -45,7 +45,11 @@ ltaFigure.addEventListener("ready", function() {
       hasAdversarial: true,
     });
   
-  lta = utils.loadDataToRenderer(urls, lta, ()=>{ltaFigure.onscreen()});
+  lta = utils.loadDataToRenderer(urls, lta, ()=>{
+    if(ltaFigure._onscreen){
+      ltaFigure.onscreen();
+    }
+  });
 
   window.addEventListener('resize', ()=>{
       // sm0.resize();

@@ -1,5 +1,5 @@
 function LayerTransitionRenderer(gl, program, kwargs) {
-  this.animId = null;
+  this.animId = undefined;
   this.gl = gl;
   this.program = program;
 
@@ -367,6 +367,11 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
 
   this.play = function() {
+    if(this.animId !== null){
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
+
     if(this.shouldRender){
       let dt = 0;
       if (this.shouldPlayGrandTour 
@@ -757,9 +762,10 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
     //draw fg
     if (this.mode === 'point') {
+      this.setColorFactor(utils.COLOR_FACTOR);
+      
       gl.uniform1i(this.isDrawingAxisLoc, 0);
       gl.drawArrays(gl.POINTS, 0, this.npoint);
-      
       //draw axis
       // gl.uniform1i(this.isDrawingAxisLoc, 1);
       // gl.drawArrays(gl.LINES, this.npoint, ndim*2);

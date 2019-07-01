@@ -788,25 +788,26 @@ But given this ability, we can directly see how images were activated in the fin
 </p>
 
 <p>
-  We are now able to align the behavior of the network across layers.
-  Under this view, we are able to trace data distribution in the softmax back to any hidden layers.
-  For example, in the softmax layer of fashion-MNIST we described earlier, we have observed a distant separation of shoes (sandals, sneakers and ankle boots as a group) from all other classes. 
+  Since we have activations of all layers, to reduce the data size, we cut the number of data points to 500 and epochs to 50.
+  Despite less points and epochs are shown, now we are able to trace a behavior we observed in softmax back to any layers.
+  In fashion-MNIST, for example, we observe a separation of shoes (sandals, sneakers and ankle boots as a group) from all other classes in the softmax layer. 
   Tracing it back to earlier layers, we can see that this separation happened as early as <a onclick="lt2Figure.onscreen()">layer 5</a>:
 </p>
 <d-figure class='lt2' style="">
   <canvas id='lt2' class='layertransition'></canvas>
   <script src='js/lt2.js'></script>
 </d-figure>
-<p class='caption'>With layers aligned, it is easy to see the early separation of shoes from <a onclick="lt2Figure.onscreen()">this view</a>.</p>
+<p class='caption'>With layers aligned, it is easy to see the early separation of shoes from <a onclick="lt2Figure.onscreen();lt2.overlay.layerPlayButton.on('click')();">this view</a>.</p>
 
 <h3>From basis to instances: extending direct manipulations</h3>
 <p> 
-  Unlike the softmax layer, there is one problem with our axis handles in hidden layers where the dimensionality is high. 
-  Although we have preprocessed data (we chose up to 45 principle components through PCA) so that their dimensionality is at manageable size for the Grand Tour, we still hide the axis lines because the original dimensionality is large (one of the convolutional layers has 5760 dimensions) so the axes lines made a hair ball, and more importantly, these axes lack strong semantics. 
-  Unlike softmax or pre-softmax where each axis represents a label class, in hidden layers, one may need some indirect way <d-cite key="olah2017feature"></d-cite> to understand the semantics.
+  Unlike the softmax layer, there is one problem with our axis handles in high dimensional hidden layers.
+  Although we have preprocessed data (we chose up to 45 principle components through PCA) so that their dimensionality is at manageable size for the Grand Tour, the axes lines still make a hair ball, and more importantly, these axes in hidden layers do not possess as much meaning as the softmax. 
+  Unlike the softmax or pre-softmax where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics.
+  But even we used some feature visualizations, these derived meanings are hard to remember or encode in the Grand Tour. 
   Thus we do not have axes handles to change the view of the Grand Tour.
-  However, we can regard data points as handles this time. 
-  An orange circle would show up after brushing a subset of data points and we can use it as we dragged axis handles before. 
+  However, we can regard <em>data points</em> as handles this time. 
+  An orange circle would show up after brushing a subset of data points and we can use it as handles to rotate the view. 
   We will cover how it works in <a href="#technical-details">technical details</a>.
 </p>
 
@@ -815,11 +816,10 @@ But given this ability, we can directly see how images were activated in the fin
 <h2>The Grand Tour of adversarial dynamics</h2>
 <p>
   The Grand Tour can also elucidate adversarial examples <d-cite key="szegedy2013intriguing"></d-cite> as they are processed by a neural network.
-  For this illustration, we adversarially generated 89 perturbed digit 8 images to fool the network into thinking they are digit 0s.
-
-  In the previous sections, we animated either the training dynamics or the layer dynamics. 
-  Here, we fix the neural network and layer of interest, and visualize the evolution of the adversarial perturbations, for which we used the Fast Gradient Sign method <d-cite key="goodfellow2014explaining"></d-cite>. 
-  Again, because the Grand Tour is a linear method, the differences in the positions of the adversarial examples over time can be faithfully attributed to changes in how the neural network perceives the original and perturbed images, rather than potential artifacts of the visualization.
+  For this illustration, we adversarially add perturbations to 89 digit 8s to fool the network into thinking they are 0s.
+  In the previous sections, we animate either the training dynamics or the layer dynamics. 
+  Here, we fix a well-trained neural network and a layer of interest, and visualize the evolution of adversarial examples, for which we used the Fast Gradient Sign method <d-cite key="goodfellow2014explaining"></d-cite>at each step. 
+  Again, because the Grand Tour is a linear method, the change in the positions of the adversarial examples over time can be faithfully attributed to changes in how the neural network perceives the images, rather than potential artifacts of the visualization.
 </p>
 <p>
   Let us examine how adversarial examples evolved to fool the network:
@@ -830,24 +830,23 @@ But given this ability, we can directly see how images were activated in the fin
 </d-figure>
 <p class="caption">
   From <a onclick="ltaFigure.onscreen()">this view of softmax</a>, we can see how  
-  <span style="color: #444444">&#x2B24; adversarial images</span> 
+  <span style="color: #444444">&#x2B24; adversarial examples</span> 
   evolved from <span style="color: #bcbd22">&#x2B24; 8s</span> 
   into <span style="color: #1f77b4">&#x2B24; 0s</span>.
-  In <a onclick="lta.overlay.onLayerSliderInput(10);">pre-softmax</a> however, the adversarial stops around the decision boundary of two classes. 
-  The <a onclick="lta.setMode('image')">image view</a> shows the actual adversarial images instead of <a onclick="lta.setMode('point')">dots</a>.
-  The <a onclick="">PCA view</a> of the input space
+  In the corresponding <a onclick="ltaFigure.onscreen(); lta.overlay.onLayerSliderInput(10);">pre-softmax</a> however, these adversarial examples stop around the decision boundary of two classes. 
+  Show data as <a onclick="lta.setMode('image')">images</a> to see the actual images generated in each step, or <a onclick="lta.setMode('point')">dots</a> colored by labels.
 </p>
 
 <p>
   We start from 89 examples of digit 8 (black dots in the plot above) and gradually add adversarial noise to these images, using the fast gradient sign method <d-cite key="goodfellow2014explaining"></d-cite>.
   Through this adversarial training, the network eventually beliefs that all these images are 0s. 
   If we stay in the softmax layer and slide though the adversarial training steps in the plot, we can see adversarial examples move from a high score for class 8 to a high score for class 0.
-  Although all adversarial examples are classified as the target class (digit 0s) eventually, some of them detoured somewhere close to the origin (around the 45th epoch) and then moved towards the target. 
+  Although all adversarial examples are classified as the target class (digit 0s) eventually, some of them detoured somewhere close to the origin (around the 25th epoch) and then moved towards the target. 
   Comparing the actual images of the two groups, we see those that the detoured images are noisier.
 </p>
 <p>
   What is more interesting is what happens in the intermediate layers. 
-  In pre-softmax, for example, we see that these fake 0s behave differently from the genuine 0s: they live closer to the decision boundary of two classes and form a plane by themselves. 
+  In pre-softmax, for example, we see that these <span style="color: #444444; font-weight: 550;">fake 0s</span> behave differently from the <span style="color: #1f77b4; font-weight: 550;">genuine 0s</span>: they live closer to the decision boundary of two classes and form a plane by themselves. 
 </p>
 
 <h2>Discussion</h2>

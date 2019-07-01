@@ -112,8 +112,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
     // .attr('class', 'teaser-grandtourButton tooltip fas fa-random')
     // .attr('class', 'teaser-grandtourButton tooltip fas fa-route')
     .attr('class', 'teaser-grandtourButton tooltip fas fa-globe-americas')
-    // .append('button')
-    // .text('pause grand tour')
+    .style('opacity', renderer.shouldPlayGrandTour ? 0.7 : 0.3)
     .on('mouseover', function() {
       d3.select(this).style('opacity', 0.7);
     })

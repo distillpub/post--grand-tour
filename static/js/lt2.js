@@ -24,8 +24,8 @@ lt2Figure.addEventListener("ready", function() {
     init_matrix: EARLY_SEPARATION_MATRIX_LAYER5,
     // selectedClasses: new Set([5,7,9]),
 
-    framesBetweenEpoch: 20,
-    framesForEpochTransition: 15,
+    framesBetweenEpoch: 25,
+    framesForEpochTransition: 20,
 
     layerNames: [
     'Conv', 'MaxPool', 'ReLU',
@@ -44,7 +44,11 @@ lt2Figure.addEventListener("ready", function() {
   lt2.overlay = new LayerTransitionOverlay(lt2, {
       landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
   });
-  lt2 = utils.loadDataToRenderer(urls, lt2, ()=>{lt2Figure.onscreen()});
+  lt2 = utils.loadDataToRenderer(urls, lt2, ()=>{
+    if(lt2Figure._onscreen){
+      lt2Figure.onscreen();
+    }
+  });
   lt2.datasetName = init_dataset;
 
   allViews.push(lt2);
@@ -94,7 +98,6 @@ lt2Figure.addEventListener("ready", function() {
       lt2.overlay.redrawLayerSlider();
       lt2.datasetName = dataset;
       lt2.shouldRecalculateColorRect = true;
-    
     });
 
 
@@ -102,7 +105,7 @@ lt2Figure.addEventListener("ready", function() {
 
 
   utils.addDatasetListener(function(){
-    if(lt2.isOnScreen){
+    if(lt2Figure._onscreen){
       lt2.onDatasetChange();
     }
   });
@@ -120,7 +123,6 @@ lt2Figure.addEventListener("onscreen", function() {
   }
   
   if(lt2 && lt2.isDataReady && lt2.play){
-    lt2.isOnScreen = true;
     if(lt2.datasetName !== 'fashion-mnist'){
       // lt2.onDatasetChange('fashion-mnist');
       lt2.shouldRender = true;
@@ -152,6 +154,5 @@ lt2Figure.addEventListener("offscreen", function() {
     if(lt2.overlay){
       lt2.overlay.pause();
     }
-    lt2.isOnScreen = false;
   }
 });
