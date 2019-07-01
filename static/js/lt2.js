@@ -66,6 +66,13 @@ lt2Figure.addEventListener("ready", function() {
 
     var urls = utils.getLayerTransitionURL(dataset, 'test');
     lt2.nlayer = urls.length/2;
+
+    if(dataset !== 'cifar10'){ //layer out of bound when cifar10->other_dataset
+      let layer = Math.min(Math.floor(lt2.layerIndex), lt2.nlayer-1);
+      this.layerIndexPrev = layer;
+      lt2.overlay.onLayerSliderInput(layer);
+    }
+
     lt2.dataObj.norms = undefined;
     lt2.colorRect = undefined;
     lt2.dataObj.dataTensor = [];
