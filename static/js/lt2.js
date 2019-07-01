@@ -30,8 +30,8 @@ lt2Figure.addEventListener("ready", function() {
     'Linear', 'ReLU',
     'Linear', 'ReLU',
     'Softmax'],
-    nepoch: 100,
-    npoint: 1000,
+    nepoch: 50,
+    npoint: 500,
     pointSize: 6.0,
     normalizeView: true,
   };
@@ -63,32 +63,38 @@ lt2Figure.addEventListener("ready", function() {
     lt2.colorRect = undefined;
     lt2.dataObj.dataTensor = [];
     lt2.dataObj.views = [];
-    lt2 = utils.loadDataToRenderer(urls, lt2);
-    lt2.overlay.initLegend();
+    lt2 = utils.loadDataToRenderer(urls, lt2, ()=>{
+      lt2.overlay.initLegend();
+      lt2.overlay.selectedClasses = new Set();
+      lt2.overlay.onSelectLegend(d3.range(10));
 
-    if(dataset=='cifar10'){
-      lt2.layerNames = [
-      'Conv', 'ReLU', 'MaxPool',
-      'Conv', 'ReLU', 'MaxPool',
-      'Linear', 'ReLU',
-      'Linear', 'ReLU',
-      'Linear',
-      'Softmax'
-      ];
-      lt2.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L,L];
-    }else{
-      lt2.layerNames = [
-      'Conv', 'MaxPool', 'ReLU',
-      'Conv', 'MaxPool', 'ReLU',
-      'Linear', 'ReLU',
-      'Linear', 'ReLU',
-      'Softmax'
-      ];
-      lt2.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L];
-    }
-    lt2.overlay.redrawLayerSlider();
-    lt2.datasetName = dataset;
-    lt2.shouldRecalculateColorRect = true;
+      if(dataset=='cifar10'){
+        lt2.layerNames = [
+        'Conv', 'ReLU', 'MaxPool',
+        'Conv', 'ReLU', 'MaxPool',
+        'Linear', 'ReLU',
+        'Linear', 'ReLU',
+        'Linear',
+        'Softmax'
+        ];
+        lt2.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L,L];
+      }else{
+        lt2.layerNames = [
+        'Conv', 'MaxPool', 'ReLU',
+        'Conv', 'MaxPool', 'ReLU',
+        'Linear', 'ReLU',
+        'Linear', 'ReLU',
+        'Softmax'
+        ];
+        lt2.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L];
+      }
+      lt2.overlay.redrawLayerSlider();
+      lt2.datasetName = dataset;
+      lt2.shouldRecalculateColorRect = true;
+    
+    });
+
+
   };
 
 
@@ -113,17 +119,23 @@ lt2Figure.addEventListener("onscreen", function() {
   if(lt2 && lt2.isDataReady && lt2.play){
     lt2.isOnScreen = true;
     if(lt2.datasetName !== 'fashion-mnist'){
-      lt2.onDatasetChange('fashion-mnist');
+      // lt2.onDatasetChange('fashion-mnist');
+      lt2.shouldRender = true;
+      lt2.play();
+      lt2.overlay.play();
+      lt2.overlay.selectedClasses = new Set();
+      lt2.overlay.onSelectLegend(d3.range(10));
     }else{
       lt2.shouldRender = true;
       lt2.play();
       lt2.overlay.play();
+      lt2.overlay.onLayerSliderInput(5);
+      lt2.overlay.selectedClasses = new Set([5,7,9]);
+      lt2.overlay.onSelectLegend(lt2.overlay.selectedClasses);
+      lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER5);
+      lt2.overlay.layerPlayButton.on('click')();
     }
-    lt2.overlay.onLayerSliderInput(5);
-    lt2.overlay.selectedClasses = new Set([5,7,9]);
-    lt2.overlay.onSelectLegend(lt2.overlay.selectedClasses);
-    lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER5);
-    lt2.overlay.layerPlayButton.on('click')();
+    
   }
 
 });

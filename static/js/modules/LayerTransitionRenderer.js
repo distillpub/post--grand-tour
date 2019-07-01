@@ -132,22 +132,29 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
     if (this.isDataReady){
       this.initGL(this.dataObj);
+
+      if (this.gt === undefined) {
+        this.gt = new GrandTour(10, this.init_matrix);
+      }else if(this.gt.ndim != this.ndim){
+        this.gt.setNdim(this.ndim);
+      }
+
       if(this.animId==null || this.shouldRender==false){
         this.shouldRender = true;
         this.play();
       }
     }
 
-    if (this.isDataReady && this.isPlaying===undefined) {
-      // renderer.isPlaying===undefined indicates the renderer on init
+    if (this.isDataReady && this.hasInitOnce===undefined) {
+      // renderer.hasInitOnce===undefined indicates the renderer on init
       // (otherwise it is reloading other dataset)
-      this.isPlaying = true;
+      this.hasInitOnce = true;
       this.overlay.init();
-      this.play();
       this.overlay.onSelectLegend(this.selectedClasses);
-      if(onReadyCallback !== undefined){
-        onReadyCallback();
-      }
+    }
+
+    if(this.isDataReady && onReadyCallback !== undefined){
+      onReadyCallback();
     }
 
   };
@@ -222,20 +229,19 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     
 
 
-    let textureCoords = [];
-    for (let i=0; i<this.npoint; i++) {
-      textureCoords.push(...utils.getTextureCoord(i));
-    }
-    for (let i=0; i<this.ndim*2; i++) {
-      textureCoords.push([0, 0]);
-    }
-
-    if (this.textureCoordLoc !== -1) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, flatten(textureCoords), gl.STATIC_DRAW);
-      gl.vertexAttribPointer(this.textureCoordLoc, 2, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(this.textureCoordLoc);
-    }
+    // let textureCoords = [];
+    // for (let i=0; i<this.npoint; i++) {
+    //   textureCoords.push(...utils.getTextureCoord(i));
+    // }
+    // for (let i=0; i<this.ndim*2; i++) {
+    //   textureCoords.push([0, 0]);
+    // }
+    // if (this.textureCoordLoc !== -1) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordBuffer);
+    //   gl.bufferData(gl.ARRAY_BUFFER, flatten(textureCoords), gl.STATIC_DRAW);
+    //   gl.vertexAttribPointer(this.textureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+    //   gl.enableVertexAttribArray(this.textureCoordLoc);
+    // }
     
     let texture;
     if (this.hasAdversarial){
@@ -246,11 +252,11 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       let dataset;
       if(this.firstInit === undefined){
         dataset = this.init_dataset || utils.getDataset();
+        this.firstInit = false;
       }else{
         dataset = utils.getDataset();
-        this.firstInit = false;
       }
-      texture = utils.loadTexture(gl, utils.getTextureURL(dataset));
+      texture = utils.loadTexture(gl, utils.getLayerTransitionTextureURL(dataset));
     }
     
     this.samplerLoc = gl.getUniformLocation(program, 'uSampler');
@@ -268,10 +274,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     this.colorFactorLoc = gl.getUniformLocation(program, 'colorFactor');
     this.setColorFactor(this.colorFactor);
 
-    if (this.gt === undefined || this.gt.ndim != this.ndim) {
-      let gt = new GrandTour(10, this.init_matrix);
-      this.gt = gt;
-    }
+    
   };
 
 
@@ -464,6 +467,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
     let points;
 
+    this.ndim = ndim;
     gt.setNdim(ndim);
     //internal view change in grand tour
     if (Math.floor(prevLayer) < Math.floor(layer) 
@@ -479,6 +483,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         let view = dataObj.views[l];
         view = math.transpose(view);
         ndim = view.length;
+        this.ndim = ndim;
         gt.setNdim(ndim);
         let matrix = this.gt.getMatrix();
         matrix = math.multiply(view, matrix);
@@ -643,10 +648,10 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         textureCoords.push(
           ...utils.getTextureCoord(
             pointIndexPairs[i][1], 
-            10, 100, 
+            this.npoint/100, 100, 
             this.hasAdversarial, 
             Math.floor(this.epochIndex), 
-            100
+            this.nepoch
           )
         );
       }

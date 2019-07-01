@@ -18,19 +18,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(html|js)$/,
-        exclude: /node_modules/,
-        loader: "babel-loader",
-        options: {
-          presets: ["es2015"]
-        }
-      },
-      {
-        test: /\.(html|svelte)$/,
-        exclude: /node_modules/,
-        loader: "svelte-loader"
-      },
-      {
         test: /\.(npy|npc)$/,
         exclude: /node_modules/,
         loader: 'numpy-loader',
@@ -67,7 +54,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./src/index.ejs", 
+      template: "./src/index.html", 
       filename: "index.html", 
       chunks: ["index"]
     }),

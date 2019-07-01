@@ -1,11 +1,11 @@
 let utils = {};
 
 // for deployment
-utils.no_cors_host = 'data-no-cors/';
-utils.cors_host = '//cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
+// utils.no_cors_host = 'data-no-cors/';
+// utils.cors_host = '//cors-hdc.cs.arizona.edu/~mwli/cors/distill-gt-data/';
 
 // for local debugging (with data stored in data/):
-// utils.no_cors_host = 'data-no-cors/';
+utils.no_cors_host = 'data-no-cors/';
 // utils.cors_host = ''; 
 
 utils.CLEAR_COLOR = [.97, .97, .97];
@@ -259,8 +259,8 @@ utils.getLabelNames = function(adversarial=false, dataset=undefined) {
 
 utils.getTeaserDataURL = function(dataset=utils.getDataset(), datasetType='test') {
   return [
-    utils.cors_host+'data/softmax/'+dataset+'/softmax-'+datasetType+'.bin',
-    utils.cors_host+'data/softmax/'+dataset+'/labels-'+datasetType+'.bin'
+    utils.no_cors_host+'data/softmax/'+dataset+'/softmax-'+datasetType+'.bin',
+    utils.no_cors_host+'data/softmax/'+dataset+'/labels-'+datasetType+'.bin'
   ];
 };
 
@@ -272,14 +272,18 @@ utils.getAdversarialTextureURL = function(dataset='mnist') {
   return utils.no_cors_host+'data/adversarial/'+dataset+'/input.png';
 };
 
+utils.getLayerTransitionTextureURL = function(dataset='mnist') {
+  return utils.no_cors_host+'data/layer-transition-test/'+dataset+'/input.png';
+};
+
 utils.getSmallMultipleDataURL = function(methods, dataset) {
   if(dataset === undefined){
     dataset = utils.getDataset();
   }
   let urls = methods.map(d =>
-    utils.cors_host+'data/comparison/'+dataset+'/'+d+'.bin'
+    utils.no_cors_host+'data/comparison/'+dataset+'/'+d+'.bin'
   );
-  urls.push(utils.cors_host+'data/comparison/'+dataset+'/labels.bin');
+  urls.push(utils.no_cors_host+'data/comparison/'+dataset+'/labels.bin');
   return urls;
 };
 
@@ -294,9 +298,9 @@ utils.getLayerTransitionURL = function(dataset=utils.getDataset(), datasetType='
     views = d3.range(11);
   }
 
-  let urls = ds.map(i=>utils.cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/d'+i+'.bin')
-    .concat( views.map(i=>utils.cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/view'+i+'.bin') );
-  urls.push(utils.cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/labels.bin');
+  let urls = ds.map(i=>utils.no_cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/d'+i+'.bin')
+    .concat( views.map(i=>utils.no_cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/view'+i+'.bin') );
+  urls.push(utils.no_cors_host+'data/layer-transition-' + datasetType + '/'+dataset+'/labels.bin');
   return urls;
 }
 
@@ -304,9 +308,9 @@ utils.getLayerTransitionURL = function(dataset=utils.getDataset(), datasetType='
 utils.getAdversarialURL = function(dataset='mnist') { //only has mnist for now
   let ds = d3.range(12);
   let views = d3.range(11);
-  let urls = ds.map(i=>utils.cors_host+'data/adversarial/'+dataset+'/d'+i+'.bin')
-    .concat( views.map(i=>utils.cors_host+'data/adversarial/'+dataset+'/view'+i+'.bin') );
-    urls.push(utils.cors_host+'data/adversarial/'+dataset+'/labels.bin');
+  let urls = ds.map(i=>utils.no_cors_host+'data/adversarial/'+dataset+'/d'+i+'.bin')
+    .concat( views.map(i=>utils.no_cors_host+'data/adversarial/'+dataset+'/view'+i+'.bin') );
+    urls.push(utils.no_cors_host+'data/adversarial/'+dataset+'/labels.bin');
   return urls;
 };
 
