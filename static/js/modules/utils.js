@@ -583,7 +583,7 @@ utils.color2rect = function(colors, npoint, ndim) {
 utils.getTextureCoord = function(i, 
   nRow=10, nCol=100,
   isAdversarial=false, epoch=99, nepoch=100) {
-  
+  let nRow0 = nRow;
   let npoint;
   if(isAdversarial){
     npoint = nRow * nCol;
@@ -596,8 +596,8 @@ utils.getTextureCoord = function(i,
   let numPerCol = nRow;
   let dx = 1/numPerRow;
   let dy = 1/numPerCol;
-  if(isAdversarial && i>=npoint){
-    ul = [dx * (i%numPerRow), dy*Math.floor(10+epoch)];
+  if(isAdversarial && i>=npoint-89){// hardcoded: last 89 are adversarial examples
+    ul = [dx * ((i-(npoint-89))%numPerRow), dy*Math.floor(nRow0+epoch)];
   }else{
     ul = [dx * (i%numPerRow), dy*Math.floor(i/numPerRow)];
   }

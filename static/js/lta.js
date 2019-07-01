@@ -28,7 +28,6 @@ ltaFigure.addEventListener("ready", function() {
     normalizeView: true,
     framesBetweenEpoch: 20,
     framesForEpochTransition: 18,
-
     mode: 'point',
     layerIndex: 11,
     init_matrix: LTA_PRESOFTMAX_MATRIX,
@@ -54,51 +53,9 @@ ltaFigure.addEventListener("ready", function() {
   });
 
 
-  utils.addDatasetListener(function(){
-    return; //currently only have mnist
-    // var urls = [xxx];
-    // if (utils.getDataset()=='cifar10'){
-    //   //cifar10 has one more layer
-    //   urls.push('data/adversarial/'+utils.getDataset()+'/view11.bin');
-    //   urls.push('data/adversarial/'+utils.getDataset()+'/d12.bin');
-    // }
-
-    // lta.nlayer = urls.length/2;
-    // lta = utils.loadDataToRenderer(urls, lta);
-    // lta.dataObj.norms = undefined;
-
-    // lta.overlay.initLegend();
-
-    // if(utils.getDataset()=='cifar10'){
-    //   lta.layerNames = [
-    //   'Conv', 'ReLU', 'MaxPool',
-    //   'Conv', 'ReLU', 'MaxPool',
-    //   'Linear', 'ReLU',
-    //   'Linear', 'ReLU',
-    //   'Linear',
-    //   'Softmax'
-    //   ];
-    //   lta.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L,L];
-    // }else{
-    //   lta.layerNames = [
-    //   'Conv', 'MaxPool', 'ReLU',
-    //   'Conv', 'MaxPool', 'ReLU',
-    //   'Linear', 'ReLU',
-    //   'Linear', 'ReLU',
-    //   'Softmax'
-    //   ];
-    //   lta.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L];
-    // }
-    // lta.overlay.redrawLayerSlider();
-
-
-    // // teaser.overlay.resize();
-    // // if(utils.getDataset() == 'cifar10'){
-    // //   teaser.setColorFactor(0.0);
-    // // }else{
-    // //   teaser.setColorFactor(utils.COLOR_FACTOR);
-    // // }
-  });
+  // utils.addDatasetListener(function(){
+  //   return; 
+  // });
 
 });
 
