@@ -14,16 +14,17 @@ nn2Figure.addEventListener("ready", function() {
 
 nn2Figure.addEventListener("onscreen", function() {
   console.log('nn2 onscreen');
-  if(nn2 && nn2.play){
-    nn2.shouldAutoNextEpoch = true;
-    nn2.play();
-    console.log('nn2 play');
-  }
   for(let view of allViews){
     if(view !== nn2 && view.pause){
       view.pause();
     }
   }
+  if(nn2 && nn2.play){
+    nn2.shouldAutoNextEpoch = true;
+    nn2.play();
+    console.log('nn2 play');
+  }
+  
 });
 
 

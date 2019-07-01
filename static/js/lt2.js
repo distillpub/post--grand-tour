@@ -24,6 +24,9 @@ lt2Figure.addEventListener("ready", function() {
     init_matrix: EARLY_SEPARATION_MATRIX_LAYER5,
     // selectedClasses: new Set([5,7,9]),
 
+    framesBetweenEpoch: 20,
+    framesForEpochTransition: 15,
+
     layerNames: [
     'Conv', 'MaxPool', 'ReLU',
     'Conv', 'MaxPool', 'ReLU',

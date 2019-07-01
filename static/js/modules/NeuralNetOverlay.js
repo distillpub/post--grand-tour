@@ -31,19 +31,20 @@ function NeuralNetOverlay(svgid) {
 
   this.playButton = d3.select(this.svg.node().parentNode)
     .insert('p', ':first-child')
-    .attr('class', 'play-button  fa fa-pause')
+    .attr('class', this.shouldAutoNextEpoch?'play-button fa fa-pause':'play-button fa fa-play');
+  this.playButton 
     .on('mouseover', function() {
       d3.select(this).style('opacity', 1);
     })
     .on('mouseout', function() {
       d3.select(this).style('opacity', 0.7);
     })
-    .on('click', function() {
-      that.shouldAutoNextEpoch = !that.shouldAutoNextEpoch;
-      if (that.shouldAutoNextEpoch) {
-        d3.select(this).attr('class', 'play-button fa fa-pause');
+    .on('click', ()=>{
+      this.shouldAutoNextEpoch = !this.shouldAutoNextEpoch;
+      if (this.shouldAutoNextEpoch) {
+        this.playButton.attr('class', 'play-button fa fa-pause');
       } else {
-        d3.select(this).attr('class', 'play-button fa fa-play');
+        this.playButton.attr('class', 'play-button fa fa-play');
       }
     });
 
@@ -516,4 +517,5 @@ function NeuralNetOverlay(svgid) {
   };
 
   this.init();
+  this.play();
 }
