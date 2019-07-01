@@ -50,14 +50,18 @@
 
 <script>
   utils.cacheAll(constants.preloadUrls);
-  // for (let url of constants.layerTransitionUrls['fashion-mnist']){
-  //   window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
-  // }
+  for (let url of constants.layerTransitionUrls['fashion-mnist']){
+    window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
+  }
+  for (let url of constants.adversarialUrls){
+    window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
+  }
+  
+  // window.requestIdleCallback(()=>{utils.cacheAll(constants.adversarialUrls)});
   // window.requestIdleCallback(()=>{utils.cacheAll(constants.layerTransitionUrls['fashion-mnist'])});
   // window.requestIdleCallback(()=>{utils.cacheAll(constants.layerTransitionUrls['mnist'])});
   // window.requestIdleCallback(()=>{utils.cacheAll(constants.layerTransitionUrls['cifar10'])});
   // 
-  // window.requestIdleCallback(()=>{utils.cacheAll(constants.adversarialUrls)});
 
   let allViews = [];// teaser, nn2, sm0, nngt, tesseract, se, dm1, nngt2, lt2, lta];
 </script>
