@@ -335,7 +335,7 @@
   Most of these simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
   (Some operations, notably max-pooling and softmax, do not fall into either categories. We will come back to this later.)
   We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
-  Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activates in different layers. 
+  Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. 
   However, in the above view we look at examples one at a time, we lose the full picture: what does the network do to <em>all</em> examples?
 </p>
 
@@ -553,7 +553,7 @@ Here are some examples of the Grand Tour:
 </p>
 
 <p>
-  We have to emphasis one favorable property of the Grand Tour in visualizing neural networks: 
+  We have to emphasize one favorable property of the Grand Tour in visualizing neural networks: 
   it is invariant about basis chosen for the data representation. 
   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view. 
   In the mean time, linear transformations in neural networks are also invariant under change of basis. 
@@ -602,7 +602,6 @@ But given this ability, we can directly see how images were activated in the fin
 <p>
   In fashion-MNIST, we see how the model confuses between classes.
   For example, the model confuses among sandals, sneakers and ankle boots, as we see data points form a triangular frame in the softmax layer.
-  The 
   In the figure below, drag any handle on the axes to change the projection:
 </p>
 
@@ -635,7 +634,7 @@ But given this ability, we can directly see how images were activated in the fin
 </p>
 
 <p>
-  Examples fall between sandal and sneaker classes indicates that the model has low confidence in distinguishing the two, same thing happens between sneaker and ankle boot classes. 
+  Examples that fall between sandal and sneaker classes indicate that the model has low confidence in distinguishing the two, same thing happens between sneaker and ankle boot classes. 
   But the model has less confusion between sandal and ankle boot classes, as not many examples fall between these two classes. 
   Moreover, all but one example falls in the interior of the triangle, while others live close to the boundary. 
   This tells us that most confusions happen between two out of the three classes, they are really two-way confusions.
@@ -695,7 +694,7 @@ But given this ability, we can directly see how images were activated in the fin
   The image view is best accompanied with an expanded canvas.  -->
 
 <p>
-  Comparing the different behavior on training and testing dataset confirmed our hypothesis about dataset difficulty before, when we only looked at the final epoch. 
+  Comparing the different behavior on training and testing datasets confirmed our hypothesis about dataset difficulty before, when we only looked at the final epoch. 
   In the MNIST dataset, the trajectory of testing images through training is consistent with the training set. 
   Data points went directly toward the corner of its true class and stabilized after 50 epochs.
   On the other hand, in CIFAR-10 there is an inconsistency between the training and testing sets. Images from the testing set keep oscillating while most images from training converges to the corresponding class corner. 
@@ -764,7 +763,7 @@ But given this ability, we can directly see how images were activated in the fin
 
   However, this transition fails to meet our principle of data-visual correspondence in a certain way: it complicates a simple change in data.
   Consider an linear action that only permutes all neurons in a layer.
-  In a neural network, this transformation should be consider as doing nearly nothing, for it only changes the order of neurons and affects only the wiring of weights to the downstream layers.
+  In a neural network, this transformation should be considered as doing nearly nothing, for it only changes the order of neurons and affects only the wiring of weights to the downstream layers.
   However, when visualizing this permutation by the linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) is unchanged. 
 </p>
 <p>
