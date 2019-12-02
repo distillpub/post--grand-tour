@@ -17,7 +17,7 @@ function TeaserOverlay(renderer, kwargs) {
     .attr('class', 'slider')
     .attr('min', renderer.epochs[0])
     .attr('max', renderer.epochs[renderer.epochs.length-1])
-    .attr('value', utils.MIN_EPOCH)
+    .attr('value', renderer.epochIndex)
     .on('input', function() {
       let value = d3.select(this).property('value');
       renderer.shouldAutoNextEpoch = false;

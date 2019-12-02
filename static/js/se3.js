@@ -45,7 +45,7 @@ function annotate3(renderer){
       },
     },
     {
-      text:'Airplaine-ship', isOn: false, 
+      text:'Airplane-ship', isOn: false, 
       action: {
         turnOn: ()=>{
           se3.gt.setMatrix(AS_MATRIX);
@@ -91,7 +91,7 @@ const seFigure3 = document.querySelector("d-figure.nngt-single-epoch-3");
 var se3;
 
 seFigure3.addEventListener("ready", function() {
-  var epochs = [99,];
+  var epochs = d3.range(100);
   let fixed_dataset = 'cifar10';
   var urls = utils.getTeaserDataURL(fixed_dataset);
   var [gl, programs] = utils.initGL(
@@ -101,19 +101,21 @@ seFigure3.addEventListener("ready", function() {
 
   se3 = new TeaserRenderer(gl, programs[0], {
     epochs, 
+    epochIndex: 99,
     shouldAutoNextEpoch:false, 
     shouldPlayGrandTour: false,
     init_matrix: CD_MATRIX,
     mode: 'point',
     fixed_dataset,
+    overlayKwargs: {
+      fixed_dataset,
+      annotate: annotate3,
+    }
   });
 
-  se3.overlay = new TeaserOverlay(se3, {
-    fixed_dataset,
-    annotate: annotate3,
-  });
-
-  se3.overlay.epochIndicator.remove();
+  // se3.overlay = new TeaserOverlay(se3, );
+  // se3.overlay.epochIndicator.remove();
+  // 
   se3 = utils.loadDataToRenderer(urls, se3);
   se3.setColorFactor(0.0); //for CIFAR-10
   

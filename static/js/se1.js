@@ -3,17 +3,19 @@ var se1;
 
 seFigure1.addEventListener("ready", function() {
   console.log('nngt-single-epoch-1 ready');
-  var epochs = [99,];
+  var epochs = d3.range(100);
   var urls = utils.getTeaserDataURL();
   var [gl, programs] = utils.initGL(
     '#nngt-single-epoch-1', 
     [['shaders/teaser_vertex.glsl', 'shaders/teaser_fragment.glsl']]
   );
-  var kwargs = { epochs, shouldAutoNextEpoch:false, };
+  var kwargs = { 
+    epochs, 
+    shouldAutoNextEpoch:false, 
+    epochIndex: 99,
+  };
   se1 = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(se1);
-  se1.overlay = new TeaserOverlay(se1);
-  se1.overlay.epochIndicator.remove();
   se1 = utils.loadDataToRenderer(urls, se1);
 
   utils.addDatasetListener(function(){

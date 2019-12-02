@@ -1,20 +1,27 @@
 function TeaserRenderer(gl, program, kwargs) {
   this.gl = gl;
   this.program = program;
-
-  this.mode = 'point'; //default point mode, or overwritten by kwargs
-  utils.walkObject(kwargs, (k) => {
-    this[k] = kwargs[k];
-  });
+  this.id = gl.canvas.id;
 
   this.framesPerTransition = 30;
   this.framesPerEpoch = 60;
   this.scaleTransitionProgress = 0;
 
+  utils.walkObject(kwargs, (k) => {
+    this[k] = kwargs[k];
+  });
   this.dataObj = {};
-  this.epochIndex = this.epochs[0];
+  this.mode = this.mode || 'point'; //default point mode, or overwritten by kwargs
+  this.epochIndex = this.epochIndex || this.epochs[0];
   this.colorFactor = utils.COLOR_FACTOR;
   this.isFullScreen = false;
+  if (this.shouldPlayGrandTour === undefined){
+    this.shouldPlayGrandTour = true;
+  }
+
+
+  this.overlay = new TeaserOverlay(this, this.overlayKwargs);
+
 
   this.sx_span = d3.scaleLinear();
   this.sy_span = d3.scaleLinear();
@@ -193,9 +200,7 @@ function TeaserRenderer(gl, program, kwargs) {
     }
   };
 
-  if (this.shouldPlayGrandTour === undefined){
-    this.shouldPlayGrandTour = true;
-  }
+  
   this.shouldCentralizeOrigin = this.shouldPlayGrandTour;
   if (!this.hasOwnProperty('shouldAutoNextEpoch')){
     this.shouldAutoNextEpoch = true;
@@ -219,12 +224,16 @@ function TeaserRenderer(gl, program, kwargs) {
         } else {
           dt = 0;
         }
+
         if (this.shouldAutoNextEpoch) {
           this.s += 1;
           if (this.s % this.framesPerEpoch == 0) {
             this.nextEpoch();
           }
-        }  
+        }else{
+          this.setEpochIndex(this.epochIndex);
+        }
+
       }
 
       if (this.isScaleInTransition 
@@ -262,11 +271,7 @@ function TeaserRenderer(gl, program, kwargs) {
       .property('value', i);
 
     this.overlay.svg.select('#epochIndicator')
-      .text('Epoch: ' 
-            + this.epochIndex
-            + '/' 
-            + (this.dataObj.nepoch-1)
-          );
+      .text(`Epoch: ${this.epochIndex}/${(this.dataObj.nepoch-1)}`);
   };
 
 

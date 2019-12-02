@@ -91,7 +91,6 @@ const seFigure2 = document.querySelector("d-figure.nngt-single-epoch-2");
 var se2;
 
 seFigure2.addEventListener("ready", function() {
-  var epochs = [99,];
   let fixed_dataset = 'fashion-mnist';
   var urls = utils.getTeaserDataURL(fixed_dataset);
   var [gl, programs] = utils.initGL(
@@ -100,20 +99,21 @@ seFigure2.addEventListener("ready", function() {
   );
 
   se2 = new TeaserRenderer(gl, programs[0], {
-    epochs, 
+    epochs: d3.range(100), 
+    epochIndex: 99,
     shouldAutoNextEpoch:false, 
     shouldPlayGrandTour: false,
     init_matrix: SSA_MATRIX,
     mode: 'image',
     fixed_dataset,
+    overlayKwargs: {
+      fixed_dataset,
+      annotate: annotate2,
+    }
   });
 
-  se2.overlay = new TeaserOverlay(se2, {
-    fixed_dataset,
-    annotate: annotate2,
-  });
-
-  se2.overlay.epochIndicator.remove();
+  // se2.overlay = new TeaserOverlay(se2, );
+  // se2.overlay.epochIndicator.remove();
   se2 = utils.loadDataToRenderer(urls, se2);
   
   allViews.push(se2);

@@ -1,24 +1,27 @@
-const seFigure0 = document.querySelector("d-figure.nngt-single-epoch-0");
+let id = 'nngt-single-epoch-0';
+const seFigure0 = document.querySelector(`d-figure.${id}`);
 var se0;
 
 seFigure0.addEventListener("ready", function() {
-  console.log('nngt-single-epoch-0 ready');
-  var epochs = [99,];
+  console.log(id + ' ready');
+  var epochs = d3.range(100);
   var urls = utils.getTeaserDataURL();
   var [gl, programs] = utils.initGL(
-    '#nngt-single-epoch-0', 
+    `#${id}`, 
     [['shaders/teaser_vertex.glsl', 'shaders/teaser_fragment.glsl']]
   );
-  var kwargs = { epochs, shouldAutoNextEpoch:false };
+  var kwargs = {
+    epochs, 
+    shouldAutoNextEpoch:false, 
+    epochIndex:5,
+  };
   se0 = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(se0);
-  se0.overlay = new TeaserOverlay(se0);
-  se0.overlay.epochIndicator.remove();
+  // se0.overlay = new TeaserOverlay(se0);
   se0 = utils.loadDataToRenderer(urls, se0);
 
   utils.addDatasetListener(function(){
     se0.pause();
-
     var urls = utils.getTeaserDataURL();
     se0 = utils.loadDataToRenderer(urls, se0);
     se0.overlay.initLegend(

@@ -17,7 +17,6 @@ nngtFigure.addEventListener("ready", function() {
   };
   nngt = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(nngt);
-  nngt.overlay = new TeaserOverlay(nngt);
   nngt = utils.loadDataToRenderer(urls, nngt);
 
   utils.addDatasetListener(function(){

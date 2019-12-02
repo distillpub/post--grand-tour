@@ -394,8 +394,7 @@ function NeuralNetOverlay(svgid) {
       this.svg.selectAll('.legendText,.legendRect')
       .on('mouseover', (d)=>{
         let legendType = d.text;
-        this.svg.selectAll('.layerRect')
-        .filter(layerText => {
+        let layerType = layerText => {
           if (legendType == 'linear'){
             return !layerText.includes('linear') 
             && !layerText.includes('conv');
@@ -408,12 +407,23 @@ function NeuralNetOverlay(svgid) {
           }else{
             return false;
           }
-        })
-        .attr('fill', text=>'#fff');
+        };
+
+        this.svg.selectAll('.layerRect')
+        .filter(layerType)
+        .attr('opacity', 0);
+
+        this.svg.selectAll('.layerText')
+        .filter(layerType)
+        .attr('opacity', 0.5);
+
       })
       .on('mouseout', ()=>{
         this.svg.selectAll('.layerRect')
-        .attr('fill', text=>getColor(text));
+        .attr('opacity', 1);
+        this.svg.selectAll('.layerText')
+        .attr('opacity', 1);
+        // .attr('fill', text=>getColor(text));
       });
 
 
