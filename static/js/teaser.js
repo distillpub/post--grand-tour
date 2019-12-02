@@ -17,7 +17,7 @@ teaserFigure.addEventListener("ready", function() {
   };
   teaser = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(teaser);
-  teaser.overlay = new TeaserOverlay(teaser);
+  // teaser.overlay = new TeaserOverlay(teaser);
   
   teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();

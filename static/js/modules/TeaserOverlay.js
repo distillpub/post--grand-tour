@@ -151,7 +151,7 @@ function TeaserOverlay(renderer, kwargs) {
   this.epochIndicator = this.svg.append('text')
     .attr('id', 'epochIndicator')
     .attr('text-anchor', 'middle')
-    .text('training');
+    .text('Epoch: ');
   
   
   this.controlOptionGroup = d3.select('d-figure.'+renderer.gl.canvas.id)
