@@ -329,7 +329,7 @@
    
 <p>
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
-  In our classifier, the pipeline has convolutional and fully-connected linear layers, and rectified linear unit (ReLU) non-linear layers.
+  In our classifier, the pipeline has convolutional and fully-connected linear layers, and rectified linear units (ReLU) as non-linear layers.
   Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations in the end.
 
   Most of these simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
@@ -898,10 +898,31 @@ lt2.overlay.layerPlayButton.on('click')();
 
 
 
+<script>
+function toggle(event, id){
 
-<h2><a name="technical-details"></a>Technical Details</h2>
+  let caller = d3.select(event.target);
+  let callerIsActive = caller.classed('clickable-active');
 
-<h3>Direct manipulation</h3>
+  let selection = d3.select(id);
+  let isHidden = selection.classed('hidden');
+
+  selection.classed('hidden', !isHidden);
+  caller.classed('clickable-active', !callerIsActive);
+}
+</script>
+
+
+<h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
+Technical Details
+</h2>
+<div id='div-technical-details' class='hidden'>
+
+<h3 class="clickable clickable-active" onclick="toggle(event, '#div-direct-manipulation')">
+Direct manipulation
+</h3>
+<div id='div-direct-manipulation' class=''>
+
 <p>
   Our direct manipulation has two modes: on the axes and on data points.
   The math behind the two is simple. 
@@ -940,7 +961,10 @@ lt2.overlay.layerPlayButton.on('click')();
   To maintain an orthogonal projection, for each infinitesimal change in <d-math>GT</d-math>, we immediately pull the new <d-math>GT</d-math> back to a nearby orthogonal matrix. For example, we can use <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt process</a> on row vectors of <d-math>GT'</d-math>, with the user dragged <d-math>i^{th}</d-math> row as its first vector to consider in Gram-Schmidt.
 </p>
 
-<h4>Extending axis handles: rotation in 2-subspaces</h4>
+<h4 class="clickable" onclick="toggle(event, '#div-handles')">
+  Extending axis handles: rotation in 2-subspaces
+</h4>
+<div id='div-handles' class='hidden'>
 <p> 
   As we have said, when the dimensionality is high, manipulating the viewing perspective by axis handles is complicated.
   A better and more intuitive way is probably by <em>dragging (centroids of) data points</em>, instead of dragging axis handles. 
@@ -980,9 +1004,14 @@ lt2.overlay.layerPlayButton.on('click')();
   </d-math>
   In essence, the dragging of user caused an extra rotation by <d-math>\theta</d-math> rad, with respect to the basis whose first two basis vectors are the span of previous and current position of a handle. Note <d-math>Q</d-math> here serves as a change of basis so that rotation can be easily specified in matrix form.
 </p>
+</div><!-- #div-handles -->
 
 
-<h4>Direct manipulation as Procrustes problems</h4>
+<h4 class="clickable" onclick="toggle(event, '#div-procrustes')">
+Direct manipulation as Procrustes problems
+</h4>
+<div id='div-procrustes' class='hidden'>
+
 <!-- TODO: shorten -->
 <p>
   Another to formulate the direct manipulation is through Procrustes problems.
@@ -1055,13 +1084,18 @@ Each iteration of step 2 will generate a new rotation matrix. The sequence of th
 <p>
   Although the above algorithm is slow in our implementation, interestingly, if we only compute one iteration, its behavior is similar to doing PCA on the subset of points user brushed. We found this operation alone very useful when points are clustered and unable to be separated by other methods.
 </p>
+</div> <!-- #div-procrustes -->
+</div> <!-- #div-direct-manipulation -->
 
 
+<h3 class="clickable clickable-active" onclick="toggle(event, '#div-align-representation')">
+  Aligning representations: enabling the visualization of layer-to-layer dynamics</h3>
+<div id='div-align-representation' class=''>
 
-
-<h3>Aligning representations: enabling the visualization of layer-to-layer dynamics</h3>
-
-<h4>The <d-math>R^p \to R^p</d-math> case</h4>
+<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rp')">
+  The <d-math>R^p \to R^p</d-math> case
+</h4>
+<div id='div-rp-to-rp' class='hidden'>
 <p>
   As noted before, we preprocessed data so that the neuron activations in one layer is aligned with another. 
   This preprocessing significantly helps us in understanding the essence of neural networks. 
@@ -1130,9 +1164,12 @@ Each iteration of step 2 will generate a new rotation matrix. The sequence of th
   is applied on a vector <d-math>v \in R^2</d-math>, linear interpolation between <d-math>v</d-math> and <d-math>vM</d-math> will exchange two coordinates, but as much as neural network is concerned, this operation should be equivalent to identity map.
   This equivalent relation is used explicitly when rotating <d-math>X</d-math> and <d-math>Y</d-math> to <d-math>XU</d-math> and <d-math>YV</d-math>. 
 </p>
+</div> <!-- #div-rp-to-rp -->
 
-
-<h4>The <d-math>R^p \overset{M}{\to} R^r</d-math> case, <d-math>p\neq r</d-math></h4>
+<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rr')">
+  The <d-math>R^p \overset{M}{\to} R^r</d-math> case, <d-math>p\neq r</d-math>
+</h4>
+<div id='div-rp-to-rr' class='hidden'>
 <p>
   Some extra care regarding to both understanding and implementation must be taken when the dimensionality of two layers differ. 
   In a linear map <d-math>M: R^p \overset{}{\to} R^r</d-math>, the (full-matrix) SVD of a matrix <d-math>M_{p \times r}</d-math> has shape <d-math>M = \,_{p}U_{p} \Sigma_{r} V^T_{r}</d-math>
@@ -1170,7 +1207,9 @@ Each iteration of step 2 will generate a new rotation matrix. The sequence of th
   When convolutional layers are concerned, one can represent multi-channel 2D convolutions as a large and sparse, doubly block circulant<d-cite key="goodfellow2016deep"></d-cite> matrix between flattened representations of multi-channel images. 
   For models shown before doing SVD on the flattened convolution is feasible. For large networks where this is infeasible, properties of convolutional matrices also allow us to find data alignments efficiently <d-cite key="sedghi2018singular"></d-cite>. We will talk about scalability issues in later discussion.
 </p>
-
+</div> <!-- #div-rp-to-rr -->
+</div> <!-- #div-align-representation -->
+</div><!-- #div-technical-details -->
 
 
 

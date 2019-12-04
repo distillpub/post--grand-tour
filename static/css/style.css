@@ -1,3 +1,37 @@
+.clickable{
+  cursor: pointer;
+}
+
+d-math{
+  pointer-events: none;
+}
+
+.clickable:before { 
+  /*content: "";
+  border-color: transparent #ddd;
+  border-style: solid;
+  border-width: 0.35em 0 0.35em 0.45em;
+  display: block;
+  height: 0;
+  width: 0;
+  left: -1em;
+  top: 0.9em;
+  position: relative;*/
+
+  content: "\002B";
+  position: relative;
+}
+
+.clickable-active:before { 
+  content: "\2212";
+}
+
+.hidden{
+  display: none;
+}
+
+
+
 /* Tooltip container */
 .tooltip {
   position: relative;
