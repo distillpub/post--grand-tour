@@ -6,6 +6,12 @@ d-math{
   pointer-events: none;
 }
 
+.img-center{
+  margin-left: auto; 
+  margin-right: auto; 
+  display: block;
+}
+
 .clickable:before { 
   /*content: "";
   border-color: transparent #ddd;

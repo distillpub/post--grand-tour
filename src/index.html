@@ -669,7 +669,7 @@ But given this ability, we can directly see how images were activated in the fin
   Both projections are found by direct manipulations.
 </p>
 <p>
-  We will explain how our direct manipulation works in <a href="#technical-details">technical details</a>.
+  We will explain how direct manipulation on the axes works in <a href="#technical-details">technical details</a>.
 </p>
 
 
@@ -892,7 +892,9 @@ lt2.overlay.layerPlayButton.on('click')();
 
 <h2>Conclusion</h2>
 
-<p>Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.</p>
+<p>
+  Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
+</p>
 
 <p>In the interest of completeness, the remainder of the article provides a number of technical details about the implementation of the techniques we described above.</p>
 
@@ -918,58 +920,107 @@ Technical Details
 </h2>
 <div id='div-technical-details' class='hidden'>
 
+In this sections, we will introduce the technical details.
+
+<h3>
+A note on the notations
+</h3>
+
+<p>
+  In this section, our notational convention is that data are represented as row vectors. 
+  They form a matrix in which each row is a record and each column is a different feature/dimension.
+  As a result, when a linear transformation is applied to the data, the transformation matrix is multiplied on the right of the data matrix.
+  This has a side benefit that when applying matrix multiplications in a chain, the formula reads from left to right and aligns with a commutative diagram.
+  For example, when a data matrix <d-math>X</d-math> is multiplied by a matrix <d-math>M</d-math> to generate <d-math>Y</d-math>, in formula we write <d-math>XM = Y</d-math>, the letters have the same order in diagram:
+</p>
+
+<d-math block>
+    X 
+    \overset{M}{\mapsto}
+    Y
+</d-math>
+
+Further, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>, we have <d-math>X U \Sigma V^{T} = Y</d-math>, while the diagram
+<d-math block>
+    X 
+    \overset{U}{\mapsto} <!-- XU  -->
+    \overset{\Sigma}{\mapsto} <!-- XU\Sigma  -->
+    \overset{V^T}{\mapsto} Y
+</d-math>
+is nicely aligned with the formula.
+
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-direct-manipulation')">
 Direct manipulation
 </h3>
 <div id='div-direct-manipulation' class=''>
 
 <p>
-  Our direct manipulation has two modes: on the axes and on data points.
-  The math behind the two is simple. 
-  Convention-wise, in this note we write vectors in rows and (matrices of) linear transformations are applied on its right.
-  This makes composition of (linear) functions read easily from left to right.
-  Note this is also a common practice when programming with data, since tabular data is often stored in rows. 
-
-  Our goal is to change the Grand Tour view <d-math>GT</d-math> so that the projection of axis moves according to the user's dragging.
-  That is:
-  <div style="font-style:italic;">
-    Given the current orthogonal matrix <d-math>GT</d-math>,
-    find a nearby orthogonal matrix <d-math>GT'</d-math> that move the <d-math>i^{th}</d-math> basis vector <d-math>e_i</d-math> by <d-math>(dx, dy)</d-math> in the first two coordinate of the projected space:
-    <d-math block>
-      e_i \cdot GT' = e_i \cdot GT + (dx, dy, ...)
-    </d-math>
-  </div>
-</p>
-<p>
-  Note the projection of standard basis <d-math>e_i</d-math> is exactly the <d-math>i^{th}</d-math> row of <d-math>GT</d-math>, thus
-  <d-math block>
-    GT'_{i,:} = GT_{i,:} + (dx, dy, ...)
-  </d-math>
-</p>
-<p>
-  So intuitively, the new matrix can be found by copying the old one and add to its two entries by <d-math>dx</d-math> and <d-math>dy</d-math>.
-</p>
-<p>
-  Two problems need clarification: 
-  First, there are infinitely many solutions for such <d-math>GT'</d-math>. 
-  Since user only specified two entries of <d-math>GT'</d-math>, the remaining entries can be fed with any values.
-  A simple assumption that forces a unique solution is that the new <d-math>GT</d-math> should be close to the original one. 
-  Thus the other unspecified (<d-math>p^2-2</d-math>) entries of <d-math>GT^{(new)}</d-math> should stay the same as the old <d-math>GT</d-math>.
-
-  Second, this specification may not satisfy orthogonality constraint of <d-math>GT</d-math>. For example, if <d-math> GT'_{i,1} > 1</d-math>, the <d-math>i^{th}</d-math> row has an l2-norm larger than <d-math>1</d-math>, so the matrix can never be orthogonal. 
-  We want to maintain orthogonal projections because it has nice properties. (One of them is that it never exaggerates data norm.)
-  To maintain an orthogonal projection, for each infinitesimal change in <d-math>GT</d-math>, we immediately pull the new <d-math>GT</d-math> back to a nearby orthogonal matrix. For example, we can use <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt process</a> on row vectors of <d-math>GT'</d-math>, with the user dragged <d-math>i^{th}</d-math> row as its first vector to consider in Gram-Schmidt.
+  Our direct manipulation provides some control over the rotation given by the Grand Tour.
+  It has two modes: on the axes and on data points. 
+  According to the properties of data, we may prefer one mode than the other.
+  When axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we encourage manipulation on the axes directly. 
+  In other cases, we should instead manipulate data points because either the axes have less semantics (e.g. other intermediate layers) or there are too many of them (e.g. the softmax layer for a 1000-class dataset). 
+  The goal is to change the linear projection according to user's demand, which is provided by mouse dragging. 
+  We will see that the axis mode is a special case of data point mode, because we can view an axis as a unit vector along the positive direction of the axis. 
+  But we will first introduce axis mode for its simplicity.
 </p>
 
-<h4 class="clickable" onclick="toggle(event, '#div-handles')">
-  Extending axis handles: rotation in 2-subspaces
+<h4 class="clickable" onclick="toggle(event, '#div-axis-mode')">
+  The axis mode
 </h4>
-<div id='div-handles' class='hidden'>
-<p> 
-  As we have said, when the dimensionality is high, manipulating the viewing perspective by axis handles is complicated.
-  A better and more intuitive way is probably by <em>dragging (centroids of) data points</em>, instead of dragging axis handles. 
-  Seeing unit vectors along axis directions as special data points, we will see this scheme is a generalization of the previous one and has a nice geometric interpretation: <em>a dragging causes rotation in a 2-subspace</em>.
+<div id='div-axis-mode' class='hidden'>
+
+<p>
+  When a user drags the tip of the unit vector on an axis, he/she wants to move this vector by some distance. 
+  The goal is to change the current Grand Tour projection to a new one so that the axis follows the user's direction.
 </p>
+  
+<p>
+  Formally, we want to change the current Grand Tour projection <d-math>GT</d-math>, which draws the <d-math>i^{th}</d-math> unit vector at <d-math>(x,y)</d-math>, to a new one <d-math>GT^{(new)}</d-math> so that the new mapping draws the unit vector <d-math>e_i</d-math> at <d-math>(x^{(new)}, y^{(new)}) = (x, y) + (dx, dy)</d-math>, where <d-math>(dx, dy) = \Delta</d-math> is implied by the user's dragging behavior.
+  (We assume <d-math>\Delta</d-math> and <d-math>(x,y)</d-math> is already translated to data coordinate. For simplicity we ignored the detail about transforming from data coordinate to canvas coordinate, since these two coordinates are related by a simple linear bijection.)
+</p>
+<p>
+  We summarize the objective in the following commutative diagram. 
+  Given all other components: the <d-math>i^{th}</d-math> basis <d-math>e_i</d-math>, the current Grand Tour rotation <d-math>GT</d-math>, the projection <d-math>\pi_2</d-math> that picks the first two coordinates, the user manipulation <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math>, we want to find a rotation <d-math>GT^{(new)}</d-math> that make the following diagram commute:
+</p>
+
+<img src="figs/direct-manipulation-axis-mode-commutative-diagram.png" 
+style="width: 60%" class="img-center"/>
+
+<p>
+  We want to constrain <d-math>GT^{new}</d-math> to be a valid Grand Tour rotation, i.e. <d-math>GT^{new}</d-math> has to be orthogonal. 
+  Strictly speaking, there might be no solutions, for example for large enough <d-math>dx</d-math> or <d-math>dy</d-math>. 
+  In this case we want to find an <d-math>GT^{new}</d-math> that maps <d-math>e_i</d-math> to somewhere close to <d-math>(x^{(new)}, y^{(new)})</d-math>.
+  If solution exists, there can be infinity many since we only specified the destination of two coordinates after projection <d-math>\pi_2</d-math>. 
+  In this case, we want to find an <d-math>GT^{new}</d-math> that is close to the original <d-math>GT</d-math>.
+  Solving these two problems at once, we choose to set our new matrix <d-math>GT^{(new)}</d-math> by adding <d-math>(dx, dy)</d-math> to the first two entry of the <d-math>i^th</d-math> row of <d-math>GT</d-math> and then do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt process</a> on the rows of the new matrix:
+</p>
+
+<d-math block>
+  GT^{(new)} = GramSchmidt(GT + dGT)
+</d-math>
+where <d-math>dGT_{i,1} = dx</d-math>, <d-math>dGT_{i,2} = dy</d-math> and <d-math>dGT_{j,k} = 0</d-math> elsewhere when <d-math>(j,k) \neq (i,1)</d-math> and <d-math>(j,k) \neq (i,2)</d-math>
+</div> <!-- #div-axis-mode -->
+
+
+<h4 class="clickable" onclick="toggle(event, '#div-data-point-mode')">
+  The data point mode
+</h4>
+<div id='div-data-point-mode' class='hidden'>
+
+<p>
+  As we have said, when the dimensionality is high, manipulating the viewing perspective by axis handles is complicated.
+  A better way to manipulate the Grand Tour projection is to <em>move a subset of data points</em>. 
+  Note that since unit vectors along axis directions can be seen as special data points, so this data point mode is a generalization of the previous axis mode.
+  We have two interpretations/formulations when dealing with subset dragging: dragging that causes a rotation in a 2-subspace or dragging that causes to solve a Procrustes problem.
+</p>
+
+<!-- TODO continue here -->
+
+<h5 class="clickable" onclick="toggle(event, '#div-rotation-formulation')">
+  Data point mode: The rotation formulation
+</h5>
+<div id='div-rotation-formulation' class='hidden'>
 
 <p>
   We want to rotate the plane which is spanned by the two centroids before and after user's movement. Let <d-math>X_{n_s \times p}</d-math> denote the <d-math>n_s</d-math> points selected by brushing. The centroid <d-math>c_0 \in R^{p}</d-math> in Grand Tour coordinate is computed by
@@ -1004,17 +1055,16 @@ Direct manipulation
   </d-math>
   In essence, the dragging of user caused an extra rotation by <d-math>\theta</d-math> rad, with respect to the basis whose first two basis vectors are the span of previous and current position of a handle. Note <d-math>Q</d-math> here serves as a change of basis so that rotation can be easily specified in matrix form.
 </p>
-</div><!-- #div-handles -->
+</div><!-- #div-rotation-formulation -->
 
-
-<h4 class="clickable" onclick="toggle(event, '#div-procrustes')">
-Direct manipulation as Procrustes problems
-</h4>
+<h5 class="clickable" onclick="toggle(event, '#div-procrustes')">
+Data point mode: The Procrustes problem formulation
+</h5>
 <div id='div-procrustes' class='hidden'>
 
 <!-- TODO: shorten -->
 <p>
-  Another to formulate the direct manipulation is through Procrustes problems.
+  Another way to formulate the direct manipulation is through Procrustes problems.
   When dragging, the user wants to translate each selected points in the direction of dragging, while keeping the other non-selected points fixed. 
   We can formulate this as an optimization over orthogonal transforms. 
   Suppose we are looking for a rotation that <em>aligns</em> the old view of data points to a new view in which selected points are translated. 
@@ -1085,6 +1135,7 @@ Each iteration of step 2 will generate a new rotation matrix. The sequence of th
   Although the above algorithm is slow in our implementation, interestingly, if we only compute one iteration, its behavior is similar to doing PCA on the subset of points user brushed. We found this operation alone very useful when points are clustered and unable to be separated by other methods.
 </p>
 </div> <!-- #div-procrustes -->
+</div> <!-- #div-data-point-mode -->
 </div> <!-- #div-direct-manipulation -->
 
 
