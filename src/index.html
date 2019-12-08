@@ -65,13 +65,9 @@
 
   let allViews = [];// teaser, nn2, sm0, nngt, tesseract, se, dm1, nngt2, lt2, lta];
 </script>
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
-<!-- <link rel="stylesheet" href="css/font-awesome/css/font-awesome.css"> -->
+
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-
 <link rel="stylesheet" type="text/css" href="css/style.css">
-
-<!-- <link rel="stylesheet" type="text/css" href="css/imagePreloads.css"> -->
 
 <style>
 .nav{
@@ -920,10 +916,10 @@ Technical Details
 </h2>
 <div id='div-technical-details' class='hidden'>
 
-In this sections, we will introduce the technical details.
+In this sections, we will introduce the technical details of direct manipulation and layer transition.
 
 <h3>
-A note on the notations
+Notations
 </h3>
 
 <p>
@@ -965,10 +961,10 @@ Direct manipulation
   But we will first introduce axis mode for its simplicity.
 </p>
 
-<h4 class="clickable" onclick="toggle(event, '#div-axis-mode')">
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-axis-mode')">
   The axis mode
 </h4>
-<div id='div-axis-mode' class='hidden'>
+<div id='div-axis-mode' class=''>
 
 <p>
   When a user drags the tip of the unit vector on an axis, he/she wants to move this vector by some distance. 
@@ -976,89 +972,197 @@ Direct manipulation
 </p>
   
 <p>
-  Formally, we want to change the current Grand Tour projection <d-math>GT</d-math>, which draws the <d-math>i^{th}</d-math> unit vector at <d-math>(x,y)</d-math>, to a new one <d-math>GT^{(new)}</d-math> so that the new mapping draws the unit vector <d-math>e_i</d-math> at <d-math>(x^{(new)}, y^{(new)}) = (x, y) + (dx, dy)</d-math>, where <d-math>(dx, dy) = \Delta</d-math> is implied by the user's dragging behavior.
-  (We assume <d-math>\Delta</d-math> and <d-math>(x,y)</d-math> is already translated to data coordinate. For simplicity we ignored the detail about transforming from data coordinate to canvas coordinate, since these two coordinates are related by a simple linear bijection.)
+  First, let us formalize the pipeline of the Grand Tour on a standard basis vector <d-math>e_i</d-math>. 
+  As shown in the diagram below, <d-math>e_i</d-math> goes through the orthogonal Grand Tour matrix <d-math>GT</d-math> to produce a rotated version of itself, <d-math>\tilde{e_i}</d-math>. 
+  Then, <d-math>\pi_2</d-math> keeps only the first two entries of <d-math>\tilde{e_i}</d-math> to give the final 2D coordinate,<d-math>(x_i, y_i)</d-math>, to be shown in the Grand Tour plot.
+</p>
+
+<img 
+src="figs/direct-manipulation-axis-mode-commutative-diagram-0.png" 
+class="img-center"
+style="width: 40%"
+/>
+
+<p>
+  Formally, we want to change the current Grand Tour rotation <d-math>GT</d-math>, which draws the <d-math>i^{th}</d-math> unit vector at <d-math>(x_i,y_i)</d-math>, to a new one <d-math>GT^{(new)}</d-math> so that the new mapping draws the unit vector <d-math>e_i</d-math> at <d-math>(x_i^{(new)}, y_i^{(new)}) = (x, y) + (dx, dy)</d-math>, where <d-math>(dx, dy) = \Delta</d-math> is implied by the user's dragging behavior on canvas.
+  (We assume <d-math>\Delta</d-math> and <d-math>(x,y)</d-math> is already translated to data coordinate. 
+  For simplicity we ignored the detail about transforming from data coordinate to canvas coordinate, since these two coordinates are related by a simple linear bijection.)
 </p>
 <p>
   We summarize the objective in the following commutative diagram. 
-  Given all other components: the <d-math>i^{th}</d-math> basis <d-math>e_i</d-math>, the current Grand Tour rotation <d-math>GT</d-math>, the projection <d-math>\pi_2</d-math> that picks the first two coordinates, the user manipulation <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math>, we want to find a rotation <d-math>GT^{(new)}</d-math> that make the following diagram commute:
+  Given all other components: the basis <d-math>e_i</d-math> that user chooses to move, the current Grand Tour rotation <d-math>GT</d-math>, the projection <d-math>\pi_2</d-math> that picks the first two coordinates <d-math>\pi_2: (v_1, v_2, v_3, ...) \mapsto (v_1, v_2)</d-math>, the mouse movement by the user <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math>, we want to find a new rotation matrix <d-math>GT^{(new)}</d-math> that make the following diagram commute:
 </p>
 
-<img src="figs/direct-manipulation-axis-mode-commutative-diagram.png" 
+<img src="figs/direct-manipulation-axis-mode-commutative-diagram-1.png" 
 style="width: 60%" class="img-center"/>
 
 <p>
-  We want to constrain <d-math>GT^{new}</d-math> to be a valid Grand Tour rotation, i.e. <d-math>GT^{new}</d-math> has to be orthogonal. 
-  Strictly speaking, there might be no solutions, for example for large enough <d-math>dx</d-math> or <d-math>dy</d-math>. 
-  In this case we want to find an <d-math>GT^{new}</d-math> that maps <d-math>e_i</d-math> to somewhere close to <d-math>(x^{(new)}, y^{(new)})</d-math>.
-  If solution exists, there can be infinity many since we only specified the destination of two coordinates after projection <d-math>\pi_2</d-math>. 
-  In this case, we want to find an <d-math>GT^{new}</d-math> that is close to the original <d-math>GT</d-math>.
-  Solving these two problems at once, we choose to set our new matrix <d-math>GT^{(new)}</d-math> by adding <d-math>(dx, dy)</d-math> to the first two entry of the <d-math>i^th</d-math> row of <d-math>GT</d-math> and then do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt process</a> on the rows of the new matrix:
-</p>
+  We want to constrain <d-math>GT^{(new)}</d-math> to be a valid Grand Tour rotation, i.e. <d-math>GT^{(new)}</d-math> has to be an orthogonal matrix: <d-math>(GT^{(new)})^{T} GT^{(new)} = I</d-math>. 
+  Strictly speaking, there can be no solutions or infinitely many solutions. 
+  For example, no solution exists for large enough <d-math>dx</d-math> or <d-math>dy</d-math>, because while the norm of <d-math>\tilde{e_i}^{(new)}</d-math> after the projection <d-math>||(x_i^{(new)}, y_i^{(new)})|| = ||(x_i+dx, y_i+dy)||</d-math> can not exceed the norm before:
+  <d-math block>
+    ||(x_i+dx, y_i+dy)|| \leq ||\tilde{e_i}^{(new)}||
+  </d-math>
+  the <d-math>dx</d-math> and/or <d-math>dy</d-math> can be chosen arbitrarily large by the user.
+  In this case we want to find <d-math>GT^{(new)}</d-math> that maps <d-math>e_i</d-math> to somewhere, <d-math>(x_i^{(new)}, y_i^{(new)})</d-math>, that is <em>close</em> to <d-math>(x_i+dx, y_i+dy)</d-math>.
 
-<d-math block>
-  GT^{(new)} = GramSchmidt(GT + dGT)
-</d-math>
-where <d-math>dGT_{i,1} = dx</d-math>, <d-math>dGT_{i,2} = dy</d-math> and <d-math>dGT_{j,k} = 0</d-math> elsewhere when <d-math>(j,k) \neq (i,1)</d-math> and <d-math>(j,k) \neq (i,2)</d-math>
+  If the solution exists, there can be infinity many since we only specified the destination of two coordinates after the projection <d-math>\pi_2</d-math>. 
+  In this case, we want to find an <d-math>GT^{new}</d-math> that is close to the original <d-math>GT</d-math>.
+  Solving both cases at once, we choose to set our new matrix <d-math>GT^{(new)}</d-math> by adding <d-math>dx</d-math> and <d-math>dy</d-math> to the first two entries of the <d-math>i^{th}</d-math> row of <d-math>GT</d-math> and then do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on all the rows 
+  <d-footnote>
+    Reordered so that the <d-math>i^{th}</d-math> row is the first vector to be considered in the Gram-Schmidt.
+  </d-footnote>
+  in the new matrix:
+</p>
+<p>
+  <d-math block>
+    GT^{(new)} = GramSchmidt(GT + dGT)
+  </d-math>
+  where
+  <d-math block>
+  dGT_{i,1} = dx
+  </d-math>
+  <d-math block>
+  dGT_{i,2} = dy
+  </d-math>
+  and
+  <d-math block>
+  dGT_{j,k} = 0
+  </d-math>
+  for <d-math>(j,k) \neq (i,1)</d-math> and <d-math>(j,k) \neq (i,2)</d-math>
+</p>
+<p>
+  Thinking more carefully in this case will help us generalize the method to move arbitrary points in the next section, so with more details, we illustrate the axis handle problem in the following diagram:
+</p>
+<img src="figs/direct-manipulation-axis-mode-commutative-diagram-2.png" 
+style="width: 70%" class="img-center"/>
+<p>
+  <d-math>\pi_2 \circ GT</d-math> and <d-math>\pi_2 \circ GT^{(new)}</d-math> are still the Grand Tour pipeline before and after axis dragging, <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math> is still the user's manipulation on the axis. 
+  But this time, we make the approximation <d-math>(x_i^{(new)}, y_i^{(new)}) \approx (x+dx, y+dy)</d-math> explicit in the diagram and we divide our solution into two steps: one (<d-math>\tilde{\Delta}</d-math>) that minimally change <d-math>GT</d-math> when there are infinitely many solutions, and one (<d-math>normalize</d-math>) that is necessary to satisfy the orthogonality constraint of <d-math>GT^{(new)}</d-math>.
+</p>
+<p>
+  For the two-step approximation, we <em>define</em> the change on <d-math>\tilde{e_i}</d-math> by <d-math>\tilde{\Delta}</d-math>, implied by <d-math>\Delta</d-math> to be minimal: 
+  <d-math block>\tilde{\Delta}: (v_1, v_2, v_3, v_4, \cdots) \mapsto (v_1+dy, v_2+dy, v_3, v_4, \cdots)</d-math>
+  And we <em>define</em> the way to approximate <d-math>(x+dx, y+dy)</d-math> that satisfy (the unit norm of rows in) the orthogonality constraint of <d-math>GT^{(new)}</d-math>:
+  <d-math block>
+    \tilde{e_i}^{(new)} = normalize(\tilde{e_i}+(dx, dy, 0, 0, \cdots)) = \tilde{e_i} / norm(\tilde{e_i}+(dx, dy, 0, 0, \cdots))
+  </d-math>
+  Note that for large <d-math>dx</d-math> or <d-math>dy</d-math>, the exact solution may not exist but the normalization gives a solution that is close.
+  For small <d-math>dx</d-math> and <d-math>dy</d-math>, the normalization never makes the solution exact but close to the exact for small <d-math>dx</d-math> and <d-math>dy</d-math>.
+  From the commutative diagram, we can see that the <d-math>i^{th}</d-math> row of <d-math>GT^{(new)}</d-math> has to be <d-math>\tilde{e_i}^{(new)}</d-math>, which can be computed from <d-math> \tilde{e_i}^{(new)} = normalize \circ \tilde{\Delta} \circ GT (e_i)</d-math>, because by definition <d-math>GT^{(new)}</d-math> maps <d-math>e_i</d-math> to the <d-math>i^{th}</d-math> row of the matrix <d-math>GT^{(new)}</d-math>.
+  Now all we need to do is to make rows of <d-math>GT^{(new)}</d-math> orthonormal to each other, so we do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on all the rows of <d-math>GT + dGT</d-math> as we described before.
+</p>
 </div> <!-- #div-axis-mode -->
 
-
-<h4 class="clickable" onclick="toggle(event, '#div-data-point-mode')">
-  The data point mode
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-data-point-mode')">
+  The Data Point Mode
 </h4>
-<div id='div-data-point-mode' class='hidden'>
+<div id='div-data-point-mode' class=''>
 
 <p>
-  As we have said, when the dimensionality is high, manipulating the viewing perspective by axis handles is complicated.
-  A better way to manipulate the Grand Tour projection is to <em>move a subset of data points</em>. 
-  Note that since unit vectors along axis directions can be seen as special data points, so this data point mode is a generalization of the previous axis mode.
-  We have two interpretations/formulations when dealing with subset dragging: dragging that causes a rotation in a 2-subspace or dragging that causes to solve a Procrustes problem.
+  When the number of dimensions is large, manipulating projection by axis handles is inefficient, since there will be as many handles as the dimensionality.
+  In that case, a better way to manipulate the Grand Tour projection is to directly <em>move a subset of data points</em>. 
+  Comparing with axis handles which form a basis, the set of data vectors also span the whole space (or the subspace we care about), so the data vectors can also play <em>like</em> a basis in direct manipulation.
+  We have two ways to interpret the request from the user when he/she drags a subset: as a request to move points or as a request to explain variations.
 </p>
+<p>
+  For the first interpretation, we either rotate a 2-subspace or solve a Procrustes problem.
+  These two techniques aim to substitute axis handles when the number of dimensions is large. 
+  The 2-subspace rotation, as the name implies, performs rotation <em>local</em> to a subspace, while the Procrustes problem performs a <em>global</em> optimization.
+  Practically, the difference is that 2-subspace rotation in response to a single dragging limits the projection to a subset of all possible projections, but is more intuitive to use and fast to compute <d-footnote>A 2-subspace rotation looks natural because in N dimensional space will <em>look like</em> a 3D rotation in real physical world, as it leaves other (N-2) dimensions unchanged.</d-footnote>.
+  Solving Procrustes problem, on the other hand, finds a global solution to an optimization problem. 
+  So in terms of its optimization objective, it provides a better solution than 2-subspace rotation.
+  It is more flexible as one can freely adjust the objective, but it may be less intuitive and can be slower in computation.
+</p>
+<p>
+  For the second interpretation, which is to show the main variation within a selected subset of data points, we can do subset PCA.
+  With this method, users can bring the variation in data that might be hidden by a random Grand Tour back to the scene. 
+  It is exactly the same as standard PCA except it is computed from a subset of points.
+</p>
+<p>Now we are going to explain the two methods in the interpretations: 2-subspace rotation and Procrustes problem.</p>
 
-<!-- TODO continue here -->
-
-<h5 class="clickable" onclick="toggle(event, '#div-rotation-formulation')">
-  Data point mode: The rotation formulation
+<h5 class="clickable" onclick="toggle(event, '#div-subspace-rotation')">
+  2-subspace rotation
 </h5>
-<div id='div-rotation-formulation' class='hidden'>
+<div id='div-subspace-rotation' class='hidden'>
 
 <p>
-  We want to rotate the plane which is spanned by the two centroids before and after user's movement. Let <d-math>X_{n_s \times p}</d-math> denote the <d-math>n_s</d-math> points selected by brushing. The centroid <d-math>c_0 \in R^{p}</d-math> in Grand Tour coordinate is computed by
+  When a user selects a subset of data points and drags them in canvas, the idea is to rotate all data points by some angle <d-math>\theta</d-math> along the 2D plane spanned by the two centroids of points, before and after the dragging. 
+  Formally, let <d-math>X \in \mathbb{R}^{n \times p}</d-math> denote the data matrix of <d-math>n</d-math> points selected by the user (through brushing in our demo). 
+  The centroid <d-math>c \in \mathbb{R}^{p}</d-math> is computed by
   <d-math block>
-    c_0 = (\frac{1}{n_s} \sum_{i=1}^{n_s} X_{i,:}) \cdot GT
+    c = \frac{1}{n} \sum_{i=1}^{n} X_i
   </d-math>
-  Where <d-math>GT_{p \times p}</d-math> is the matrix of the Grand Tour rotation.
-  Dragging the centroid by a small amount adds a small change <d-math>(dx, dy)</d-math> in the first two coordinates of <d-math>c_0</d-math>, which gives the position of a new centroid <d-math>c_1 \in R^{p}</d-math>:
-  <d-math block>
-    c_1 = c_0 + (dx, dy, 0, 0, \cdots)
-  </d-math>
-  By completing the space, we can form an orthogonal matrix <d-math>Q_{p \times p}</d-math> whose first two columns span the same plane as <d-math>span(c_0, c_1)</d-math>. 
-  Using <d-math>Q</d-math> as a change of basis, we rotates the plane of <d-math>span(c_0, c_1)</d-math> by an angle <d-math>\theta</d-math>, which is the angle between two centroids <d-math>c_0</d-math> and <d-math>c_1</d-math>.
-  
-  The matrix of such rotation is given by:
-  
-  <d-math block>
-    R = Q 
-    \begin{bmatrix}
-    cos \theta& sin \theta&  0&  0& \cdots\\
-    -sin \theta& cos \theta&  0&  0& \cdots\\
-    0& 0&  \\ 
-    \vdots& \vdots& & I& \\
-    \end{bmatrix}
-    Q^T
-    =: Q R_{1,2}(\theta) Q^T
-  </d-math>
-
-  The old Grand Tour matrix <d-math>GT</d-math> then absorbs this rotation and generates a new Grand Tour view in which selected points follow user's manipulation:
-  <d-math block>
-    GT^{(new)} = GT \cdot R = GT \cdot (Q R_{1,2}(\theta) Q^T)
-  </d-math>
-  In essence, the dragging of user caused an extra rotation by <d-math>\theta</d-math> rad, with respect to the basis whose first two basis vectors are the span of previous and current position of a handle. Note <d-math>Q</d-math> here serves as a change of basis so that rotation can be easily specified in matrix form.
+  where <d-math>X_i</d-math> is the <d-math>i^{th}</d-math> row of <d-math>X</d-math>.
 </p>
-</div><!-- #div-rotation-formulation -->
+<p>
+  Using the similar commutative diagram for axis handle <d-math>e_i</d-math> but this time for centroid <d-math>c</d-math>: 
+</p>
+
+<img src="figs/direct-manipulation-rotation-commutative-diagram.png" 
+style="width: 65%" class="img-center"/>
+
+<p>
+Here again we want to find <d-math>GT^{(new)}</d-math> when we <em>define</em> the new centroids <d-math>\tilde{c}^{(new)}</d-math> to be derived from composing <d-math>\tilde{\Delta}</d-math> and <d-math>normalize</d-math>. 
+This time, we further denote the composition by <d-math>\rho</d-math>
+<d-footnote>
+  <d-math>\rho</d-math> for "rotation" which we will see the reason soon.
+</d-footnote>
+: 
+<d-math block>
+  \rho := normalize \circ \tilde{\Delta}
+</d-math>
+Geometrically, the composition <d-math>\rho</d-math> is equivalent to rotating the plane spanned by <d-math>\tilde{c}</d-math> and <d-math><d-math>\tilde{c}^{(new)}</d-math></d-math> by an angle <d-math>\theta</d-math> between the two vectors. 
+From this view, we can represent <d-math>\rho</d-math> in matrix form: 
+</p>
+<p>
+First, let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>.
+For example we can let its first row to be <d-math>\tilde{c}</d-math> and second row to be its orthonormal complement <d-math>\tilde{c}^{(new)}_{\perp}</d-math>
+<d-math block>
+\tilde{c}^{(new)}_{\perp} 
+:=
+normalize(\tilde{c}^{(new)} - \langle \tilde{c}, \tilde{c}^{(new)} \rangle \cdot \tilde{c} )</d-math>
+
+<d-math block>
+  Q :=
+  \begin{bmatrix}
+  \cdots \tilde{c} \cdots \\
+  \cdots \tilde{c}^{(new)}_{\perp} \cdots \\
+  P
+  \end{bmatrix}
+</d-math>
+where <d-math>P</d-math> completes the (orthonormal) basis.
+</p>
+
+<p>
+Making use of <d-math>Q</d-math>, we can rotate the plane of <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math> by an angle <d-math>\theta = arccos(\langle \tilde{c}, \tilde{c}^{(new)} \rangle)</d-math>, the angle between two centroids <d-math>\tilde{c}</d-math> and <d-math>\tilde{c}^{(new)}</d-math>:
+<d-math block>
+  \rho = Q 
+  \begin{bmatrix}
+  cos \theta& sin \theta&  0&  0& \cdots\\
+  -sin \theta& cos \theta&  0&  0& \cdots\\
+  0& 0&  \\ 
+  \vdots& \vdots& & I& \\
+  \end{bmatrix}
+  Q^T
+  =: Q R_{1,2}(\theta) Q^T
+</d-math>
+</p>  
+<p>
+Following the commutative diagram, the old Grand Tour matrix <d-math>GT</d-math> should absorb <d-math>\rho</d-math> to generate a new Grand Tour <d-math>GT^{(new)}</d-math> that follows the user's manipulation:
+<d-math block>
+  GT^{(new)} := \rho \circ GT
+</d-math>
+In summary, the dragging of user caused an extra rotation <d-math>\rho</d-math>, a planar rotation on the plane spanned by two centroids. 
+The <d-math>Q</d-math> serves as a change of basis so that <d-math>\rho</d-math> can be easily specified in matrix form.
+The beauty of this formulation over the Gram-Schmidt for axis handles, while exactly equivalent, is that this interprets direct manipulation explicitly as another linear transformation (a rotation).
+The beauty lies on its alignment with the linearities in both the Grand Tour and layer transitions.
+</p>
+
+</div><!-- #div-subspace-rotation -->
 
 <h5 class="clickable" onclick="toggle(event, '#div-procrustes')">
-Data point mode: The Procrustes problem formulation
+The Procrustes problem
 </h5>
 <div id='div-procrustes' class='hidden'>
 

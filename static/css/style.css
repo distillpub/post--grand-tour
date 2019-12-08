@@ -1,3 +1,13 @@
+d-article h4 {
+    margin-top: 1em;
+}
+
+/*d-article h5 {
+    margin-top: 1em;
+    font-size: 14px;
+    line-height: 1.4em;
+}*/
+
 .clickable{
   cursor: pointer;
 }
