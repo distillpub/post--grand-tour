@@ -40,20 +40,27 @@ utils.data2canvas = function(points, sx, sy, sz){
   return points;
 };
 
-utils.updateScale_span = function(points, canvas, sx, sy, sz,
-  marginTop = 30, marginBottom = 40, marginRight = 50,){
+utils.updateScale_span = function(points, canvas, sx, sy, sz, 
+  scaleFactor=1.0,
+  marginTop = 30, marginBottom = 40, marginRight = 50){
 
   let vmin = math.min(points, 0);
   let vmax = math.max(points, 0);
   let xDataRange = vmax[0]-vmin[0];
   let yDataRange = vmax[1]-vmin[1];
 
+  let yMiddle = ((canvas.clientHeight-marginBottom) + marginTop ) /2;
+  let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
+  yRadius *= scaleFactor;
   sy.domain([vmin[1], vmax[1]])
-  .range([canvas.clientHeight-marginBottom, marginTop]);
+  .range([yMiddle-yRadius, yMiddle+yRadius]);
 
   let xMiddle = (canvas.clientWidth-marginRight)/2;
-  let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
-                / yDataRange * xDataRange;
+  // let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
+                // / yDataRange * xDataRange;
+  let xRadius = yRadius / yDataRange * xDataRange;
+  xRadius *= scaleFactor;
+
   sx.domain([vmin[0], vmax[0]])
   .range([xMiddle-xRadius, xMiddle+xRadius]);
 
@@ -63,6 +70,7 @@ utils.updateScale_span = function(points, canvas, sx, sy, sz,
 };
 
 utils.updateScale_center = function(points, canvas, sx, sy, sz, 
+  scaleFactor=1.0,
   marginTop = 30, marginBottom = 40, marginRight = 50,){
 
   let vmax = math.max(math.abs(points), 0);
@@ -71,12 +79,15 @@ utils.updateScale_center = function(points, canvas, sx, sy, sz,
   let xDataRange = 2*vmax[0];
   let yDataRange = 2*vmax[1];
 
+  let yMiddle = ((canvas.clientHeight-marginBottom) + marginTop ) /2;
+  let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
+  yRadius *= scaleFactor;
   sy.domain([vmin[1], vmax[1]])
-  .range([canvas.clientHeight-marginBottom, marginTop]);
+  .range([yMiddle-yRadius, yMiddle+yRadius]);
 
   let xMiddle = (canvas.clientWidth-marginRight)/2;
-  let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
-                / yDataRange * xDataRange;
+  let xRadius = yRadius / yDataRange * xDataRange;
+
   sx.domain([vmin[0], vmax[0]])
   .range([xMiddle-xRadius, xMiddle+xRadius]);
 

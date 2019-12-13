@@ -1,0 +1,381 @@
+<p>
+  Formally, we want to change the current Grand Tour rotation <d-math>GT</d-math>, which draws the <d-math>i^{th}</d-math> unit vector at <d-math>(x_i,y_i)</d-math>, to a new one <d-math>GT^{(new)}</d-math> so that the new mapping draws the unit vector <d-math>e_i</d-math> at <d-math>(x_i^{(new)}, y_i^{(new)}) = (x, y) + (dx, dy)</d-math>, where <d-math>(dx, dy) = \Delta</d-math> is implied by the user's dragging behavior on canvas.
+  (We assume <d-math>\Delta</d-math> and <d-math>(x,y)</d-math> is already translated to data coordinate. 
+  For simplicity we ignored the detail about transforming from data coordinate to canvas coordinate, since these two coordinates are related by a simple linear bijection.)
+</p>
+<p>
+  We summarize the objective in the following commutative diagram. 
+  Given all other components: the basis <d-math>e_i</d-math> that user chooses to move, the current Grand Tour rotation <d-math>GT</d-math>, the projection <d-math>\pi_2</d-math> that picks the first two coordinates <d-math>\pi_2: (v_1, v_2, v_3, ...) \mapsto (v_1, v_2)</d-math>, the mouse movement by the user <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math>, we want to find a new rotation matrix <d-math>GT^{(new)}</d-math> that make the following diagram commute:
+</p>
+
+<img src="figs/direct-manipulation-axis-mode-commutative-diagram-1.png" 
+style="width: 60%" class="img-center"/>
+
+<p>
+  We want to constrain <d-math>GT^{(new)}</d-math> to be a valid Grand Tour rotation, i.e. <d-math>GT^{(new)}</d-math> has to be an orthogonal matrix: <d-math>(GT^{(new)})^{T} GT^{(new)} = I</d-math>. 
+  Strictly speaking, there can be no solutions or infinitely many solutions. 
+  For example, no solution exists for large enough <d-math>dx</d-math> or <d-math>dy</d-math>, because while the norm of <d-math>\tilde{e_i}^{(new)}</d-math> after the projection <d-math>||(x_i^{(new)}, y_i^{(new)})|| = ||(x_i+dx, y_i+dy)||</d-math> can not exceed the norm before:
+  <d-math block>
+    ||(x_i+dx, y_i+dy)|| \leq ||\tilde{e_i}^{(new)}||
+  </d-math>
+  the <d-math>dx</d-math> and/or <d-math>dy</d-math> can be chosen arbitrarily large by the user.
+  In this case we want to find <d-math>GT^{(new)}</d-math> that maps <d-math>e_i</d-math> to somewhere, <d-math>(x_i^{(new)}, y_i^{(new)})</d-math>, that is <em>close</em> to <d-math>(x_i+dx, y_i+dy)</d-math>.
+
+  If the solution exists, there can be infinity many since we only specified the destination of two coordinates after the projection <d-math>\pi_2</d-math>. 
+  In this case, we want to find an <d-math>GT^{new}</d-math> that is close to the original <d-math>GT</d-math>.
+  Solving both cases at once, we choose to set our new matrix <d-math>GT^{(new)}</d-math> by adding <d-math>dx</d-math> and <d-math>dy</d-math> to the first two entries of the <d-math>i^{th}</d-math> row of <d-math>GT</d-math> and then do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on all the rows 
+  <d-footnote>
+    Reordered so that the <d-math>i^{th}</d-math> row is the first vector to be considered in the Gram-Schmidt.
+  </d-footnote>
+  in the new matrix:
+</p>
+<p>
+  <d-math block>
+    GT^{(new)} = GramSchmidt(GT + dGT)
+  </d-math>
+  where
+  <d-math block>
+  dGT_{i,1} = dx
+  </d-math>
+  <d-math block>
+  dGT_{i,2} = dy
+  </d-math>
+  and
+  <d-math block>
+  dGT_{j,k} = 0
+  </d-math>
+  for <d-math>(j,k) \neq (i,1)</d-math> and <d-math>(j,k) \neq (i,2)</d-math>
+</p>
+<p>
+  Thinking more carefully in this case will help us generalize the method to move arbitrary points in the next section.
+  With more details, we illustrate the axis handle problem in the following diagram:
+</p>
+<img src="figs/direct-manipulation-axis-mode-commutative-diagram-2.png" 
+style="width: 70%" class="img-center"/>
+<p>
+  <d-math>\pi_2 \circ GT</d-math> and <d-math>\pi_2 \circ GT^{(new)}</d-math> are still the Grand Tour pipelines before and after user drags an axis handle, <d-math>\Delta: (x,y) \mapsto (x+dx, y+dy)</d-math> is still the user's movement on canvas. 
+  But this time, we make the approximation <d-math>(x_i^{(new)}, y_i^{(new)}) \approx (x+dx, y+dy)</d-math> explicit in the diagram and we divide our solution into two steps: one (<d-math>\tilde{\Delta}</d-math>) that minimally change <d-math>GT</d-math> when there are infinitely many solutions, and one (<d-math>normalize</d-math>) that we use to approximate <d-math>(x+dx, y+dy)</d-math> and satisfy the orthogonality constraint of <d-math>GT^{(new)}</d-math>.
+</p>
+<p>
+  In these two steps, we <em>define</em> the change on <d-math>\tilde{e_i}</d-math> by <d-math>\tilde{\Delta}</d-math>, which is implied by <d-math>\Delta</d-math> to be minimal: 
+  <d-math block>\tilde{\Delta}: (v_1, v_2, v_3, v_4, \cdots) \mapsto (v_1+dy, v_2+dy, v_3, v_4, \cdots)</d-math>
+  And we <em>define</em> the way to approximate <d-math>(x+dx, y+dy)</d-math> that satisfy (the unit norm of rows in) the orthogonality constraint of <d-math>GT^{(new)}</d-math>:
+  <d-math block>
+    \tilde{e_i}^{(new)} = normalize(\tilde{e_i}+(dx, dy, 0, 0, \cdots)) = \tilde{e_i} / norm(\tilde{e_i}+(dx, dy, 0, 0, \cdots))
+  </d-math>
+  Note that for large <d-math>dx</d-math> or <d-math>dy</d-math>, the exact solution may not exist but the normalization gives a solution that is close.
+  For small <d-math>dx</d-math> and <d-math>dy</d-math>, the normalization never makes the solution exact but close to the exact for small <d-math>dx</d-math> and <d-math>dy</d-math>.
+  From the commutative diagram, we can see that the <d-math>i^{th}</d-math> row of <d-math>GT^{(new)}</d-math> has to be <d-math>\tilde{e_i}^{(new)}</d-math>, which can be computed from <d-math> \tilde{e_i}^{(new)} = normalize \circ \tilde{\Delta} \circ GT (e_i)</d-math>, because by definition <d-math>GT^{(new)}</d-math> maps <d-math>e_i</d-math> to the <d-math>i^{th}</d-math> row of the matrix <d-math>GT^{(new)}</d-math>.
+  Now all we need to do is to make rows of <d-math>GT^{(new)}</d-math> orthonormal to each other, so we do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on all the rows of <d-math>GT + dGT</d-math> as we described before.
+</p>
+</div> <!-- #div-axis-mode -->
+
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-data-point-mode')">
+  The Data Point Mode
+</h4>
+<div id='div-data-point-mode' class=''>
+
+<p>
+  When the number of dimensions is large, manipulating projection by axis handles is inefficient, since there will be as many handles as the dimensionality.
+  In that case, a better way to manipulate the Grand Tour projection is to directly <em>move a subset of data points</em>. 
+  Comparing with axis handles which form a basis, the set of data vectors also span the whole space (or the subspace we care about), so the data vectors can also play <em>like</em> a basis in direct manipulation.
+  We have two ways to interpret the request from the user when he/she drags a subset: as a request to move points or as a request to explain variations.
+</p>
+<p>
+  For the first interpretation, we either rotate a 2-subspace or solve a Procrustes problem.
+  These two techniques aim to substitute axis handles when the number of dimensions is large. 
+  The 2-subspace rotation, as the name implies, performs rotation <em>local</em> to a subspace, while the Procrustes problem performs a <em>global</em> optimization.
+  Practically, the difference is that 2-subspace rotation in response to a single dragging limits the projection to a subset of all possible projections, but is more intuitive to use and fast to compute <d-footnote>A 2-subspace rotation looks natural because in N dimensional space will <em>look like</em> a 3D rotation in real physical world, as it leaves other (N-2) dimensions unchanged.</d-footnote>.
+  Solving Procrustes problem, on the other hand, finds a global solution to an optimization problem. 
+  So in terms of its optimization objective, it provides a better solution than 2-subspace rotation.
+  It is more flexible as one can freely adjust the objective, but it may be less intuitive and can be slower in computation.
+</p>
+<p>
+  For the second interpretation, which is to show the main variation within a selected subset of data points, we can do subset PCA.
+  With this method, users can bring the variation in data that might be hidden by a random Grand Tour back to the scene. 
+  It is exactly the same as standard PCA except it is computed from a subset of points.
+</p>
+<p>Now we are going to explain the two methods in the interpretations: 2-subspace rotation and Procrustes problem.</p>
+
+<h5 class="clickable" onclick="toggle(event, '#div-subspace-rotation')">
+  2-subspace rotation
+</h5>
+<div id='div-subspace-rotation' class='hidden'>
+
+<p>
+  When a user selects a subset of data points and drags them in canvas, the idea is to rotate all data points by some angle <d-math>\theta</d-math> along the 2D plane spanned by the two centroids of points, before and after the dragging. 
+  Formally, let <d-math>X \in \mathbb{R}^{n \times p}</d-math> denote the data matrix of <d-math>n</d-math> points selected by the user (through brushing in our demo). 
+  The centroid <d-math>c \in \mathbb{R}^{p}</d-math> is computed by
+  <d-math block>
+    c = \frac{1}{n} \sum_{i=1}^{n} X_i
+  </d-math>
+  where <d-math>X_i</d-math> is the <d-math>i^{th}</d-math> row of <d-math>X</d-math>.
+</p>
+<p>
+  Using the similar commutative diagram for axis handle <d-math>e_i</d-math> but this time for centroid <d-math>c</d-math>: 
+</p>
+
+<img src="figs/direct-manipulation-rotation-commutative-diagram.png" 
+style="width: 65%" class="img-center"/>
+
+<p>
+Here again we want to find <d-math>GT^{(new)}</d-math> when we <em>define</em> the new centroids <d-math>\tilde{c}^{(new)}</d-math> to be derived from composing <d-math>\tilde{\Delta}</d-math> and <d-math>normalize</d-math>. 
+This time, we further denote the composition by <d-math>\rho</d-math>
+<d-footnote>
+  <d-math>\rho</d-math> for "rotation" for the reason we will see soon.
+</d-footnote>
+: 
+<d-math block>
+  \rho := normalize \circ \tilde{\Delta}
+</d-math>
+Geometrically, the composition <d-math>\rho</d-math> is equivalent to rotating the plane <d-math>span(\tilde{c}, \tilde{c}^{(new)}</d-math> by the angle <d-math>\theta</d-math> between the two vectors. 
+From this view, we can represent <d-math>\rho</d-math> in matrix form: 
+</p>
+<p>
+First, let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>.
+For example we can let its first row to be <d-math>\tilde{c}</d-math> and second row to be its orthonormal complement <d-math>\tilde{c}^{(new)}_{\perp}</d-math>
+<d-math block>
+\tilde{c}^{(new)}_{\perp} 
+:=
+normalize(\tilde{c}^{(new)} - \langle \tilde{c}, \tilde{c}^{(new)} \rangle \cdot \tilde{c} )</d-math>
+
+<d-math block>
+  Q :=
+  \begin{bmatrix}
+  \cdots \tilde{c} \cdots \\
+  \cdots \tilde{c}^{(new)}_{\perp} \cdots \\
+  P
+  \end{bmatrix}
+</d-math>
+where <d-math>P</d-math> completes the (orthonormal) basis.
+</p>
+
+<p>
+Making use of <d-math>Q</d-math>, we can rotate the plane of <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math> by an angle <d-math>\theta = arccos(\langle \tilde{c}, \tilde{c}^{(new)} \rangle)</d-math>, the angle between two centroids <d-math>\tilde{c}</d-math> and <d-math>\tilde{c}^{(new)}</d-math>:
+<d-math block>
+  \rho = Q 
+  \begin{bmatrix}
+  cos \theta& sin \theta&  0&  0& \cdots\\
+  -sin \theta& cos \theta&  0&  0& \cdots\\
+  0& 0&  \\ 
+  \vdots& \vdots& & I& \\
+  \end{bmatrix}
+  Q^T
+  =: Q R_{1,2}(\theta) Q^T
+</d-math>
+</p>  
+<p>
+Following the commutative diagram, the old Grand Tour matrix <d-math>GT</d-math> should absorb <d-math>\rho</d-math> to generate a new Grand Tour <d-math>GT^{(new)}</d-math> that follows the user's manipulation:
+<d-math block>
+  GT^{(new)} := \rho \circ GT
+</d-math>
+In summary, the dragging of user caused an extra rotation <d-math>\rho</d-math>, a planar rotation on the plane spanned by two centroids. 
+The <d-math>Q</d-math> serves as a change of basis so that <d-math>\rho</d-math> can be easily specified in matrix form.
+The beauty of this formulation over the Gram-Schmidt for axis handles, while they are exactly equivalent, is that this formulation interprets direct manipulation explicitly as another linear transformation (a rotation).
+The beauty lies in the alignment among linearities in this direct manipulation, the Grand Tour and layer transitions.
+</p>
+</div><!-- #div-subspace-rotation -->
+
+<h5 class="clickable" onclick="toggle(event, '#div-procrustes')">
+The Procrustes problem
+</h5>
+<div id='div-procrustes' class='hidden'>
+
+<!-- TODO: shorten -->
+<p>
+  Another way to formulate the direct manipulation is through Procrustes problems.
+  When dragging, the user wants to translate each selected points in the direction of dragging, while keeping the other non-selected points fixed. 
+  We can formulate this as an optimization over orthogonal transforms. 
+  Suppose we are looking for a rotation that <em>aligns</em> the old view of data points to a new view in which selected points are translated. 
+  This is a typical objective in <em>(orthogonal) Procrustes problems</em>, which has a closed form solution. 
+  If we discard the part on the <em>hidden</em> dimensions which is not shown on canvas, the problem is called <em>projection Procrustes</em>, which has an iterative algorithmic solution. We will explain the orthogonal version first.
+</p>
+<p>
+  Before any formula we encourage our readers to go back to our interactive demo about <a href="layer-dynamics">layer dynamics</a> and experience the difference between these methods.
+</p>
+
+<p>
+  To formalize the orthogonal Procrustes problem, let <d-math>X_0</d-math> be the <d-math>n \times p</d-math> matrix of the original dataset with <d-math>n</d-math> rows of individual data points. Let <d-math>Y_0 := X_0 \cdot GT</d-math> be the rotated data by the Grand Tour matrix, <d-math>GT_{p \times p}</d-math>. By permuting the rows in <d-math>X_0</d-math> and <d-math>Y_0</d-math>, we can let its first <d-math>n_s</d-math> rows be data points selected by brushing. Suppose user drag these points by <d-math>(dx, dy)</d-math>, it means he/she want to update the Grand Tour matrix to <d-math>GT^{(new)}</d-math> such that it project data points in <d-math>X_0</d-math> to <d-math>Y_1</d-math>, where
+  <d-math block>
+    Y_{1[i,1]} = Y_{0[i,1]} + dx
+  </d-math>
+  <d-math block>
+    Y_{1[i,2]} = Y_{0[i,2]} + dy
+  </d-math>
+  for <d-math>1 \leq i \leq n_s</d-math>, and
+  <d-math block>
+    Y_{1[i,j]} = Y_{0[i,j]}
+  </d-math>
+  elsewhere (<d-math>1 \leq i \leq n_s</d-math>, <d-math>3 \leq j \leq p</d-math>).
+
+  Since user manipulation happens under the frame <em>after</em> the Grand Tour rotation, we can think there is an post-rotation <d-math>Q^*</d-math> after the Grand Tour that rotates <d-math>Y_0</d-math> to some orientation closest to <d-math>Y_1</d-math>. That is, we are looking for an orthogonal <d-math>p \times p</d-math> matrix <d-math>Q</d-math> that minimizes the sum of square difference between <d-math>Y_0 Q</d-math> and <d-math>Y_1</d-math>:
+  <d-math block>
+    Q^* := argmax_{Q}\; ||Y_0 Q - Y_1||^2
+  </d-math>
+  where <d-math>||\cdots||^2</d-math> denotes <a href="http://mathworld.wolfram.com/FrobeniusNorm.html">frobenius norm</a> squared. 
+  This optimization has a closed form solution <d-cite key="gower2004procrustes"></d-cite>:
+  <d-math block>
+    Q^* = VU^T
+  </d-math>
+  where <d-math>U\Sigma V^T</d-math> is the singular value decomposition of <d-math>Y_1^T Y_0</d-math>. To resume the Grand Tour from the new orientation, the Grand Tour matrix should absorbs <d-math>Q^*</d-math> on its right:
+  <d-math block>
+    GT^{(new)} = GT \cdot Q^*
+  </d-math>
+
+</p>
+
+
+<p>
+  Instead of looking for full <d-math>p \times p</d-math> matrix that aligns all dimensions, we can restrict our attention to the first <d-math>d</d-math> (e.g. <d-math>d=2</d-math>) dimensions. That is, we look for an optimal projection <d-math>P_{p \times d}</d-math> that aligns first <d-math>d</d-math> dimensions of <d-math>Y_0</d-math> and <d-math>Y_1</d-math>:
+  <d-math block>
+    P^* := argmax_{P}\; ||Y_0 P - Y_{1[:,:d]}||^2
+  </d-math>
+  which is known as <em>projection Procrustes</em> problems.
+  Unfortunately, the solution can only be found with an iterative algorithm. We reproduced the algorithm given in the Procrustes problem book<d-cite key="gower2004procrustes"></d-cite> in our context. <!-- We stop iterating when the square loss gets below a threshold or the algorithm reaches the maximum number of iterations that we set. -->
+</p>
+<d-code block language="python">
+Step 1 Initialization: Set last (p-d) columns of Y1 to be zero.
+
+Step 2 Use orthogonal Procrustes procedure to fix Y0 to the current Y1, 
+record the rotation matrix VU^T, and replace Y0 by its rotated form.
+
+Step 3 If the sum-of-square of the differences between the final (p-d) columns 
+of Y0 and Y1 is below a threshold, exit.
+
+Step 4 Replace the final p-d columns of Y1 by the corresponding columns of 
+the rotated Y0 and return to step 2.
+</d-code>
+
+<p>
+Each iteration of step 2 will generate a new rotation matrix. The sequence of these matrices will be multiplied to the right of the current Grand Tour matrix. Also interesting is that the first orthogonal Procrustes iteration will behave similar to PCA, since it tries to minimize the norm in last p-d dimensions. We will demonstrate that this operation is also useful for data exploration in Grand Tour.
+</p>
+
+<p>
+  Although the above algorithm is slow in our implementation, interestingly, if we only compute one iteration, its behavior is similar to doing PCA on the subset of points user brushed. We found this operation alone very useful when points are clustered and unable to be separated by other methods.
+</p>
+</div> <!-- #div-procrustes -->
+</div> <!-- #div-data-point-mode -->
+</div> <!-- #div-direct-manipulation -->
+
+
+<h3 class="clickable clickable-active" onclick="toggle(event, '#div-align-representation')">
+  Aligning representations: enabling the visualization of layer-to-layer dynamics</h3>
+<div id='div-align-representation' class=''>
+
+<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rp')">
+  The <d-math>R^p \to R^p</d-math> case
+</h4>
+<div id='div-rp-to-rp' class='hidden'>
+<p>
+  As noted before, we preprocessed data so that the neuron activations in one layer is aligned with another. 
+  This preprocessing significantly helps us in understanding the essence of neural networks. 
+  Without this, there will be a lot of unnecessary cross-the-origin and switching axes shown in the transition between layers.
+</p>
+<p>
+  We will first see this in a case where the number of neurons lying in between a linear map are the same, later we extend this to cases where the number differs in two layers.
+</p>
+
+<p>
+  Suppose we want to look at a linear transformation in Grand Tour. 
+  Data that are stored in rows vectors of <d-math>X_{n \times p}</d-math> and <d-math>Y_{n \times p}</d-math> are related by a full-rank weight matrix <d-math>M</d-math>, i.e. 
+  <d-math block>
+    Y = X M
+  </d-math>
+
+  The SVD of <d-math>M</d-math>, <d-math>U \Sigma V^T</d-math>, tells us one way to look at this linear map in three consecutive steps:
+  <d-math block>
+    X 
+    \overset{U}{\mapsto} <!-- XU  -->
+    \overset{\Sigma}{\mapsto} <!-- XU\Sigma  -->
+    \overset{V^T}{\mapsto} Y
+  </d-math>
+
+  Since <d-math>U</d-math> and <d-math>V^T</d-math> are orthogonal, they rotate (and/or reflect) the data points in the Euclidean space <d-math>R^p</d-math>. 
+  <d-math>\Sigma</d-math> is a square and diagonal matrix, so it stretches each dimension <d-math>i</d-math> independently, by a factor of singular value <d-math>\sigma_i := \Sigma_{i,i}</d-math>.
+  Geometrically, this decomposition allows us to explain the effect of the linear map in three steps: any data point (seen as a vector) passing through a linear map will be first rotated by <d-math>U</d-math>, stretched by <d-math>\Sigma</d-math> and finally rotated by <d-math>V^T</d-math>. 
+  <!-- This concept can be demonstrated in a 2-dimensional space as below:
+  TODO: DEMO, two dim, rotate-scale-rotate animation --> 
+</p>
+<p>
+  One may need matrix exponentials to compute intermediate steps for the transitions <d-cite key="shingel2008interpolation"></d-cite>. 
+  However, we argue that the first and last step of this three-step animation is not necessary, as soon as we observe that they are not different than a Grand Tour rotation.
+</p>
+<p>
+  Consider a p-dimensional case where the linear transformation <d-math>M</d-math> is simply a permutation. 
+  We should convince ourselves that this layer does essentially nothing.
+  It does reorder neurons, but for any such reordering there is a permutation in rows of the <em>downstream</em> matrix that maintains the same downstream activation. 
+
+  Geometrically, we think that the rotational components of <d-math>M</d-math>, i.e. <d-math>U</d-math> and <d-math>V^T</d-math> in its SVD, <em>only give convenient bases</em> to the stretching operation <d-math>\Sigma</d-math> and downstream operations such as adding biases and non-linear transformations. 
+
+  Moreover, since the Grand Tour is also rotating the data, viewing the rotation <d-math>U</d-math> or <d-math>V^T</d-math> is redundant and they should not give us any more insights than the Grand Tour.
+  In neural networks, it is the scaling, bias together with non-linear functions that actually reshapes the collection of data points in space to fit our task, rotation only gives a convenient basis.
+  Given that, all linear maps should be simplified to scalings, at least when viewing them in the Grand Tour.
+</p>
+<p>
+  Given these considerations, we want to reduce the rotation-scaling-rotation operation and shows its scaling component only.
+  Note that by definition, <d-math>Y = X U \Sigma V^T</d-math>. Multiplying by <d-math>V</d-math> on the right of both sides gives
+  <d-math block>Y V = X U \Sigma</d-math>
+  Since <d-math>U</d-math> and <d-math>V</d-math> are orthogonal, <d-math>YV</d-math> and <d-math>XU</d-math> can be seen as rotated versions of data. With these versions of data, the transformation from <d-math>XU</d-math> to <d-math>YV</d-math> is simply scaling on each dimension of <d-math>XU</d-math>, with the scaling factors given by the diagonal entries of <d-math>\Sigma</d-math>.  
+</p>
+<p>
+  In summary, for any linear map 
+  <d-math>M: X \mapsto Y</d-math>, with SVD of <d-math>M = U\Sigma V^T</d-math>
+  we align coordinates in <d-math>X</d-math> and <d-math>Y</d-math> by rotating them to <d-math>XU</d-math> and <d-math>YV</d-math> respectively. We will then visualize the transformation by linearly interpolating the rotated data and show them through the Grand Tour. If matrix <d-math>P</d-math> stores rows of data points whose first two coordinates are plotted on canvas, and <d-math>s \in [0,1]</d-math> is a parameter for transition and <d-math>t</d-math> is time for Grand Tour,
+  <d-math block>
+    P(s, t) = ((1-s)XU + sYV) \cdot GT(t)
+  </d-math>
+</p>
+<p>
+  In this transition, linear interpolation between <d-math>XU</d-math> and <d-math>YV</d-math> faithfully conveys the essential effect of the linear map <d-math>M</d-math>. 
+  Contrastingly, a naive linear interpolation between the original <d-math>X</d-math> and <d-math>Y</d-math> creates artifacts that is caused by internal basis change in the linear operator. 
+  For example, if operator
+  <!-- [TODO: need better example] -->
+  <d-math>M = [[0,1],[1,0]] </d-math> 
+  is applied on a vector <d-math>v \in R^2</d-math>, linear interpolation between <d-math>v</d-math> and <d-math>vM</d-math> will exchange two coordinates, but as much as neural network is concerned, this operation should be equivalent to identity map.
+  This equivalent relation is used explicitly when rotating <d-math>X</d-math> and <d-math>Y</d-math> to <d-math>XU</d-math> and <d-math>YV</d-math>. 
+</p>
+</div> <!-- #div-rp-to-rp -->
+
+<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rr')">
+  The <d-math>R^p \overset{M}{\to} R^r</d-math> case, <d-math>p\neq r</d-math>
+</h4>
+<div id='div-rp-to-rr' class='hidden'>
+<p>
+  Some extra care regarding to both understanding and implementation must be taken when the dimensionality of two layers differ. 
+  In a linear map <d-math>M: R^p \overset{}{\to} R^r</d-math>, the (full-matrix) SVD of a matrix <d-math>M_{p \times r}</d-math> has shape <d-math>M = \,_{p}U_{p} \Sigma_{r} V^T_{r}</d-math>
+</p>
+<p>
+  When <d-math>p\lt r</d-math>, linear operator <d-math>M</d-math> represents an embedding.
+  The rotated data points <d-math>\,_{n}X_{p}U_{p}</d-math> in <d-math>R^p</d-math> should be seen as embedded in a larger space <d-math>R^r</d-math>, in which <d-math>\,_{n}Y_{r}V_{r}</d-math> lives. 
+  The linear interpolation between two data sets can be made possible by padding <d-math>r-p</d-math> zeros to the right of <d-math>XU</d-math>.
+</p>
+<p>
+  When <d-math>p\gt r</d-math>, <d-math>M</d-math> represents a projection. 
+  The rotated data points <d-math>\,_{n}X_{p}U_{p}</d-math> should be seen as projected down to its first <d-math>r</d-math> coordinates, in which <d-math>\,_{n}Y_{r}V_{r}</d-math> lives. 
+  The linear interpolation between two activations can be made possible by padding <d-math>r-p</d-math> zeros to the right of <d-math>YV</d-math>.
+</p>
+
+<p>
+  Our presentation of layer-to-layer visualization implicitly assumed a setting in which only two layers were involved.
+  When animating more than one transition at once, we need to deal with the discrepancy between the pairwise alignments. 
+  This problem only arises when composing linear operations. Non-linear layers, as we discussed above, have natural alignments.
+  For example, when dealing with three operators <d-math>M_1</d-math>, <d-math>ReLU</d-math> and <d-math>M_2</d-math> where <d-math>M_1</d-math> and <d-math>M_2</d-math> are linear and <d-math>ReLU</d-math> is component-wise non-linear, we do not have to make additional considerations for the <d-math>ReLU</d-math> operation.
+  For two consecutive linear maps <d-math>M_1</d-math> and <d-math>M_2</d-math>, suppose 
+  
+  <d-math block>
+  X \overset{M_1 = U_1 \Sigma_1 V^T_1}{\mapsto} Y \overset{M_2 = U_2 \Sigma_2 V^T_2}{\mapsto} Z
+  </d-math>
+  
+  Suppose we have aligned <d-math>XU_1</d-math> and <d-math>YV_1</d-math> and used Grand Tour matrix <d-math>GT_1</d-math> to show the transition in <d-math>M_1</d-math>, and we know that <d-math>YU_2</d-math> and <d-math>ZV_2</d-math> will be viewed with a different Grand Tour matrix <d-math>GT_2</d-math>. 
+  To make the Grand Tour view consistent when switching the representation from <d-math>YV_1</d-math> to <d-math>YU_2</d-math>, in the layer of <d-math>Y</d-math> we have to internally switch from <d-math>GT_1</d-math> to <d-math>GT_2</d-math> so that the view is unchanged. 
+  Expressing our need in an equality, we want a <d-math>GT_2</d-math> such that
+  <d-math block> YV_1 \cdot GT_1 = YU_2 \cdot GT_2</d-math>
+  which gives us
+  <d-math block> GT_2 = U_2^T V_1 \cdot GT_1</d-math>
+</p>
+<p>
+  When convolutional layers are concerned, one can represent multi-channel 2D convolutions as a large and sparse, doubly block circulant<d-cite key="goodfellow2016deep"></d-cite> matrix between flattened representations of multi-channel images. 
+  For models shown before doing SVD on the flattened convolution is feasible. For large networks where this is infeasible, properties of convolutional matrices also allow us to find data alignments efficiently <d-cite key="sedghi2018singular"></d-cite>. We will talk about scalability issues in later discussion.
+</p>
+</div> <!-- #div-rp-to-rr -->
+</div> <!-- #div-align-representation -->

@@ -118,6 +118,7 @@ function TeaserOverlay(renderer, kwargs) {
       renderer.shouldCentralizeOrigin = renderer.shouldPlayGrandTour;
 
       renderer.isScaleInTransition = true;
+      this.setScaleFactor(1.0);
       renderer.scaleTransitionProgress = 
         renderer.shouldCentralizeOrigin ? 
         Math.min(1,renderer.scaleTransitionProgress)
@@ -266,6 +267,26 @@ function TeaserOverlay(renderer, kwargs) {
     if (this.annotate !== undefined){
       this.annotate(this.renderer);
     }
+    this.initZoom();
+  };
+
+
+  this.initZoom = function(){
+    // let zoomed = ()=>{
+    //   let k = d3.event.transform.k;
+
+    //   if(this.renderer.scaleFactor>=0.5 && this.renderer.scaleFactor<=3){
+    //     this.renderer.scaleFactor *= 1.0 + (k-1.0) * 0.5;
+    //   }
+    //   if(this.renderer.scaleFactor<=0.5){
+    //     this.renderer.scaleFactor = 0.5;
+    //   }
+    //   if(this.renderer.scaleFactor>3){
+    //     this.renderer.scaleFactor = 3;
+    //   }
+    // };
+    // this.zoom = d3.zoom().on('zoom', zoomed);
+    // this.svg.call(this.zoom);
   };
 
 

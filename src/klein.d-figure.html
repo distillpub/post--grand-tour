@@ -1,0 +1,61 @@
+<!-- <d-figure class='lt' style="">
+  <canvas id='lt' class='layertransition'></canvas>
+  <script>
+    const ltFigure = document.querySelector("d-figure.lt");
+    let lt;
+
+    ltFigure.addEventListener("ready", function() {
+      console.log('lt ready');
+      let [gl, programs] = utils.initGL(
+        '#lt', 
+        [['shaders/layertransition_vertex.glsl', 
+        'shaders/layertransition_fragment.glsl']]
+      );
+  
+      let urls = [
+      'data/klein/d0.bin',
+      'data/klein/d1.bin',
+      'data/klein/d2.bin',
+      'data/klein/d3.bin',
+      'data/klein/d4.bin',
+
+      // 'data/klein0/d0.bin',
+      // 'data/klein0/d1.bin',
+      // 'data/klein0/d2.bin',
+      // 'data/klein0/d3.bin',
+      // 'data/klein0/d4.bin',
+      ];
+
+      lt = new LayerTransitionRenderer(gl, programs[0], {
+        nlayer: urls.length,
+        ndim: 36, //klein
+        nepoch: 100,
+        pointSize: 2.0,
+      });
+      lt.overlay = new LayerTransitionOverlay(lt);
+      
+      lt = utils.loadDataToRenderer(urls, lt);
+
+      window.addEventListener('resize', ()=>{
+        // sm0.resize();
+        // sm0.overlay.resize();
+      });
+    });
+
+    ltFigure.addEventListener("onscreen", function() {
+      console.log('onscreen');
+      if(lt && lt.isDataReady && lt.play){
+        lt.play();
+        lt.overlay.play();
+      }
+    });
+
+    ltFigure.addEventListener("offscreen", function() {
+      console.log('offscreen');
+      if(lt && lt.pause){
+        lt.pause();
+        lt.overlay.pause();
+      }
+    });    
+  </script>
+</d-figure> -->

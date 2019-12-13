@@ -31,6 +31,7 @@ function TeaserRenderer(gl, program, kwargs) {
   this.sz_center = d3.scaleLinear();
   this.sx = this.sx_center;
   this.sy = this.sy_center;
+  this.scaleFactor = 1.0;
 
 
   this.initData = function(buffer, url) {
@@ -328,9 +329,9 @@ function TeaserRenderer(gl, program, kwargs) {
 
 
     utils.updateScale_center(points, gl.canvas,
-      this.sx_center, this.sy_center, this.sz_center);
+      this.sx_center, this.sy_center, this.sz_center, this.scaleFactor);
     utils.updateScale_span(points, gl.canvas,
-      this.sx_span, this.sy_span, this.sz_span);
+      this.sx_span, this.sy_span, this.sz_span, this.scaleFactor);
 
     let transition;
     if (this.scaleTransitionDelta > 0){
