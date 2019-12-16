@@ -189,7 +189,7 @@
   The <em>Grand Tour</em> works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. 
   This is a <em>linear</em> process.
   The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear <d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs.
-  We will find this data-visual correspondence crucial to the visualization (vis) design, especially when compared to other non-linear methods.
+  We will find this data-visual correspondence crucial to the visualization design, especially when compared to other non-linear methods.
 </p>
 <p>
   To understand a neural network, we often try to observe its action on input examples.
@@ -379,8 +379,8 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 <p>
   The reason that non-linear embeddings fail in spotting the fundamental change in data is that they did not fulfill the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>:
   we design visualizations to reveal signals in data, so that a change in data is reflected in its visualization (vis) correspondingly. 
-  Ideally, we want the changes in two parts (data and its visualization) to <em>match in magnitude</em>: a barely noticeable change in vis reflects the smallest possible change in data, and a salient change in vis reflects a significant one in data.
-  Here in non-linear embeddings, a significant change happened in only a subset of data (e.g. all points of digit 1 from epoch 13 to 14), but all points in the vis move dramatically.
+  Ideally, we want the changes in two parts (data and its visualization) to <em>match in magnitude</em>: a barely noticeable change in visualization reflects the smallest possible change in data, and a salient change in visualization reflects a significant one in data.
+  Here in non-linear embeddings, a significant change happened in only a subset of data (e.g. all points of digit 1 from epoch 13 to 14), but all points in the visualization move dramatically.
   This is because the position of each single point depends on the whole data distribution in such embedding algorithms.
   Non-linear projections is thus not ideal for visualization. 
   The lack of data-visual correspondence make it hard to <em>infer</em> the underlying change in data from the vis.
@@ -768,12 +768,12 @@ But given this ability, we can directly see how images were activated in the fin
   Note that here we make an explicit distinction between data and its representation to help us think about the true signal in the data that is hidden in its specific representation. 
   Order of neurons in a layer is an artifact of the specific model, or a specific representation of the model, since other models that only permute the neurons should be thought as the same model.
   When designing a visualization (vis), we should think about which part of the data representation is an artifact that we should denoise, and which contains the real knowledge we should <em>distill</em> from this representation.
-  In this case, we want our vis to equivalent the ordering of neurons/dimensions in data points because the ordering is not important.
-  Conversely, when judging a vis, we should think about what this vis emphasizes about the data and what it discards.
+  In this case, we want our visualization to equivalent the ordering of neurons/dimensions in data points because the ordering is not important.
+  Conversely, when judging a vis, we should think about what this visualization emphasizes about the data and what it discards.
   That is, we think of what the Grand Tour sees equivalent and whether it is aligned with our goals.
 </p>
 <p>
-  To see whether the Grand Tour is a desired vis in viewing a linear transformation, we take advantage of a central, amazing fact of linear algebra. 
+  To see whether the Grand Tour is a desired visualization in viewing a linear transformation, we take advantage of a central, amazing fact of linear algebra. 
   The <em>Singular Value Decomposition</em> (SVD) theorem shows that <em>any</em> linear transformation can be decomposed into a sequence of very simple operations: a rotation, a scaling, and another rotation. 
 
   <!-- (From another perspective, any linear operation in standard bases is a scaling operation with appropriately chosen orthonormal bases on both sides.  -->
@@ -860,8 +860,8 @@ lt2.overlay.layerPlayButton.on('click')();
 
 <p>
   Previously, we compared the Grand Tour with other dimensionality reduction techniques. 
-  We used small multiples of random projections to serve as key frames of Grand Tour. The trade-offs between small multiples and animations is an ongoing discussion <!-- [TODO CITE?] --> in the vis community.
-  Here, we value the animation more than multiple static plots, for it eliminate certain kind of misleaders in the vis and thus gives a better data-visual correspondence. 
+  We used small multiples of random projections to serve as key frames of Grand Tour. The trade-offs between small multiples and animations is an ongoing discussion <!-- [TODO CITE?] --> in the visualization community.
+  Here, we value the animation more than multiple static plots, for it eliminate certain kind of misleaders in the visualization and thus gives a better data-visual correspondence. 
   In a linear projection, points that form a straight line in the original space are guaranteed to form a straight line in its low dimensional projection. 
   However, since the mapping is from a high dimension to a lower one, there can be false positives - a straight line on screen may <em>not</em> correspond to a real straight line in original space - the line being shown may be an illusion caused by this the lossy mapping. 
   With static plots, this potential illusion can never be eliminated, since we only see one projection at a time.
