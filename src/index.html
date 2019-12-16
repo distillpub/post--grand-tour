@@ -912,10 +912,15 @@ function toggle(event, id){
 </script>
 
 
-<h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
+<h2 class="clickable clickable-active" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
 Technical Details
 </h2>
-<div id='div-technical-details' class='hidden'>
+<div id='div-technical-details' class=''>
+
+<!-- <h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
+Technical Details
+</h2>
+<div id='div-technical-details' class='hidden'> -->
 
 In this sections, we will introduce the technical details of direct manipulation and layer transition.
 
@@ -1037,15 +1042,16 @@ style="width: 40%"
   This induces a delta change in the <d-math>i^{th}</d-math> row of the Grand Tour matrix <d-math>GT</d-math>.
   Next, as the first step in Gram-Schmidt, we normalized this row: 
   <d-math block>
-    GT_i^{(new)} := normalize(GT_i^{(new)}) = normalize(\tilde{e_i} + \tilde{\Delta})
+    GT_i^{(new)} := normalize(\tilde{GT}_i) = normalize(\tilde{e_i} + \tilde{\Delta})
   </d-math>
   These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := normalize(\tilde{e_i}+\tilde{\Delta})</d-math>.
 </p>
 <p>
   Looking at the geometry of this movement, the "add-delta-then-normalize" on <d-math>\tilde{e_i}</d-math> is equivalent to a <em>rotation</em> from <d-math>\tilde{e_i}</d-math> towards <d-math>\tilde{e_i}^{(new)}</d-math>, illustrated in the figure below. 
-<p>
-<img src="figs/direct-manipulation-rotation-3d.png" style="width: 65%" class="img-center"/>
+  This geometric interpretation can be directly generalized to any arbitrary data point.
 </p>
+<img src="figs/direct-manipulation-rotation-3d.png" style="width: 65%" class="img-center"/>
+<p>
   The figure shows the case in 3D, but in higher dimensional space it is essentially the same, since the two vectors <d-math>\tilde{e_i}</d-math> and <d-math>\tilde{e_i}+\tilde{\Delta}</d-math> only span a 2-subspace.
   Now we have a nice geometric intuition about direct manipulation: dragging a point induces a <em>simple rotation</em>
   <d-footnote><a href="https://en.wikipedia.org/wiki/Rotations_in_4-dimensional_Euclidean_space#Simple_rotations">Simple rotations</a> are rotations with only one <a href="https://en.wikipedia.org/wiki/Plane_of_rotation#Simple_rotations">plane of rotation</a>.</d-footnote>
@@ -1107,28 +1113,68 @@ style="width: 40%"
   In axis mode, the <d-math>i^{th}</d-math>-row-first Grand-Schmidt does the rotation and change of basis in one step.
 </p>
 </div> <!-- div-data-point-mode -->
-
+</div> <!-- div-direct-manipulation -->
 
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-align-representation')">
-  Aligning representations: enabling the visualization of layer-to-layer dynamics</h3>
+  <!-- Aligning representations: enabling the visualization of layer-to-layer dynamics -->
+  Layer Transitions
+</h3>
 <div id='div-align-representation' class=''>
 
-<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rp')">
-  The <d-math>R^p \to R^p</d-math> case
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-relu')">
+  <d-math>ReLU</d-math> Layers
 </h4>
-<div id='div-rp-to-rp' class='hidden'>
-</div> <!-- #div-rp-to-rp -->
+<div id='div-relu' class=''>
+  When the <d-math>l^{th}</d-math> layer is a ReLU function, the output activation is <d-math>X^{l} = ReLU(X^{l-1})</d-math>. Since ReLU does not change the dimensionality and the function is taken coordinate wise, we can animate the transition by a simple linear interpolation: for a time parameter <d-math>t \in [0,1]</d-math>,
+  <d-math block>
+    X^{(l-1) \to l}(t) := (1-t) X^{l-1} + t X^{l}
+  </d-math>
+</div> <!-- #div-relu -->
 
-
-<h4 class="clickable" onclick="toggle(event, '#div-rp-to-rr')">
-  The <d-math>R^p \overset{M}{\to} R^r</d-math> case, <d-math>p\neq r</d-math>
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-linear')">
+  Linear Layers
 </h4>
-<div id='div-rp-to-rr' class='hidden'>
-</div> <!-- #div-rp-to-rr -->
+<div id='div-linear' class=''>
+  Linear layers can seem complicated with a inappropriate basis. 
+  For example, if <d-math>X^{l} = X^{l-1} M</d-math> where <d-math>M \in \mathbb{R}^{m \times n}</d-math> is the matrix of a linear transformation, then it has a singular value decomposition (SVD):
+  <d-math block>M = U \Sigma V^T</d-math>
+  where <d-math>U \in \mathbb{R}^{m \times m}</d-math> and <d-math>V^T \in \mathbb{R}^{n \times n}</d-math> are orthogonal, <d-math>\Sigma \in \mathbb{R}^{m \times n}</d-math> is diagonal.
+  For arbitrary <d-math>U</d-math> and <d-math>V^T</d-math>, the transformation on <d-math>X^{l-1}</d-math> is a composition of a rotation (<d-math>U</d-math>), scaling (<d-math>\Sigma</d-math>) and another rotation (<d-math>V^T</d-math>), which can look complicated. 
+  However, when thinking about the role of the Grand Tour, notice that <d-math>U</d-math> and <d-math>V^T</d-math> has no significance in Grand Tour, they are another two rotations to the view.
+  Hence, instead of showing <d-math>M</d-math>, we should animate <d-math>\Sigma</d-math> only.
+  Since <d-math>\Sigma</d-math> is a scaling done coordinate-wise, we can animate it similar to the ReLU after a proper change of basis.
+  Given <d-math>X^{l} = X^{l-1} U \Sigma V^T</d-math>, we have
+  <d-math block>
+    (X^{l}V) = (X^{l-1}U)\Sigma
+  </d-math>
+  For a time parameter <d-math>t \in [0,1]</d-math>,
+  <d-math block>
+    X^{(l-1) \to l}(t) := (1-t) (X^{l-1}U) + t (X^{l}V)
+  </d-math>
 
+</div> <!-- #div-linear -->
+
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-conv')">
+  Convolutional Layers
+</h4>
+<div id='div-conv' class=''>
+  Convolutional layers can be represented as special linear layers.
+  With a change of representation, we can animate a convolutional layer like the previous section.
+  For 2D convolutions this change of representation involves flattening the input and output, and repeating the kernel pattern in a sparse matrix <d-math>M \in \mathbb{R}^{m \times n}</d-math>, where <d-math>m</d-math> and <d-math>n</d-math> are the dimensionalities of the input and output respectively.
+  This change of representation is only practical for a small dimensionality (e.g. up to 1000), since we need to solve SVD for linear layers.
+  However, the singular value decomposition of multi-channel 2D convolutions can be computed efficiently <d-cite key="sedghi2018singular"></d-cite>, which can be then be directly used for alignment.
+</div> <!-- #div-conv -->
+
+<h4 class="clickable clickable-active" onclick="toggle(event, '#div-maxpool')">
+  Max-pooling Layers
+</h4>
+<div id='div-maxpool' class=''>
+  Animating max-pooling layers can be tricky since its not linear <d-footnote>A max-pooling layer is piece-wise linear</d-footnote> or coordinate-wise.
+  We approximate it by average-pooling. 
+  Similar to convolutional layers, we find the matrix form of average-pooling and use its SVD to align the view before and after this layer. 
+</div> <!-- #div-maxpool -->
 </div> <!-- #div-align-representation -->
-
 
 </div><!-- #div-technical-details -->
 
