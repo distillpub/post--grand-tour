@@ -273,7 +273,7 @@
 
 
 
-<h3>Opening the black box</h3>
+<h3>Opening the Black Box</h3>
 
 <p>
   We trained deep CNN models with 3 common classification datasets: MNIST, fashion-MNIST and CIFAR-10. 
@@ -348,7 +348,7 @@
 </p> -->
 
 
-<h3>Dimensionality reduction</h3>
+<h3>Dimensionality Reduction</h3>
 
 <p>
 The need is simple: we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
@@ -358,7 +358,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 </p>
 
 <i id="sm0-a"></i>
-<h3>But state-of-the-art dimensionality reduction is non-linear!</h3>
+<h3>But State-of-the-art Dimensionality Reduction is Non-linear!</h3>
 <p>
   Consider the aforementioned intriguing feature about the different learning rate that the MNIST classifier has on digit 1 and 7: the network did not learn to recognize digit 1 until epoch 14, digit 7 until epoch 21.
   With that in mind, look for changes of digit 1 around epochs 14 and changes of digit 7 around epochs 21 in the visualizations below. 
@@ -445,7 +445,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 
 
-<h3>Linear methods to the rescue</h3>
+<h3>Linear Methods to the Rescue</h3>
 
 <p>
   When given the option, then, we should prefer methods for which changes in the data produce predictable, visually salient changes in the result.
@@ -568,7 +568,7 @@ We will spell out how to generate a smooth sequence of rotation matrices in the 
 But given this ability, we can directly see how images were activated in the final softmax layer of a neural network.
 </p> -->
 
-<h2>The Grand Tour of the softmax layer</h2>
+<h2>The Grand Tour of the Softmax Layer</h2>
 <p>
   The Grand Tour is a general technique for any high dimensional data points, so in principle we should be able to use it to view neuron activations in <em>any</em> layers. 
   However, the final softmax layer is especially easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. For other intermediate hidden layers, the axes are more abstract. 
@@ -595,7 +595,7 @@ But given this ability, we can directly see how images were activated in the fin
   <!-- <strong><br><br>[TODO Figure showing all three datasets side-by-side]<br><br></strong> -->
 </p>
 
-<h3>Direct manipulation on the axes</h3>
+<h3>Direct Manipulation on the Axes</h3>
 
 <p>
   In fashion-MNIST, we see how the model confuses between classes.
@@ -671,7 +671,7 @@ But given this ability, we can directly see how images were activated in the fin
 </p>
 
 
-<h2>The Grand Tour of training dynamics</h2>
+<h2>The Grand Tour of Training Dynamics</h2>
 
 <p>
   We trained 99 epochs and recorded the entire history of neuron activations on subsets of training and testing examples. 
@@ -767,7 +767,7 @@ But given this ability, we can directly see how images were activated in the fin
 <p>
   Note that here we make an explicit distinction between data and its representation to help us think about the true signal in the data that is hidden in its specific representation. 
   Order of neurons in a layer is an artifact of the specific model, or a specific representation of the model, since other models that only permute the neurons should be thought as the same model.
-  When designing a visualization (vis), we should think about which part of the data representation is an artifact that we should denoise, and which contains the real knowledge we should <em>distill</em> from this representation.
+  When designing a visualization, we should think about which part of the data representation is an artifact that we should denoise, and which contains the real knowledge we should <em>distill</em> from this representation.
   In this case, we want our visualization to equivalent the ordering of neurons/dimensions in data points because the ordering is not important.
   Conversely, when judging a vis, we should think about what this visualization emphasizes about the data and what it discards.
   That is, we think of what the Grand Tour sees equivalent and whether it is aligned with our goals.
@@ -804,7 +804,7 @@ lt2Figure.onscreen();
 lt2.overlay.layerPlayButton.on('click')();
 ">this view</a>.</p>
 
-<h3>From basis to instances: extending direct manipulations</h3>
+<h3>From Basis to Instances: Extending Direct Manipulations</h3>
 <p> 
   Unlike the softmax layer, there is one problem with our axis handles in high dimensional hidden layers.
   Although we have preprocessed data (we chose up to 45 principle components through PCA) so that their dimensionality is at manageable size for the Grand Tour, the axes lines still make a hair ball, and more importantly, these axes in hidden layers do not possess as much meaning as the softmax. 
@@ -818,7 +818,7 @@ lt2.overlay.layerPlayButton.on('click')();
 
 
 
-<h2>The Grand Tour of adversarial dynamics</h2>
+<h2>The Grand Tour of Adversarial Dynamics</h2>
 <p>
   The Grand Tour can also elucidate adversarial examples <d-cite key="szegedy2013intriguing"></d-cite> as they are processed by a neural network.
   For this illustration, we adversarially add perturbations to 89 digit 8s to fool the network into thinking they are 0s.
@@ -856,7 +856,7 @@ lt2.overlay.layerPlayButton.on('click')();
 
 <h2>Discussion</h2>
 
-<h3>The power of animation and direct manipulation</h3>
+<h3>The Power of Animation and Direct Manipulation</h3>
 
 <p>
   Previously, we compared the Grand Tour with other dimensionality reduction techniques. 
@@ -873,14 +873,14 @@ lt2.overlay.layerPlayButton.on('click')();
 </p>
 
 
-<h3>Generalizing to non-sequential models</h3>
+<h3>Non-sequential Models</h3>
 <p>
   In our work we have walked through models that are purely sequential. In modern architectures it is common to have non-sequential parts such as small ephemeral highway <d-cite key="srivastava2015highway"></d-cite> branches or dedicated branches for different tasks <d-cite key="szegedy2015going"></d-cite>. 
   With our technique, technically one can visualize neuron activations on each such branch, but more interesting to us in future work is how in theory our visual encoding could be extended in order to efficiently interpret such complex architectures.
 </p>
 
 
-<h3>Scaling to larger models</h3>
+<h3>Scaling to Larger Models</h3>
 <p>
   Modern architectures are also wide. Especially when convolutional layers are concerned, one could run into issues with scalability if we see such layers as a large sparse matrix acting on flattened multi-channel images.
   For the sake of simplicity, in this article we brute-forced the computation of the alignment of such convolutional layers by writing out their explicit matrix representation. 
