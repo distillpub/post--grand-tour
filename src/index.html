@@ -989,12 +989,14 @@ Direct manipulation
   Then, <d-math>\pi_2</d-math> is a function that keeps only the first two entries of <d-math>\tilde{e_i}</d-math> and gives the 2D coordinate of the handle to be shown in the plot, <d-math>(x_i, y_i)</d-math>.
 </p>
 
-<img 
+<!-- <img 
 src="figs/direct-manipulation-axis-mode-commutative-diagram-0.png" 
 class="img-center"
 style="width: 40%"
-/>
-
+/> -->
+<d-math block>
+  e_i \overset{GT}{\mapsto} \tilde{e_i} \overset{\pi_2}{\mapsto} (x_i, y_i)
+</d-math>
 <p>
   When user drags an axis handle on canvas, he/she induces a delta change <d-math>\Delta = (dx, dy)</d-math>on the xy-plane. 
   The coordinate of the handle becomes:
@@ -1141,9 +1143,9 @@ style="width: 40%"
   <d-math block>M = U \Sigma V^T</d-math>
   where <d-math>U \in \mathbb{R}^{m \times m}</d-math> and <d-math>V^T \in \mathbb{R}^{n \times n}</d-math> are orthogonal, <d-math>\Sigma \in \mathbb{R}^{m \times n}</d-math> is diagonal.
   For arbitrary <d-math>U</d-math> and <d-math>V^T</d-math>, the transformation on <d-math>X^{l-1}</d-math> is a composition of a rotation (<d-math>U</d-math>), scaling (<d-math>\Sigma</d-math>) and another rotation (<d-math>V^T</d-math>), which can look complicated. 
-  However, when thinking about the role of the Grand Tour, notice that <d-math>U</d-math> and <d-math>V^T</d-math> has no significance in Grand Tour, they are another two rotations to the view.
+  However, when thinking about these actions in Grand Tour which is rotations, we notice that <d-math>U</d-math> and <d-math>V^T</d-math> will have no significance in it - they are just another two rotations to the view.
   Hence, instead of showing <d-math>M</d-math>, we should animate <d-math>\Sigma</d-math> only.
-  Since <d-math>\Sigma</d-math> is a scaling done coordinate-wise, we can animate it similar to the ReLU after a proper change of basis.
+  <d-math>\Sigma</d-math> is a coordinate-wise scaling, so we can animate it similar to the ReLU after the proper change of basis.
   Given <d-math>X^{l} = X^{l-1} U \Sigma V^T</d-math>, we have
   <d-math block>
     (X^{l}V) = (X^{l-1}U)\Sigma
