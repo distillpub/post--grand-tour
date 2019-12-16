@@ -450,8 +450,9 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 <p>
   When given the option, then, we should prefer methods for which changes in the data produce predictable, visually salient changes in the result.
   PCA is a natural way of doing linear dimensionality reduction since it tries to preserve the most variance in the data.
-  The distribution of data from softmax layers, however, is essentially spherical, since activations of examples from different class are orthogonal to each other.
-  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations tend not to be substantially better than the third. So which of them should we show to the user? 
+  The distribution of data from softmax layers, if trained perfectly on a class-balanced dataset, has equal variance in every dimensions, since around each one-hot vector there concentrates similar amount of examples.
+  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations tend not to be substantially better than the third. 
+  So which of them should we show to the user? 
   To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once.
   <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
   On the other hand, the Grand Tour is a linear method which also offers us the chance to see many projections <em>smoothly animated</em>.
