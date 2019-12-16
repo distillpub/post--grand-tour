@@ -995,7 +995,7 @@ style="width: 40%"
   The coordinate of the handle becomes:
   <d-math block>(x_i^{(new)}, y_i^{(new)}) := (x_i+dx, y_i+dy)</d-math>
   Note that <d-math>(x_i, y_i)</d-math> is the first two coordinates of the axis handle in high dimension after the Grand Tour rotation, so a delta change on <d-math>(x_i, y_i)</d-math> induces a delta change <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> on <d-math>\tilde{e_i}</d-math>:
-  <d-math block>\tilde{e_i}^{(new)} := \tilde{e_i} + \tilde{\Delta}</d-math>
+  <d-math block>\tilde{e_i} \overset{\tilde{\Delta}}{\mapsto} \tilde{e_i} + \tilde{\Delta}</d-math>
 </p>
 <p>
   To find a nearby Grand Tour rotation that respects this change, first note that <d-math>\tilde{e_i}</d-math> is exactly the <d-math>i^{th}</d-math> row of orthogonal Grand Tour matrix <d-math>GT</d-math> 
@@ -1003,16 +1003,24 @@ style="width: 40%"
     Recall that the convention is that vectors are in row forms and linear transformations are matrices that are multiplied on the right.
     So <d-math>e_i</d-math> is a row vector whose <d-math>i^{th}</d-math> is 1 and 0s elsewhere, and <d-math>\tilde{e_i} := e_i \cdot GT</d-math> is the <d-math>i^{th}</d-math> row of <d-math>GT</d-math>
   </d-footnote>. 
-  Naturally, we want the new matrix to be the original <d-math>GT</d-math> with its <d-math>i^{th}</d-math> row replaced by <d-math>\tilde{e_i}^{(new)}</d-math>, i.e. adding <d-math>dx</d-math> and <d-math>dy</d-math> to the <d-math>(i,1)</d-math>-th entry and <d-math>(i,2)</d-math>-th entry of <d-math>GT</d-math> respectively:
+  Naturally, we want the new matrix to be the original <d-math>GT</d-math> with its <d-math>i^{th}</d-math> row replaced by <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, i.e. we should add <d-math>dx</d-math> and <d-math>dy</d-math> to the <d-math>(i,1)</d-math>-th entry and <d-math>(i,2)</d-math>-th entry of <d-math>GT</d-math> respectively:
   <d-math block>\tilde{GT} \leftarrow GT</d-math>
   <d-math block>\tilde{GT}_{i,1} \leftarrow GT_{i,1} + dx</d-math>
   <d-math block>\tilde{GT}_{i,2} \leftarrow GT_{i,2} + dy</d-math>
   However, <d-math>\tilde{GT}</d-math> is not orthogonal for arbitrary <d-math>(dx, dy)</d-math>.
   In order to find an approximation to <d-math>\tilde{GT}</d-math> that is orthogonal, we apply <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of <d-math>\tilde{GT}</d-math>, with the <d-math>i^{th}</d-math> row considered first in the Gram-Schmidt process:
   <d-math block>GT^{(new)} := GramSchmidt(\tilde{GT})</d-math>
-  Note that the <d-math>i^{th}</d-math> row is now normalized to a unit vector during Gram-Schmidt, so the resulting position of the handle may not be the same as the destination of the dragging. 
-  For small amount of <d-math>\Delta</d-math>, the difference is bounded above by <d-math>||\Delta||</d-math>.
+  Note that the <d-math>i^{th}</d-math> row is normalized to a unit vector during the Gram-Schmidt, so the resulting position of the handle is 
+  <d-math>\tilde{e_i}^{(new)} = normalize(\tilde{e_i} + \tilde{\Delta})</d-math>
+  which may not be exactly the same as <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, as the following figure shows
+  <d-footnote>
+    However, for any <d-math>\tilde{\Delta}</d-math>, the norm of the difference is bounded above by <d-math>||\tilde{\Delta}||</d-math>, as the following figure proves.
+    <img src="figs/direct-manipulation-rotation-2d-proof.png" style="width: 100%" class="img-center"/>
+  </d-footnote>
+  .
 </p>
+<img src="figs/direct-manipulation-rotation-2d.png" style="width: 40%" class="img-center"/>
+
 
 </div> <!-- div-axis-mode -->
 
@@ -1022,17 +1030,82 @@ style="width: 40%"
 <div id='div-data-point-mode' class=''>
 <p>
   We now explain how we directly manipulate data points. 
-  Technically speaking, the method here only considers one point at a time.
-  For a group of points, we compute their centroid and directly manipulate this single point instead.
-  Thinking more carefully about the duty of the Gram-Schmidt in axis mode gives us a way to drag any single point.
-  Recall that in axis mode, we added user's manipulation <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> to the original position of the <d-math>i^{th}</d-math> axis handle, <d-math>\tilde{e_i}</d-math>.
-  Next, as the first step in Gram-Schmidt, we normalized <d-math>\tilde{e_i} + \tilde{\Delta}</d-math>. 
-  So the the axis handle moved from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new, norm)} := normalize(\tilde{e_i}+\tilde{\Delta})</d-math>.
-  Looking at its geometry, the change "add then normalize" is equivalent to a rotation from <d-math>\tilde{e_i}</d-math> towards <d-math>\tilde{e_i} + \tilde{\Delta}</d-math>, illustrated in the figure below. 
-  The figure shows this equivalence in 3D, but it is essentially the same case in higher dimensional space, since the two vectors <d-math>\tilde{e_i}</d-math> and <d-math>\tilde{e_i}+\tilde{\Delta}</d-math> always span only a 2-subspace.
+  Technically speaking, this method only considers one point at a time.
+  For a group of points, we compute their centroid and directly manipulate this single point with this method.
+  Thinking more carefully about the process in axis mode gives us a way to drag any single point.
+  Recall that in axis mode, we added user's manipulation <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> to the position of the <d-math>i^{th}</d-math> axis handle <d-math>\tilde{e_i}</d-math>.
+  This induces a delta change in the <d-math>i^{th}</d-math> row of the Grand Tour matrix <d-math>GT</d-math>.
+  Next, as the first step in Gram-Schmidt, we normalized this row: 
+  <d-math block>
+    GT_i^{(new)} := normalize(GT_i^{(new)}) = normalize(\tilde{e_i} + \tilde{\Delta})
+  </d-math>
+  These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := normalize(\tilde{e_i}+\tilde{\Delta})</d-math>.
 </p>
-<!-- TODO continue here -->
-<!-- TODO figure -->
+<p>
+  Looking at the geometry of this movement, the "add-delta-then-normalize" on <d-math>\tilde{e_i}</d-math> is equivalent to a <em>rotation</em> from <d-math>\tilde{e_i}</d-math> towards <d-math>\tilde{e_i}^{(new)}</d-math>, illustrated in the figure below. 
+<p>
+<img src="figs/direct-manipulation-rotation-3d.png" style="width: 65%" class="img-center"/>
+</p>
+  The figure shows the case in 3D, but in higher dimensional space it is essentially the same, since the two vectors <d-math>\tilde{e_i}</d-math> and <d-math>\tilde{e_i}+\tilde{\Delta}</d-math> only span a 2-subspace.
+  Now we have a nice geometric intuition about direct manipulation: dragging a point induces a <em>simple rotation</em>
+  <d-footnote><a href="https://en.wikipedia.org/wiki/Rotations_in_4-dimensional_Euclidean_space#Simple_rotations">Simple rotations</a> are rotations with only one <a href="https://en.wikipedia.org/wiki/Plane_of_rotation#Simple_rotations">plane of rotation</a>.</d-footnote>
+  in high dimensional space.
+  This intuition is precisely how we implemented our direct manipulation on arbitrary data points, which we will specify as below.
+</p>
+<p>
+  Generalizing this observation from axis handle to arbitrary data point, we want to find the rotation that moves the centroid of a selected subset of data points <d-math>\tilde{c}</d-math> to 
+  <d-math block>
+    \tilde{c}^{(new)} := (\tilde{c} + \tilde{\Delta}) \cdot ||\tilde{c}|| / ||\tilde{c} + \tilde{\Delta}||
+  </d-math>
+</p>
+<img src="figs/direct-manipulation-rotation-2d-perp.png" style="width: 40%" class="img-center"/>
+<p>
+  First, the angle of rotation can be found by their cosine similarity:
+  <d-math block> \theta = arccos(
+    \frac{
+      \langle \tilde{c}, \tilde{c}^{(new)} \rangle
+    }{
+      ||\tilde{c}|| \cdot ||\tilde{c}^{(new)}||
+    }
+  )</d-math>
+  Next, to find the matrix form of the rotation, we need a convenient basis.
+  Let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>.
+  For example, we can let its first row to be <d-math>normalize(\tilde{c})</d-math>, second row to be its orthonormal complement <d-math>normalize(\tilde{c}^{(new)}_{\perp})</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, and the remaining rows complete the whole space:
+  <d-math block>
+  \tilde{c}^{(new)}_{\perp} 
+  := \tilde{c} - ||\tilde{c}|| \cdot cos \theta \frac{\tilde{c}^{(new)}}{||\tilde{c}^{(new)}||}
+  </d-math>
+
+  <d-math block>
+    Q :=
+    \begin{bmatrix}
+    \cdots normalize(\tilde{c}) \cdots \\
+    \cdots normalize(\tilde{c}^{(new)}_{\perp}) \cdots \\
+    P
+    \end{bmatrix}
+  </d-math>
+  where <d-math>P</d-math> completes the remaining space.
+
+  Making use of <d-math>Q</d-math>, we can find the matrix that rotates the plane <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math> by the angle <d-math>\theta</d-math>:
+  <d-math block>
+    \rho = Q^T
+    \begin{bmatrix}
+    cos \theta& sin \theta&  0&  0& \cdots\\
+    -sin \theta& cos \theta&  0&  0& \cdots\\
+    0& 0&  \\ 
+    \vdots& \vdots& & I& \\
+    \end{bmatrix}
+    Q
+    =: Q^T R_{1,2}(\theta) Q
+  </d-math>
+  The new Grand Tour matrix is the matrix product of the original <d-math>GT</d-math> and <d-math>\rho</d-math>:
+  <d-math>
+    GT^{(new)} := GT \cdot \rho
+  </d-math>
+  Now we should be able to see the connection between axis mode and data point mode.
+  In data point mode, finding <d-math>Q</d-math> can be done by Grand-Schmidt: Let the first basis be <d-math>\tilde{c}</d-math>, find the orthogonal component of <d-math>\tilde{c}^{(new)}</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, repeatedly take a random vector, find its orthogonal component to the span of the current basis vectors and add it to the basis set. 
+  In axis mode, the <d-math>i^{th}</d-math>-row-first Grand-Schmidt does the rotation and change of basis in one step.
+</p>
 </div> <!-- div-data-point-mode -->
 
 
