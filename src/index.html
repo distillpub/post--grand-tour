@@ -203,7 +203,7 @@
 </p>
 
 
-<h2>Background</h2>
+<h2>Motivation</h2>
 
 <!-- <p>
   There is a number of great videos and blogs that explain what a neural network is (for example the one made by <a href="https://www.youtube.com/watch?v=aircAruvnKk">3Blue1Brown</a>).
@@ -347,11 +347,8 @@
   In a sense, then, it is the <em>linear</em> parts of a neural network that need most help from visualization.
 </p> -->
 
-
-<h3>Dimensionality Reduction</h3>
-
 <p>
-The need is simple: we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
+The need is: we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
 If there are only two neurons/dimensions, a scatter plot would suffice.
 However, the data points in the softmax layer are 10 dimensional, thus we need to either show two dimensions at a time which does not scale well (as there would be 45 scatter plots - a quadric to the dimensionality - to look at),
 or we can use <em>dimensionality reduction</em> to map the data into a two dimensional space and show them in a single plot. 
@@ -913,15 +910,15 @@ function toggle(event, id){
 </script>
 
 
-<h2 class="clickable clickable-active" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
+<!-- <h2 class="clickable clickable-active" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
 Technical Details
 </h2>
-<div id='div-technical-details' class=''>
+<div id='div-technical-details' class=''> -->
 
-<!-- <h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
+<h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
 Technical Details
 </h2>
-<div id='div-technical-details' class='hidden'> -->
+<div id='div-technical-details' class='hidden'>
 
 In this sections, we will introduce the technical details of direct manipulation and layer transition.
 
