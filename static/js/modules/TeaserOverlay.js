@@ -118,7 +118,7 @@ function TeaserOverlay(renderer, kwargs) {
       renderer.shouldCentralizeOrigin = renderer.shouldPlayGrandTour;
 
       renderer.isScaleInTransition = true;
-      this.setScaleFactor(1.0);
+      renderer.setScaleFactor(1.0);
       renderer.scaleTransitionProgress = 
         renderer.shouldCentralizeOrigin ? 
         Math.min(1,renderer.scaleTransitionProgress)

@@ -53,7 +53,7 @@ utils.updateScale_span = function(points, canvas, sx, sy, sz,
   let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
   yRadius *= scaleFactor;
   sy.domain([vmin[1], vmax[1]])
-  .range([yMiddle-yRadius, yMiddle+yRadius]);
+  .range([yMiddle+yRadius, yMiddle-yRadius]);
 
   let xMiddle = (canvas.clientWidth-marginRight)/2;
   // let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
@@ -83,7 +83,7 @@ utils.updateScale_center = function(points, canvas, sx, sy, sz,
   let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
   yRadius *= scaleFactor;
   sy.domain([vmin[1], vmax[1]])
-  .range([yMiddle-yRadius, yMiddle+yRadius]);
+  .range([yMiddle+yRadius, yMiddle-yRadius]);
 
   let xMiddle = (canvas.clientWidth-marginRight)/2;
   let xRadius = yRadius / yDataRange * xDataRange;

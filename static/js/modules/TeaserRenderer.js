@@ -33,6 +33,9 @@ function TeaserRenderer(gl, program, kwargs) {
   this.sy = this.sy_center;
   this.scaleFactor = 1.0;
 
+  this.setScaleFactor = function(s){
+    this.scaleFactor = s;
+  }
 
   this.initData = function(buffer, url) {
     if (url.includes('labels')) {
