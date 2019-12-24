@@ -878,17 +878,12 @@ lt2.overlay.layerPlayButton.on('click')();
 <h3>The Power of Animation and Direct Manipulation</h3>
 
 <p>
-  Previously, we compared the Grand Tour with other dimensionality reduction techniques. 
-  We used small multiples of random projections to serve as key frames of Grand Tour. The trade-offs between small multiples and animations is an ongoing discussion <!-- [TODO CITE?] --> in the visualization community.
-  Here, we value the animation more than multiple static plots, for it eliminate certain kind of misleaders in the visualization and thus gives a better data-visual correspondence. 
-  In a linear projection, points that form a straight line in the original space are guaranteed to form a straight line in its low dimensional projection. 
-  However, since the mapping is from a high dimension to a lower one, there can be false positives - a straight line on screen may <em>not</em> correspond to a real straight line in original space - the line being shown may be an illusion caused by this the lossy mapping. 
-  With static plots, this potential illusion can never be eliminated, since we only see one projection at a time.
-  With animations, a viewer can visually infer and <em>confirm</em> the existence of a line in high dimensional space by looking at multiple frames of different projection. 
-  The longer a line persist in the animated projection, the higher chance that it is indeed a straight line in its original space.
-  The smoothness animation gives the viewer an easier way to link points from view to view, compared to presenting the same thing with a sequence of snapshots.
-  Therefore animation in this context enables a form of visual hypothesis testing, with the null hypothesis being "the line I see is created merely by the projection instead of data".
-  As you may be convinced by the figure in the the comparison section, it is harder to recognize straight lines with high confidence with static plots than with Grand Tour animation, not to mention more complicated structures such as curves and clusters.
+  When comparing the Grand Tour with other dimensionality reduction techniques, we used small multiples that cover different training epochs and dimensionality reduction methods. 
+  When comparing small multiples and animation, there is no general conclusion on which one is better than the other in the literature. 
+  They are only studied in specific settings, for example, in dynamic graph drawing <d-cite key="archambault2010animation"></d-cite> and people have raised concerns about incomparable contents <d-cite key="tversky2002animation"></d-cite> in some of these studies.
+  In our case, however, the use of animation comes naturally from our direct manipulation.
+  Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections. 
+  Although we could have used small multiples over animations for training and layer dynamics, without specific support that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
 </p>
 
 
