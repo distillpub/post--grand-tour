@@ -7,12 +7,27 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
   this.xOffsetLeft = xOffsetLeft;
   this.xOffsetRight = xOffsetRight;
   this.renderer = renderer;
+
+  let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
   let that = this;
 
-  this.slider = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.zoomSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider')
+    .attr('class', 'slider zoomSlider')
+    .attr('min', 0.2)
+    .attr('max', 2.0)
+    .attr('value', this.renderer.viewFactor)
+    .attr('step', 0.01)
+    .on('input', function() {
+      let value = d3.select(this).property('value');
+      renderer.scaleFactor = +value;
+    });
+
+  this.epochSlider = figure
+    .insert('input', ':first-child')
+    .attr('type', 'range')
+    .attr('class', 'slider epochSlider')
     .attr('min', renderer.epochs[0])
     .attr('max', renderer.epochs[renderer.epochs.length-1])
     .attr('value', utils.MIN_EPOCH)
@@ -27,11 +42,11 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
 
   //special treatment when showing only one peoch
   if(renderer.epochs.length <= 1){
-    this.slider.style('display', 'none');
+    this.epochSlider.style('display', 'none');
   }
 
 
-  this.playButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.playButton = figure
     .insert('i', ':first-child')
     .attr('class', 'play-button tooltip fa ' + (renderer.shouldAutoNextEpoch?'fa-pause':'fa-play'));
 
@@ -64,7 +79,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
   }
 
 
-  this.fullScreenButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.fullScreenButton = figure
     .insert('i', ':first-child')
     .attr('class', 'tooltip teaser-fullscreenButton fas fa-expand-arrows-alt')
     .on('mouseover', function() {
@@ -92,7 +107,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     .attr('class', 'tooltipTextBottom')
     .text('Toggle fullscreen');
 
-  this.grandtourButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.grandtourButton = figure
     .insert('i', ':first-child')
     .attr('class', 'teaser-grandtourButton tooltip fas fa-globe-americas')
     .attr('width', 32)
@@ -130,7 +145,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     });
 
 
-  this.svg = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.svg = figure
     .insert('svg', ':first-child')
     .attr('class', 'overlay')
     .attr('width', width)
@@ -160,7 +175,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     .text('training');
   
   
-  this.controlOptionGroup = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.controlOptionGroup = figure
     .insert('div', ':first-child');
 
   this.modeOption = this.controlOptionGroup
@@ -231,8 +246,8 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     let width = this.svg.attr('width');
     let height = this.svg.attr('height');
 
-    let sliderLeft = parseFloat(this.slider.style('left'));
-    let sliderWidth = parseFloat(this.slider.style('width'));
+    let sliderLeft = parseFloat(this.epochSlider.style('left'));
+    let sliderWidth = parseFloat(this.epochSlider.style('width'));
     let sliderMiddle = sliderLeft+sliderWidth/2;
     
     this.epochIndicator

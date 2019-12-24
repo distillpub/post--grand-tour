@@ -303,9 +303,6 @@ canvas.smallmultiple, canvas.smallmultiple0{
 
 .slider {
     position: absolute;
-    top: calc(100% - 34px);
-    left: 15%;
-    width: 60%;
     -webkit-appearance: none;
     grid-column: middle;
     height: 5px;
@@ -332,13 +329,27 @@ canvas.smallmultiple, canvas.smallmultiple0{
     background: #4CAF50;
     cursor: pointer;
 }
-.layerSlider {
-    top: calc(100% - 70px);
+
+
+.epochSlider {
+  top: calc(100% - 34px);
+  left: 15%;
+  width: 60%;
 }
 
 .layerSlider {
-    top: calc(100% - 70px);
+  top: calc(100% - 70px);
+  left: 15%;
+  width: 60%;
 }
+
+.zoomSlider {
+    top: 20px; 
+    left: 83%; 
+    width: 15%;
+}
+
+
 
 canvas.layertransition {
     width: 100%;

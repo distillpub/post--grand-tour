@@ -271,7 +271,7 @@ function TeaserRenderer(gl, program, kwargs) {
 
   this.setEpochIndex = (i)=>{
     this.epochIndex = i;
-    this.overlay.slider
+    this.overlay.epochSlider
       .property('value', i);
 
     this.overlay.svg.select('#epochIndicator')

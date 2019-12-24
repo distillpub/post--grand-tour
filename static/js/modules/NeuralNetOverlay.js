@@ -17,7 +17,7 @@ function NeuralNetOverlay(svgid) {
   this.slider = d3.select(this.svg.node().parentNode)
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider')
+    .attr('class', 'slider epochSlider')
     .attr('min', utils.MIN_EPOCH)
     .attr('max', utils.MAX_EPOCH)
     .attr('value', utils.MIN_EPOCH)

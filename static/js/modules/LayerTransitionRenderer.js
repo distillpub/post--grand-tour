@@ -25,7 +25,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
   }
 
 
-  this.viewFactor = 0.8;
+  this.scaleFactor = 0.8;
 
   this.dataObj = {};
   this.epochIndex = this.nepoch-1;
@@ -577,7 +577,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       points = points.map((row)=>{
       row[0] -= dataObj.mean[0];
       row[1] -= dataObj.mean[1];
-        return numeric.div(row, dataObj.dmax/(this.viewFactor));
+        return numeric.div(row, dataObj.dmax/(this.scaleFactor));
       });
       this.pointsNormalized = points;
 
@@ -673,7 +673,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         this.bgColorRect[6*pointIndexPairs[Math.floor(i/6)][1]]
       );
       points = utils.point2rect(points, this.npoint, 
-        this.imageSize * Math.pow(this.viewFactor, 0.4), 
+        this.imageSize * Math.pow(this.scaleFactor, 0.4), 
         true
       );
     }

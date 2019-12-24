@@ -11,10 +11,23 @@ function TeaserOverlay(renderer, kwargs) {
 
   let that = this;
 
-  this.slider = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.zoomSlider = d3.select('d-figure.'+renderer.gl.canvas.id)
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider')
+    .attr('class', 'slider zoomSlider')
+    .attr('min', 0.5)
+    .attr('max', 2.5)
+    .attr('value', 1.0)
+    .attr('step', 0.01)
+    .on('input', function() {
+      let value = +d3.select(this).property('value');
+      renderer.setScaleFactor(value);
+    });
+
+  this.epochSlider = d3.select('d-figure.'+renderer.gl.canvas.id)
+    .insert('input', ':first-child')
+    .attr('type', 'range')
+    .attr('class', 'slider epochSlider')
     .attr('min', renderer.epochs[0])
     .attr('max', renderer.epochs[renderer.epochs.length-1])
     .attr('value', renderer.epochIndex)
@@ -29,7 +42,7 @@ function TeaserOverlay(renderer, kwargs) {
 
   //special treatment when showing only one peoch
   if(renderer.epochs.length <= 1){
-    this.slider.style('display', 'none');
+    this.epochSlider.style('display', 'none');
   }
 
 
@@ -234,8 +247,8 @@ function TeaserOverlay(renderer, kwargs) {
     let width = this.svg.attr('width');
     let height = this.svg.attr('height');
 
-    let sliderLeft = parseFloat(this.slider.style('left'));
-    let sliderWidth = parseFloat(this.slider.style('width'));
+    let sliderLeft = parseFloat(this.epochSlider.style('left'));
+    let sliderWidth = parseFloat(this.epochSlider.style('width'));
     let sliderMiddle = sliderLeft+sliderWidth/2;
     
     this.epochIndicator

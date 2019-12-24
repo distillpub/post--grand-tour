@@ -33,6 +33,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
   this.mode = 'point';
   this.colorFactor = utils.COLOR_FACTOR;
   this.isFullScreen = false;
+  this.scaleFactor = 1.0;
 
   
   
@@ -292,7 +293,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
 
   this.setEpochIndex = (i)=>{
     this.epochIndex = i;
-    this.overlay.slider
+    this.overlay.epochSlider
       .property('value', i);
 
     this.overlay.svg.select('#epochIndicator')
@@ -369,7 +370,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
       }
 
       utils.updateScale_center(points, gl.canvas,
-      this.sx_center, this.sy_center, this.sz_center);
+      this.sx_center, this.sy_center, this.sz_center, this.scaleFactor);
       this.sx = this.sx_center;
       this.sy = this.sy_center;
       this.sz = this.sz_center;

@@ -33,7 +33,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.layerSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider')
+    .attr('class', 'slider layerSlider')
     .attr('min', 0)
     .attr('max', renderer.nlayer-1)
     .attr('value', renderer.nlayer-1)
@@ -55,7 +55,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.epochSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider')
+    .attr('class', 'slider epochSlider')
     .attr('min', 0)
     .attr('max', renderer.nepoch-1)
     .attr('value', renderer.nepoch-1)
@@ -86,23 +86,17 @@ function LayerTransitionOverlay(renderer, kwargs) {
     });
 
 
-  this.viewFactorSlider = figure
+  this.zoomSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider ')
+    .attr('class', 'slider zoomSlider')
     .attr('min', 0.2)
     .attr('max', 5.0)
-    .attr('value', this.renderer.viewFactor)
+    .attr('value', this.renderer.scaleFactor)
     .attr('step', 0.01)
-    .style('top', '20px')
-    .style('left', '83%')
-    .style('width', '15%')
     .on('input', function() {
       let value = d3.select(this).property('value');
-      // if(that.dmax0 === undefined){
-      //   that.dmax0 = renderer.dataObj.dmax;
-      // }
-      renderer.viewFactor = +value;
+      renderer.scaleFactor = +value;
     });
 
 
@@ -215,48 +209,54 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
 
   //developer options start =================
-  let devOptionsNode = document.createElement('div');
-  figure.node().parentNode.insertBefore(devOptionsNode, figure.node().nextSibling);
-  this.devOptions = d3.select(devOptionsNode);
+  let isDev = false;
+  if (isDev){
 
-  this.dmOption = this.devOptions.append('div')
-  .attr('class', 'dmOption');
-  this.dmOption.append('span')
-  .text('Manipulation mode: ');
+    let devOptionsNode = document.createElement('div');
+    figure.node().parentNode.insertBefore(devOptionsNode, figure.node().nextSibling);
+    this.devOptions = d3.select(devOptionsNode);
 
-  this.dmRadioButtons = this.dmOption
-  .selectAll('.dmOption_i')
-  .data(['rotation', 'ortho_procrustes', 'proj_procrustes', 'PCA'])
-  .enter()
-  .append('input')
-  .attr('class', 'dmOption_i')
-  .attr('type', 'radio')
-  .attr('name', 'dmMode-'+this.renderer.gl.canvas.id)
-  .text(d=>d)
-  .style('margin-left', '10px')
-  .on('change', (d)=>{
-    this.directManipulationMode = d;
-  });
-  this.dmRadioButtons.filter(d=>{
-    d=='rotation'
-  }).attr('checked', 'checked');
+    this.dmOption = this.devOptions.append('div')
+    .attr('class', 'dmOption');
+    this.dmOption.append('span')
+    .text('Manipulation mode: ');
 
-  this.dmOption
-  .select('.dmOption_i')
-  .attr('checked', 'checked');
+    this.dmRadioButtons = this.dmOption
+    .selectAll('.dmOption_i')
+    .data(['rotation', 'ortho_procrustes', 'proj_procrustes', 'PCA'])
+    .enter()
+    .append('input')
+    .attr('class', 'dmOption_i')
+    .attr('type', 'radio')
+    .attr('name', 'dmMode-'+this.renderer.gl.canvas.id)
+    .text(d=>d)
+    .style('margin-left', '10px')
+    .on('change', (d)=>{
+      this.directManipulationMode = d;
+    });
+    this.dmRadioButtons.filter(d=>{
+      d=='rotation'
+    }).attr('checked', 'checked');
 
-  // dmRadioButtons labels
-  this.dmRadioButtons
-  .each(function(d){
-    var t = document.createElement('label');
-    this.parentNode.insertBefore(t, this.nextSibling);
-    d3.select(t)
-    .attr('class', 'dmOptionLabel_i')
-    .text(d);   
-  })
-  .on('change', (d)=>{
-    this.directManipulationMode = d;
-  });
+    this.dmOption
+    .select('.dmOption_i')
+    .attr('checked', 'checked');
+
+    // dmRadioButtons labels
+    this.dmRadioButtons
+    .each(function(d){
+      var t = document.createElement('label');
+      this.parentNode.insertBefore(t, this.nextSibling);
+      d3.select(t)
+      .attr('class', 'dmOptionLabel_i')
+      .text(d);   
+    })
+    .on('change', (d)=>{
+      this.directManipulationMode = d;
+    });
+  }
+
+  
   //developer options end =================
 
 
@@ -320,7 +320,6 @@ function LayerTransitionOverlay(renderer, kwargs) {
         // }
 
         let dmax = this.renderer.dataObj.dmax;
-        // let viewFactor = this.renderer.dataObj.viewFactor || 1;
 
         let selectedPoints = this.renderer.currentData
         .filter((d,i)=>{
