@@ -147,7 +147,7 @@
   <div class="flex-item" style="flex: 1;"></div>
 </div>
 <div class='base-grid'>
-<p class='caption' style="grid-column: text;">With the Grand Tour<d-cite key="asimov1985grand"></d-cite>, we see that 
+<p class='caption' style="grid-column: text;">With the Grand Tour<d-cite key="asimov1985grand"></d-cite>, we learned that 
   <span 
     style="color: #ff7f0e; cursor: pointer;" 
     onmouseover="teaser.overlay.onSelectLegend(1);"
@@ -161,7 +161,7 @@
     onmouseout="teaser.overlay.restoreAlpha()">
     &#x2B24; digit 7
   </span> 
-  are learned later than other digits, in training epoch 15 and 22 respectively.
+  are classified correctly after training epoch 14 and 21 respectively, later than all the other digits.
 </p>
 </div>
 
@@ -190,7 +190,7 @@
   The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a classic visualization technique for high-dimensional point clouds.
   Although it has fallen out of favor for modern methods such as UMAP <d-cite key="mcinnes2018umap"></d-cite> and t-SNE<d-cite key="maaten2008visualizing"></d-cite>, the Grand Tour offers unique properties in the visualization of the behavior of neural networks.
   Because the Grand Tour is fundamentally a <em>linear</em> method, the patterns it shows more directly correspond to patterns of interest in the neural network.
-  We present two use cases of interest: visualizing the training process as the network weights change, and visualizing the layer-to-layer behavior as the data travel through the network.
+  We present three use cases of interest: visualizing the training process as the network weights change, visualizing the layer-to-layer behavior as the data travel through the network and visualizing adversarial examples.
   
   <!-- The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting it to 2D. -->
   <!-- With the Grand Tour, user interaction is easy to incorporate, allowing a natural mixed-initiative mode of visual exploration. -->
@@ -205,12 +205,12 @@
 <d-article>
 <h2>Introduction</h2>
 <p>
-  Neural networks have outperformed other methods in supervised learning contests such as Imagenet Large Scale Visual Recognition Challenge (ILSVRC) <d-cite key="ILSVRC15"></d-cite>, sometimes performing at the same level as humans in a number of tasks.
-  Unfortunately, their decision process is notoriously hard to interpret <d-cite key="lipton2016mythos"></d-cite>, and their training process is often hard to debug<d-cite key="wongsuphasawat2018visualizing"></d-cite>.
+  Neural networks have outperformed other methods in supervised learning contests such as Imagenet Large Scale Visual Recognition Challenge (ILSVRC)<d-cite key="ILSVRC15"></d-cite>, sometimes performing at the same level as humans in a number of tasks.
+  Unfortunately, their decision process is notoriously hard to interpret<d-cite key="lipton2016mythos"></d-cite>, and their training process is often hard to debug<d-cite key="wongsuphasawat2018visualizing"></d-cite>.
   We present a method to visualize the responses of a neural network using an under-appreciated visualization method.
   The <em>Grand Tour</em> works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. 
   This is a <em>linear</em> process.
-  The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear <d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs.
+  The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear<d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs.
   We will find this data-visual correspondence crucial to the visualization design, especially when compared to other non-linear methods.
 </p>
 <p>
@@ -390,7 +390,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   <script>
   let sm1 = createSmallMultiple('#smallmultiple1', 
     [13,14,15, 20,21,22], ['t-SNE', 'Dynamic t-SNE', 'UMAP'], 
-    'mnist', false, highlight_digits);
+    'mnist', true, highlight_digits);
 </script>
 </d-figure>
 <p class='caption'>Softmax activations of the MNIST classifier with non-linear dimensionality reduction</p>
@@ -429,7 +429,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   <script>
   let sm3 = createSmallMultiple('#smallmultiple3', 
 [2,5,10,20,30,60,99], ['t-SNE', 'UMAP', 'Linear'], 
-'fashion-mnist', false, highlight_shoes)</script>
+'fashion-mnist', true, highlight_shoes)</script>
 </d-figure>
 <p class='caption'>Three-way confusion in fashion-MNIST</p>
 
