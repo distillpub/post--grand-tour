@@ -210,18 +210,19 @@
   We present a method to visualize the responses of a neural network using an under-appreciated visualization method.
   The <em>Grand Tour</em> works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. 
   This is a <em>linear</em> process.
-  The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear<d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs.
+  <!-- The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear<d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs. -->
+  The Grand Tour works well for visualizing neural networks because, as we will see, neural networks contain linear transformations from inputs to outputs.
   We will find this data-visual correspondence crucial to the visualization design, especially when compared to other non-linear methods.
 </p>
 <p>
   To understand a neural network, we often try to observe its action on input examples.
   These kinds of visualizations are useful to elucidate the activation patterns of a neural network for a single example, but they offer little insight about the relationship between different examples, different states of the network as it's being trained, or the same example as it is transformed by the different layers of a single network.
-  <!-- It is not enough though to see one example at a time, because example in isolation does not tell its relation to other examples.  -->
-  Therefore, we should instead aim to visualize the <em>context around</em> our examples of interest. This context is precisely the structure that linear methods preserve well.
-
+  Therefore, we should instead aim to visualize the <em>context around</em> our examples of interest. 
+  This context is precisely the structure that linear methods preserve well.
   To fully understand the neural network process, it is not enough to "open the black box".
   We need a visualization that opens the box, but crucially, does not destroy the patterns we are hoping to find.
-  As a concrete example of how visualizations can fail <d-cite key="kindlmann2014algebraic"></d-cite>, if our visualization is not consistent throughout a sequence of training epochs, then changes in the visualization might not be due to any meaningful change in the network itself. Just as importantly, changes in the network might not be reflected in the visualization.
+  As a concrete example of how visualizations can fail <d-cite key="kindlmann2014algebraic"></d-cite>, if our visualization is not consistent throughout a sequence of training epochs, then changes in the visualization might not be due to any meaningful change in the network itself. 
+  Just as importantly, changes in the network might not be reflected in the visualization.
 </p>
 
 
@@ -298,9 +299,45 @@
 <h3>Opening the Black Box</h3>
 
 <p>
-  We trained deep CNN models with 3 common classification datasets: MNIST, fashion-MNIST and CIFAR-10. 
+  We trained deep CNN models with 3 common image classification datasets: 
+  MNIST
+  <d-footnote>
+    MNIST<d-cite key="lecun2010mnist"></d-cite> contains images of 10 digits
+    <img 
+    style="width: 70%; display: block" 
+    src="figs/mnist.png" />
+    Image credit to <a href="https://en.wikipedia.org/wiki/File:MnistExamples.png">https://en.wikipedia.org/wiki/File:MnistExamples.png</a> 
+  </d-footnote>,
+  fashion-MNIST
+  <d-footnote>
+    Fashion-MNIST<d-cite key="xiao2017fashion"></d-cite> contains 10 classes of clothes/shoes:
+    <img 
+    style="width: 70%; display: block" 
+    src="figs/fashion-mnist.png" />
+    Image credit to <a href="https://github.com/zalandoresearch/fashion-mnist">https://github.com/zalandoresearch/fashion-mnist</a> 
+  </d-footnote>
+
+  and CIFAR-10
+  <d-footnote>
+    CIFAR-10<d-cite key="lecun2010mnist"></d-cite> contains colored images of 10 classes of objects
+    <img 
+    style="width: 70%; display: block" 
+    src="figs/cifar-10.png" />
+    Image credit to <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a> 
+  </d-footnote>. 
   Our architecture is simpler in structure than state-of-the-arts but is complex enough to demonstrate the power of the Grand Tour. 
-  When training neural networks, we often monitor the training process by plotting the history of loss over training epochs. 
+  Our CNN models are sequential, meaning that the output (<d-math>y</d-math>) is derived from input (<d-math>x</d-math>) passing through a sequence of functions.
+  <d-math block>
+    y :=  f_L \cdots f_2 \circ f_1(x)
+  </d-math>
+  For images in the datasets, the input is not a scalar but a 2D array of gray-scale values or RGB tuples.
+  When flattened, the input is equivalent to a <d-math>w \times h \time c</d-math> vector of real values, where <d-math>w</d-math>, <d-math>h</d-math> and <d-math>c</d-math> are width, height, number of channels respectively.
+  The intermediate values in the function composition are also vectors. 
+  This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also gives us a practical way of visualizing our data.
+  <!-- TODO start from here -->
+</p>
+<p>
+  When training neural networks, it is common to monitor the history of training and/or testing loss over training epochs, making sure that the loss decreases over time. 
   Taking the training of an MNIST classifier as an example, if we plot the testing loss:
 </p>
 
@@ -310,12 +347,12 @@
 </d-figure>
 
 <p>
-  We see it happened twice, before the loss converges, that the curve went flat then dropped (around epoch 14 and 21).
+  We see something weird around epoch 14 and 21: the curve went flat before it dropped again.
   What happened?
-  We may simply guess that the optimization went to two local basins, but what caused that?
+  We may guess that the optimization went to two local basins, but what caused that?
 </p>
 <p>
-  If we take one step further by plotting the <em>per-class</em> loss:
+  If we plot the <em>per-class</em> loss,
 </p>
 
 <d-figure class='lh-per-class' style="">
@@ -324,8 +361,7 @@
 </d-figure>
 
 <p>
-  we learned that the two drops are caused by two particular classes (digit 1 and 7), whose loss curves drop later than the other classes. 
-  The model learns different classes at very different times in the training process. 
+  We learned that the two drops are caused by digit 1 and 7 - the model learns different classes at very different times in the training process. 
   Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
 </p>
 <p>
@@ -350,7 +386,7 @@
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
   In our classifier, the pipeline has convolutional and fully-connected linear layers, and rectified linear units (ReLU) as non-linear layers.
   Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations in the end.
-
+<!-- TODO vector views here? -->
   Most of these simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
   (Some operations, notably max-pooling and softmax, do not fall into either categories. We will come back to this later.)
   We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
@@ -370,9 +406,9 @@
 </p> -->
 
 <p>
-The need is: we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
-If there are only two neurons/dimensions, a scatter plot would suffice.
-However, the data points in the softmax layer are 10 dimensional, thus we need to either show two dimensions at a time which does not scale well (as there would be 45 scatter plots - a quadric to the dimensionality - to look at),
+Now we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
+Should there be only two neurons/dimensions, a simple scatter plot of these two dimensions would suffice.
+However, the points in the softmax layer are 10 dimensional, thus we need to either show two dimensions at a time which does not scale well (as there would be 45 scatter plots - a quadric to the dimensionality - to look at),
 or we can use <em>dimensionality reduction</em> to map the data into a two dimensional space and show them in a single plot. 
 </p>
 
@@ -383,7 +419,8 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   With that in mind, look for changes of digit 1 around epochs 14 and changes of digit 7 around epochs 21 in the visualizations below. 
   The network behavior is not subtle, every digit in those classes is misclassified until the critical epoch. 
   Yet, note how hard to spot it in any of the plots below at first glance. 
-  In fact, if inspected carefully, we can see that in the UMAP <d-cite key="mcinnes2018umap"></d-cite> (last row), the digit 1 which cluttered in the bottom in epoch 13 becomes a new tentacle in epoch 14. Use the highlight buttons to help yourself spot the change.
+  In fact, if inspected carefully, we can see that in the UMAP <d-cite key="mcinnes2018umap"></d-cite> (last row), the digit 1 which cluttered in the bottom in epoch 13 becomes a new tentacle in epoch 14. 
+  Use the buttons on the right to identify the change.
 </p>
 <d-figure id='smallmultiple1' class='smallmultiple' style="">
   <canvas id='sm1' class='smallmultiple' width='100' height='200'></canvas>
@@ -397,18 +434,18 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 <p>
   The reason that non-linear embeddings fail in spotting the fundamental change in data is that they did not fulfill the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>:
-  we design visualizations to reveal signals in data, so that a change in data is reflected in its visualization (vis) correspondingly. 
-  Ideally, we want the changes in two parts (data and its visualization) to <em>match in magnitude</em>: a barely noticeable change in visualization reflects the smallest possible change in data, and a salient change in visualization reflects a significant one in data.
-  Here in non-linear embeddings, a significant change happened in only a subset of data (e.g. all points of digit 1 from epoch 13 to 14), but all points in the visualization move dramatically.
-  This is because the position of each single point depends on the whole data distribution in such embedding algorithms.
-  Non-linear projections is thus not ideal for visualization. 
-  The lack of data-visual correspondence make it hard to <em>infer</em> the underlying change in data from the vis.
+  we design visualizations to reveal signals in data, so that a change in data is reflected in its visualization correspondingly. 
+  Ideally, we further want the changes in two parts (data and its visualization) to <em>match in magnitude</em>: a barely noticeable change in visualization reflects the smallest possible change in data, and a salient change in visualization reflects a significant one in data.
+  Here in non-linear embeddings, a significant change happened in only a <em>subset</em> of data (e.g. all points of digit 1 from epoch 13 to 14), but <em>all</em> points in the visualization move dramatically.
+  In most non-linear embeddings, the position of each single point depends on the whole data distribution in such embedding algorithms.
+  This property is not ideal for visualization because it fails the data-visual correspondence. 
+  The lack of data-visual correspondence make it hard to <em>infer</em> the underlying change in data from the visualization.
 </p>
 
 <p>
   Non-linear embeddings that have non-convex objectives also tend to be sensitive to initial conditions.
   For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30 and 99.
-  But even with spatial regularization <d-cite key="rauber2016visualizing"></d-cite>, these non-linear methods suffer from interpretability issues <d-cite key="wattenberg2016use"></d-cite>. 
+  But even with spatial regularization (e.g. Dynamic t-SNE<d-cite key="rauber2016visualizing"></d-cite>), these non-linear methods suffer from interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
 </p>
 
 <d-figure id='smallmultiple2' class='smallmultiple' style="">
@@ -418,8 +455,8 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 <p>
   As another example, in fashion-MNIST, take the network's three-way confusion among sandals, sneakers and ankle boots.
-  You can see it most directly in the linear projection (last row, which we found using the Grand Tour and direct manipulation), as the points from those three classes form a triangular frame. 
-  T-SNE, in contrast, incorrectly separates the class clusters (possibly because of an inappropriately-chosen hyperparameter).
+  You can see it most directly in the linear projection (last row, which we found using the Grand Tour and direct manipulation), as the points form a triangle. 
+  The t-SNE, in contrast, incorrectly separates the class clusters (possibly because of an inappropriately-chosen hyperparameter).
   Although UMAP isolates the three classes successfully, the fundamental complexity of non-linear methods makes it hard to know whether this is a feature of data or an artifact in the embedding algorithm.
   If, as in these cases, a fundamental change in a visualization is not only due to the data (e.g. it is also partially due to the embedding algorithm), this bad design can obscure the data interpretation: we may miss important patterns from reading a bad visualization.
 </p>
@@ -468,13 +505,17 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 <p>
   When given the option, then, we should prefer methods for which changes in the data produce predictable, visually salient changes in the result.
-  PCA is a natural way of doing linear dimensionality reduction since it tries to preserve the most variance in the data.
-  The distribution of data from softmax layers, if trained perfectly on a class-balanced dataset, has equal variance in every dimensions, since around each one-hot vector there concentrates similar amount of examples.
+  Linear dimensionality reductions often have this property. 
+  They are more interpretable than non-linear methods due to a good data-visual correspondence.
+  Principle Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
+  It works by choosing directions that preserve the most variance in data.
+  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because around each one-hot vector there concentrates similar number of examples<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples which might not </d-footnote>.
   As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations tend not to be substantially better than the third. 
-  So which of them should we show to the user? 
-  To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once.
+  So which of them should we use? 
+  <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
   <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
-  On the other hand, the Grand Tour is a linear method which also offers us the chance to see many projections <em>smoothly animated</em>.
+  To address the problem of equal variance, we use a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
+  The Grand Tour is a linear method which makes infinitely many projections <em>smoothly animated</em>.
 </p>
 
 <d-figure class='nngt-single-epoch-0' style="">
@@ -485,12 +526,13 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 
 <p>
-  When combined with some user interactions, we can quickly find projections of interest that highlight important features in the data. 
-  In the above view you can drag the circular handle on each axis to move that axis.
+  When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections of interest that highlight important features in the data. 
+  In the above view you can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 and 7 in MNIST, or the three-way confusion in Fashion-MNIST.
 </p>
 <p>
-  To illustrate the late learning of digit 1 and 7 in the MNIST classifier, we find the following linear projection which project the first and and seventh axis on top of the canvas. 
-  We can see clearly that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the data-visual correspondence of linear projections. 
+  Direct manipulation handles are not only for <em>exploratory</em> visual analysis, they are also friendly for <em>explanatory</em> visualizations/presentations. 
+  To illustrate the late learning of digit 1 and 7 in the MNIST classifier, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas. 
+  We can clearly explain to the viewers that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the good data-visual correspondence in the Grand Tour/linear projections. 
 </p>
 
 <d-figure class='nngt' style="">
@@ -543,14 +585,14 @@ A digit 1 image should fire up the cell in first column, second row.
 
 <h3>The Grand Tour</h3>
 <p>
-The Grand Tour <d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
-It randomly rotates data points in a smooth manner, and shows its first two dimensions. 
-Here are some examples of the Grand Tour:
+The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
+Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then project it down to 2D for display. 
+Here are some (low-dimensional) examples of the Grand Tour:
 </p>
 <ul>
-<li>On a square, the Grand Tour shows a square rotating with constant angular velocity.</li> 
-<li>On a cube, the smooth rotation shows us every facet of the cube in 2D. </li>
-<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D but only 2D is shown in the projection.</li>
+<li>On a square, the Grand Tour rotates it with a constant angular velocity.</li> 
+<li>On a cube, the Grand Tour rotates it in 3D, and its 2D projection let us see every facet of the cube. </li>
+<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projections.</li>
 </ul>
 <d-figure class='tesseract' style="grid-column: text;">
 <canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
@@ -558,34 +600,28 @@ Here are some examples of the Grand Tour:
 <script src='js/tesseract.js'></script>
 </d-figure>
 
-<p>
-  Mathematically, the Grand Tour provides us a sequence of pD-to-2D projections that let us project the p-dimensional data onto different 2D subspaces. 
-  This sequence/path of projection can be seen as a mapping from the time variable <d-math>t</d-math> to a composition of a p-by-p rotation matrix, <d-math>GT \in SO(p)</d-math>, and a projection onto 2D, <d-math>\pi_2 = [e_1, e_2]</d-math>:
+<!-- <p>
+  Mathematically, the Grand Tour provides us a sequence of <d-math>p-dimensional</d-math> to 2D projections, which can be represented by a function from a time variable <d-math>t</d-math> to p-by-2 matrices. 
+  The p-by-2 matrices can be seen as a composition of a p-by-p orthogonal matrix, <d-math>GT \in SO(p)</d-math>, followed by a simple projection <d-math>\pi_2</d-math> that picks up the first two coordinates of p-dimensional vectors:
   <d-math block>
     t \mapsto \pi_2 \circ GT 
   </d-math>
-  The construction of the rotations guarantees the path to be smooth (i.e. infinitely differentiable) and thorough (that the curve is space-filling).
-  Under this construction and given enough time, people have chance to see every possible 2D projections smoothly animated. 
-  We will cover more detail of how to generate the sequence in the supplementary material.
+  We will need the above detail for direct manipulation in <a href="#technical-details">technical details</a>.
+</p> -->
+<p>
+  For more details about the Grand Tour, we recommend curious readers to consult the original paper by Asimov<d-cite key="asimov1985grand"></d-cite>.
 </p>
+
 
 <p>
   We have to emphasize one favorable property of the Grand Tour in visualizing neural networks: 
-  it is invariant about basis chosen for the data representation. 
+  it is invariant about the basis chosen for the data representation. 
   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view. 
   In the mean time, linear transformations in neural networks are also invariant under change of basis. 
   Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation. 
-  We will later show that this connection suggests a simplification of all linear transformations in the Grand Tour view. 
+  We will later show that this connection suggests a way to simplify all linear transformations in the Grand Tour view. 
 </p>
 
-<!-- <p>If the data point has <d-math>p</d-math> dimensions, then for any give timestamp <d-math>t</d-math>, the Grand Tour defines a rotation matrix <d-math>M_t</d-math> of size <d-math>p \times p</d-math>. If the sequence of matrix for any time is properly defined, we will get a sequence of 2 dimensional point clouds for animation by applying rotation matrix <d-math>M(t)</d-math> then retain only the first 2 coordinate, i.e. for any given data point <d-math>v</d-math> the (x,y) coordinate in a drawing canvas is:
-<d-math block>
-  (x,y) = f(v, t) = \pi_2 \circ M_t(v)
-</d-math>
-where <d-math>\pi_2</d-math> denotes the function that takes a p-vector and returns its first 2 coordinates. 
-We will spell out how to generate a smooth sequence of rotation matrices in the supplementary material. 
-But given this ability, we can directly see how images were activated in the final softmax layer of a neural network.
-</p> -->
 
 <h2>The Grand Tour of the Softmax Layer</h2>
 <p>
@@ -909,21 +945,22 @@ lt2.overlay.layerPlayButton.on('click')();
   Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
 </p>
 
-<p>In the interest of completeness, the remainder of the article provides a number of technical details about the implementation of the techniques we described above.</p>
+<p>
+  In the interest of completeness, the remainder of the article provides a number of technical details about the implementation of the techniques we described above.
+</p>
 
 
 
 <script>
 function toggle(event, id){
-
-  let caller = d3.select(event.target);
+  let caller = d3.select(event.target); //DOM that received the event
   let callerIsActive = caller.classed('clickable-active');
 
-  let selection = d3.select(id);
+  let selection = d3.select(id); //DOM to be toggled
   let isHidden = selection.classed('hidden');
 
   selection.classed('hidden', !isHidden);
-  caller.classed('clickable-active', !callerIsActive);
+  caller.classed('clickable-active', !callerIsActive); //change the indicator (+/- sign) besides the caller
 }
 </script>
 
