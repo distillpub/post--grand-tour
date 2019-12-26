@@ -1,3 +1,53 @@
+.colored-text{ 
+  font-style: normal;
+  font-weight: 550;
+} 
+
+.class-0 { 
+  color: #1f77b4;
+}
+
+.class-1{
+  color: #ff7f0e;
+}
+
+.class-2{
+  color: #2ca02c;
+}
+
+.class-3{
+  color: #d62728;
+}
+
+.class-4{
+  color: #9467bd;
+}
+
+.class-5{
+  color: #8c564b;
+}
+
+.class-6{
+  color: #e377c2;
+}
+
+.class-7{
+  color: #7f7f7f;
+}
+
+.class-8 { 
+  color: #bcbd22;
+}
+
+.class-9 { 
+  color: #17becf;
+}
+
+.class-adversarial { 
+  color: #444444;
+}
+
+
 d-article h4 {
     margin-top: 1em;
 }
@@ -131,10 +181,10 @@ svg.confusionMatrix{
     /*border: 3px solid green;*/
 }
 
-.caption > span{
+/*.caption > span{
   font-style: normal;
   font-weight: 550;
-}
+}*/
 
 
 .options{

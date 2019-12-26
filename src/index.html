@@ -226,7 +226,7 @@
 </p>
 
 
-<h2>Motivation</h2>
+<h2>Motivation and Background</h2>
 
 <!-- <p>
   There is a number of great videos and blogs that explain what a neural network is (for example the one made by <a href="https://www.youtube.com/watch?v=aircAruvnKk">3Blue1Brown</a>).
@@ -326,19 +326,19 @@
     Image credit to <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a> 
   </d-footnote>. 
   Our architecture is simpler in structure than state-of-the-arts but is complex enough to demonstrate the power of the Grand Tour. 
-  Our CNN models are sequential, meaning that the output (<d-math>y</d-math>) is derived from input (<d-math>x</d-math>) passing through a sequence of functions.
+  <!-- Our CNN models are sequential, meaning that the prediction (<d-math>y</d-math>) is derived from input (<d-math>x</d-math>) passing through a sequence of functions, or "layers" in neural network terminology.
   <d-math block>
     y :=  f_L \cdots f_2 \circ f_1(x)
-  </d-math>
-  For images in the datasets, the input is not a scalar but a 2D array of gray-scale values or RGB tuples.
-  When flattened, the input is equivalent to a <d-math>w \times h \time c</d-math> vector of real values, where <d-math>w</d-math>, <d-math>h</d-math> and <d-math>c</d-math> are width, height, number of channels respectively.
-  The intermediate values in the function composition are also vectors. 
-  This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also gives us a practical way of visualizing our data.
-  <!-- TODO start from here -->
+  </d-math> -->
+  <!-- For images, the input is not a single scalar but a 2D array of scalar values for gray scale images or RGB triples for colored images, written as <d-math>x \in \mathbb{R}^{w \times h \times c}</d-math>, where <d-math>w</d-math>, <d-math>h</d-math> and <d-math>c</d-math> are width, height and number of channels (<d-math>c = </d-math>1 or 3) respectively.
+  When needed, one can always flatten the 2D array into an equivalent <d-math>w \cdot h \cdot c</d-math> -dimensional vector.
+  Similarly, the intermediate values after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in a layer. 
+  This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also gives us a way of thinking the design visualizing our data. -->
 </p>
 <p>
-  When training neural networks, it is common to monitor the history of training and/or testing loss over training epochs, making sure that the loss decreases over time. 
-  Taking the training of an MNIST classifier as an example, if we plot the testing loss:
+  When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
+  Because we want our optimization algorithm to keep decreasing the loss, it is common to monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
+  Taking the training of an MNIST classifier as an example, the testing loss in the training looks like the following
 </p>
 
 <d-figure class='lh' style="">
@@ -347,12 +347,8 @@
 </d-figure>
 
 <p>
-  We see something weird around epoch 14 and 21: the curve went flat before it dropped again.
-  What happened?
-  We may guess that the optimization went to two local basins, but what caused that?
-</p>
-<p>
-  If we plot the <em>per-class</em> loss,
+  Although its general trend meets what we expected, the loss keeps decreasing, we see something weird around epoch 14 and 21: the curve went flat before it dropped again.
+  What happened? What caused that?
 </p>
 
 <d-figure class='lh-per-class' style="">
@@ -361,12 +357,13 @@
 </d-figure>
 
 <p>
-  We learned that the two drops are caused by digit 1 and 7 - the model learns different classes at very different times in the training process. 
+  If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we learned that the two drops were caused by the class of digit 1 and 7 - the model learns different classes at very different times in the training process. 
   Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
 </p>
 <p>
-  Perhaps the next question is: were these late learning caused by a subset of input examples or the whole class of digit 1 or 7?
+  Perhaps the next question is: were these late learning caused by some outliers in the dataset or it is a feature for all 1s or 7s?
   To explore this we need to break the per-class losses further down to individual input examples.
+  <!-- TODO smoother transition -->
   But instead of looking at losses, we can directly look at the softmax activations. 
   The softmax layer has 10 neurons that can be seen as the (predicted) probability, one for each class. 
   We expect, for example, the 7th (0-indexed) neuron to be mostly fired up for hand written sevens.
@@ -386,8 +383,14 @@
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
   In our classifier, the pipeline has convolutional and fully-connected linear layers, and rectified linear units (ReLU) as non-linear layers.
   Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations in the end.
-<!-- TODO vector views here? -->
-  Most of these simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
+
+  For images, the input is a 2D array of scalar values for gray scale images or RGB triples for colored images.
+  When needed, one can always flatten the 2D array into an equivalent <d-math>w \cdot h \cdot c</d-math> -dimensional vector.
+  Similarly, the intermediate value after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in the layer. 
+  The softmax, for example, can be seen as a 10-vector whose values are positive real numbers that sum up to 1.
+  This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also hints us on how to visualize them in a better way.
+
+  Most of the simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
   (Some operations, notably max-pooling and softmax, do not fall into either categories. We will come back to this later.)
   We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
   Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. 
@@ -396,7 +399,7 @@
 
 
 <!-- <p>
-  TODO NEED THIS LATER
+  TODO NEED THIS LATER?
   In a neural network, it must be the effect of non-linear functions that cause its classification power, because linear methods are fundamentally limited in their predictive ability (CITE VC-DIMENSION).
   However, notice that in neural networks, the non-linearities are in fact easy to understand because they tend to operate component-wise: in effect, one coordinate does not influence another.
   On the other hand, linear layers <em>combine many coordinates</em> in their computation, making the overall behavior hard to understand in terms of the numbers being passed around.
@@ -413,7 +416,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 </p>
 
 <i id="sm0-a"></i>
-<h3>But State-of-the-art Dimensionality Reduction is Non-linear</h3>
+<h3>The State-of-the-art Dimensionality Reduction is Non-linear</h3>
 <p>
   Consider the aforementioned intriguing feature about the different learning rate that the MNIST classifier has on digit 1 and 7: the network did not learn to recognize digit 1 until epoch 14, digit 7 until epoch 21.
   With that in mind, look for changes of digit 1 around epochs 14 and changes of digit 7 around epochs 21 in the visualizations below. 
@@ -509,13 +512,13 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   They are more interpretable than non-linear methods due to a good data-visual correspondence.
   Principle Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
   It works by choosing directions that preserve the most variance in data.
-  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because around each one-hot vector there concentrates similar number of examples<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples which might not </d-footnote>.
-  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations tend not to be substantially better than the third. 
-  So which of them should we use? 
+  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help making sense of the data either. </d-footnote>.
+  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third. 
+  So which of them should we choose? 
   <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
   <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
-  To address the problem of equal variance, we use a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
-  The Grand Tour is a linear method which makes infinitely many projections <em>smoothly animated</em>.
+  So instead of PCA, we visualize this equal variance data by choosing random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
+  The Grand Tour is a linear method which generates infinitely many projections and interpolate them smoothly.
 </p>
 
 <d-figure class='nngt-single-epoch-0' style="">
@@ -526,13 +529,14 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 
 
 <p>
-  When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections of interest that highlight important features in the data. 
-  In the above view you can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 and 7 in MNIST, or the three-way confusion in Fashion-MNIST.
+  When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections that reveals important patterns in the data. 
+  In the above view we can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 or 7 in MNIST, or the three-way confusion in Fashion-MNIST.
+  But see how much easier this time than previous non-linear methods.
 </p>
 <p>
   Direct manipulation handles are not only for <em>exploratory</em> visual analysis, they are also friendly for <em>explanatory</em> visualizations/presentations. 
-  To illustrate the late learning of digit 1 and 7 in the MNIST classifier, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas. 
-  We can clearly explain to the viewers that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the good data-visual correspondence in the Grand Tour/linear projections. 
+  To illustrate the late learning of digit 1 and 7 in the MNIST classifier, for example, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas. 
+  Without much difficulty, we can convince the viewers that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the good data-visual correspondence in the Grand Tour/linear projections. 
 </p>
 
 <d-figure class='nngt' style="">
@@ -587,7 +591,7 @@ A digit 1 image should fire up the cell in first column, second row.
 <p>
 The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
 Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then project it down to 2D for display. 
-Here are some (low-dimensional) examples of the Grand Tour:
+Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 </p>
 <ul>
 <li>On a square, the Grand Tour rotates it with a constant angular velocity.</li> 
@@ -615,19 +619,21 @@ Here are some (low-dimensional) examples of the Grand Tour:
 
 <p>
   We have to emphasize one favorable property of the Grand Tour in visualizing neural networks: 
-  it is invariant about the basis chosen for the data representation. 
+  it is invariant about the (orthonormal) basis chosen for the data representation. 
   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view. 
   In the mean time, linear transformations in neural networks are also invariant under change of basis. 
-  Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation. 
-  We will later show that this connection suggests a way to simplify all linear transformations in the Grand Tour view. 
+  Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation.
+  We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour. 
 </p>
 
 
 <h2>The Grand Tour of the Softmax Layer</h2>
 <p>
   The Grand Tour is a general technique for any high dimensional data points, so in principle we should be able to use it to view neuron activations in <em>any</em> layers. 
-  However, the final softmax layer is especially easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. For other intermediate hidden layers, the axes are more abstract. 
-  Because of this strong semantics in softmax layer, we first look at the Grand Tour in this layer. 
+  However, the final softmax layer is especially easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
+  With this nice semantics, direct manipulations with axis handles come more handy.
+  For other intermediate layers, the axes are more abstract so we deployed another technique which directly manipulate a subset of points. 
+  We first look at the Grand Tour of the softmax layer. 
 </p>
 
 <i id="nngt-single-epoch-a"></i>
@@ -722,7 +728,7 @@ Here are some (low-dimensional) examples of the Grand Tour:
   Both projections are found by direct manipulations.
 </p>
 <p>
-  We will explain how direct manipulation on the axes works in <a href="#technical-details">technical details</a>.
+  We will explain how direct manipulation works in <a href="#technical-details">technical details</a>.
 </p>
 
 
@@ -731,7 +737,7 @@ Here are some (low-dimensional) examples of the Grand Tour:
 <p>
   We trained 99 epochs and recorded the entire history of neuron activations on subsets of training and testing examples. 
   In the beginning when neural network first randomly initialized, all examples are placed around the origin of softmax space. 
-  Through training, examples are pushed to their correct "class corners" in the softmax space.
+  Through training, examples are pushed to their correct "class corners" - the one hot vectors - in the softmax space.
 </p>
 
   <!-- In softmax layer, our neural networks aim to match each image to its 'one-hot' encoding of the corresponding class label. 
@@ -747,10 +753,11 @@ Here are some (low-dimensional) examples of the Grand Tour:
   The image view is best accompanied with an expanded canvas.  -->
 
 <p>
-  Comparing the different behavior on training and testing datasets confirmed our hypothesis about dataset difficulty before, when we only looked at the final epoch. 
+  Comparing the difference between training and testing datasets gives us an estimation about over-fitting. 
   In the MNIST dataset, the trajectory of testing images through training is consistent with the training set. 
-  Data points went directly toward the corner of its true class and stabilized after 50 epochs.
-  On the other hand, in CIFAR-10 there is an inconsistency between the training and testing sets. Images from the testing set keep oscillating while most images from training converges to the corresponding class corner. 
+  Data points went directly toward the corner of its true class and all classes are stabilized after about 50 epochs.
+  On the other hand, in CIFAR-10 there is an <em>inconsistency</em> between the training and testing sets. Images from the testing set keep oscillating while most images from training converges to the corresponding class corner. 
+  In epoch 99, we can clearly see a difference in distribution between these two sets.
   This signals that the model overfits the training set and thus does not generalize well to the testing set. 
 </p>
 
@@ -785,25 +792,26 @@ Here are some (low-dimensional) examples of the Grand Tour:
 </p>  --> 
 
 <p>
-  Given the presented techniques, we can in principle inspect any intermediate layer of a neural network. 
+  Given the presented techniques, the Grand Tour and direct manipulations on the axes, are in theory applicable to all intermediate layers of a neural network. 
   Despite that, two problems need to be solved first:
-
   <ul>
     <li>
       The handles on axes of softmax layer were very convenient, but it is only practical when dimensionality is small.
-      With hundreds of dimensions, for example, the interaction would become quite cluttered.
-      But a deeper problem in using axis vectors as handles is that hidden layers do not have clear semantics as the softmax layer.
-      We can visualize the features using other techniques <d-cite key="olah2017feature"></d-cite>, but memorizing and corresponding them in a different view like the Grand Tour can be hard.
+      With hundreds of dimensions, for example, the axis handles would look like a hairball, making them impossible in interact with.
+      Another problem is that hidden layers do not have clear semantics as the softmax layer.
+      Although we can interpret axes in intermediate layers using other techniques <d-cite key="olah2017feature"></d-cite><d-cite key="kim2017tcav"></d-cite>, keeping many abstract concepts in head and manipulating them can be cumbersome.
     </li>
     <li>
-      If we put two Grand Tour views of different layers side by side, it can be hard to match data points across the two views.
-      In specific cases, two layers can have a direct neuron-to-neuron correspondence, for example when a ReLU function is in between.
-      However, in the more general case (e.g. between linear transformations), different layers will have a different number of dimensions and neurons have mixed relationship between layers. 
+      While we want to trace out the activation patterns through different layers, the points going under a linear transformation can be hard to trace in Grand Tour.
+      Under linear transformations, the dimensionality might change, and each neuron in a later layer is resulted from mixing activation of all neurons in the previous layer. 
     </li>
   </ul>
 </p>
+
 <p>
-  We address the first problem by allowing users to directly manipulate <em>instances</em> with the argument that instances have better semantics than neurons (we describe this in the <a href="#technical-details">technical details section</a>.)
+  We address the first problem by allowing users to directly manipulate a subset of <em>points</em>.
+  When axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should have no difficulty in dragging the axes. 
+  In other cases, we should directly manipulate data points because either the axes are not as interpretable as the softmax (e.g. intermediate layers), or there are too many of them (e.g. a softmax layer of a 1000-class classification problem). 
 </p>
 
 
@@ -1012,9 +1020,8 @@ Direct manipulation
 <p>
   Our direct manipulations provide direct control over possible projections of data points.
   It can be done either on the axes or on a group of data points. 
-  Based on the dimensionality and axis semantics, we may prefer one mode than the other.
-  When axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we prefer manipulation on the axes. 
-  In other cases, we should directly manipulate data points because either the axes are not as interpretable as the softmax, or there are too many of them (e.g. a softmax layer of a 1000-class classification problem). 
+  Based on the dimensionality and axis semantics, as discussed in <a href='#layer-dynamics'>Layer Dynamics</a>, we may prefer one mode than the other.
+  
 
   The goal of direct manipulations is to change the linear projection according to user's demand, which is provided by for example mouse dragging. 
   We will see that the axis mode is a special case of data point mode, because we can view an axis handle as a special point on the positive direction of the axis. 
