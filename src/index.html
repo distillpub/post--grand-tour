@@ -319,7 +319,7 @@
 
   and CIFAR-10
   <d-footnote>
-    CIFAR-10<d-cite key="lecun2010mnist"></d-cite> contains colored images of 10 classes of objects
+    CIFAR-10<d-cite key="krizhevsky2009cifar10"></d-cite> contains colored images of 10 classes of objects
     <img 
     style="width: 70%; display: block" 
     src="figs/cifar-10.png" />
@@ -512,7 +512,7 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   They are more interpretable than non-linear methods due to a good data-visual correspondence.
   Principle Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
   It works by choosing directions that preserve the most variance in data.
-  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help making sense of the data either. </d-footnote>.
+  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help much in making sense of the data either. </d-footnote>.
   As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third. 
   So which of them should we choose? 
   <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
