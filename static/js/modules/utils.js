@@ -59,7 +59,7 @@ utils.updateScale_span = function(points, canvas, sx, sy, sz,
   // let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
                 // / yDataRange * xDataRange;
   let xRadius = yRadius / yDataRange * xDataRange;
-  xRadius *= scaleFactor;
+  // xRadius *= scaleFactor;
 
   sx.domain([vmin[0], vmax[0]])
   .range([xMiddle-xRadius, xMiddle+xRadius]);
