@@ -211,7 +211,7 @@
   The <em>Grand Tour</em> works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. 
   This is a <em>linear</em> process.
   <!-- The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear<d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs. -->
-  The Grand Tour works well for visualizing neural networks because, as we will see, neural networks contain linear transformations from inputs to outputs.
+  The Grand Tour works well for visualizing neural networks because, as we will see, the linear transformations in neural networks can be simplified in the Grand Tour.
   We will find this data-visual correspondence crucial to the visualization design, especially when compared to other non-linear methods.
 </p>
 <p>
@@ -366,9 +366,9 @@
   <!-- TODO smoother transition -->
   But instead of looking at losses, we can directly look at the softmax activations. 
   The softmax layer has 10 neurons that can be seen as the (predicted) probability, one for each class. 
-  We expect, for example, the 7th (0-indexed) neuron to be mostly fired up for hand written sevens.
-  In fact, since we have access to not only the softmax but also all hidden layers, 
-  we can probe the network with input examples to see how it reacts on <em>each</em> layer.
+  Together these 10 neurons can also be seen as a 10-vector, which will become useful later.
+  We expect, for example, that the 7th (0-indexed) neuron fired up for hand written 7s.
+  In fact, since we have access to not only the softmax but also all hidden layers, we can probe the network with input examples to see how it reacts on <em>each</em> layer.
   In this way we are trying to open the "black box" and understand the internal of a neural network.
   Here is a typical view of the opened box:
 </p>
@@ -377,7 +377,7 @@
   <svg id='nn2' height=300 style='width: 100%; height: 300px;'></svg>
   <script src='js/nn2.js'></script>
 </d-figure>
-<p class='caption'>Neural network opened. Our classifier has linear components (conv and linear) and component-wise non-linear functions (ReLU)</p>
+<p class='caption'>Neural network opened. The colored blocks are building-block functions (i.e. neural network layers), the gray-scale heatmaps are either the input image or intermediate activation vectors after some layers.</p>
    
 <p>
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
@@ -622,18 +622,17 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   it is invariant about the (orthonormal) basis chosen for the data representation. 
   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view. 
   In the mean time, linear transformations in neural networks are also invariant under change of basis. 
-  Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation.
+  Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation<d-cite key="austin2009svd"></d-cite>.
   We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour. 
 </p>
 
 
 <h2>The Grand Tour of the Softmax Layer</h2>
 <p>
-  The Grand Tour is a general technique for any high dimensional data points, so in principle we should be able to use it to view neuron activations in <em>any</em> layers. 
-  However, the final softmax layer is especially easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
-  With this nice semantics, direct manipulations with axis handles come more handy.
-  For other intermediate layers, the axes are more abstract so we deployed another technique which directly manipulate a subset of points. 
   We first look at the Grand Tour of the softmax layer. 
+  The softmax layer is relatively easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
+  With this nice semantics, direct manipulations with axis handles come more handy.
+  For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly.
 </p>
 
 <i id="nngt-single-epoch-a"></i>
@@ -698,7 +697,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   Moreover, all but one example falls in the interior of the triangle, while others live close to the boundary. 
   This tells us that most confusions happen between two out of the three classes, they are really two-way confusions.
 
-  Within the same dataset, we can also see a triangular <em>plane</em> filled by pullovers, coats and shirts.
+  Within the same dataset, we can also see pullovers, coats and shirts filling a triangular <em>plane</em>.
   This is different from the sandal-sneaker-ankle-boot case, as examples not only fall on the boundary of a triangle, but also in its interior: a true three-way confusion. 
 
   Similarly, in the CIFAR-10 dataset we can see confusion between dogs and cats, airplanes and ships.
@@ -792,7 +791,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 </p>  --> 
 
 <p>
-  Given the presented techniques, the Grand Tour and direct manipulations on the axes, are in theory applicable to all intermediate layers of a neural network. 
+  Given the presented techniques of the Grand Tour and direct manipulations on the axes, we are in theory able to visualize and manipulate any intermediate layer of a neural network. 
   Despite that, two problems need to be solved first:
   <ul>
     <li>
@@ -811,48 +810,54 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 <p>
   We address the first problem by allowing users to directly manipulate a subset of <em>points</em>.
   When axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should have no difficulty in dragging the axes. 
-  In other cases, we should directly manipulate data points because either the axes are not as interpretable as the softmax (e.g. intermediate layers), or there are too many of them (e.g. a softmax layer of a 1000-class classification problem). 
+  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions to make a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
 </p>
 
-
-
 <p>
-  To tackle the second, instead of looking at layers side by side, we shall see the transformation as an action on a layer and look at how this action moves data points through animation.
-  One direct approach, is to embed the low dimensional layer into the higher layer (by appending zeros) and then linearly interpolate the source <d-math>x_0</d-math> and destination <d-math>x_1</d-math> as time <d-math>t</d-math> goes from 0 to 1. 
+  To tackle the second, we simplify the linear transformations by observing that they are equivalent to simple scalings under the view of the Grand Tour.
+  To see how a linear transformation can be viewed unnecessarily complicated, think about a neural network layer <d-math>A</d-math> that negates two axis in 2D, in matrix form:
+  <d-math block>
+    A = \begin{bmatrix}
+    -1, 0 \\
+    0, -1
+    \end{bmatrix}
+  </d-math>
+  One way to interpolate the source <d-math>x_0</d-math> and destination <d-math>x_1 = A(x_0) = -x_0</d-math> of this action <d-math>A</d-math> is by a simple linear interpolation
 
-  <d-math block>x(t) = (1-t) \cdot x_0 + t \cdot x_1</d-math>
+  <d-math block>
+  x_t = (1-t) \cdot x_0 + t \cdot x_1 = (1-2t) \cdot x_0    
+  </d-math>
+  for <d-math>t \in [0,1].</d-math>
 
-  However, this transition fails to meet our principle of data-visual correspondence in a certain way: it complicates a simple change in data.
-  Consider an linear action that only permutes all neurons in a layer.
-  In a neural network, this transformation should be considered as doing nearly nothing, for it only changes the order of neurons and affects only the wiring of weights to the downstream layers.
-  However, when visualizing this permutation by the linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) is unchanged. 
+  If we apply this interpolation on all data points, they will cross the origin at the same time <d-math>t=0.5</d-math>, making it impossible trace individual points. 
+  Moreover, this interpolation complicates a simple 180 degree rotation in data.
+  In the Grand Tour, matrix <d-math>A</d-math> should be considered doing nearly nothing, for it only rotates the data while the Grand Tour is also a rotation.
+  However, when visualizing this by the simple linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) stays the same.
+  Therefore, this interpolation fails to meet the principle of data-visual correspondence: a simple change in data (negation in 2D/ 180 degree rotation) results in a drastic change in visualization (all points cross the origin).
 </p>
 <p>
-  Note that here we make an explicit distinction between data and its representation to help us think about the true signal in the data that is hidden in its specific representation. 
-  Order of neurons in a layer is an artifact of the specific model, or a specific representation of the model, since other models that only permute the neurons should be thought as the same model.
-  When designing a visualization, we should think about which part of the data representation is an artifact that we should denoise, and which contains the real knowledge we should <em>distill</em> from this representation.
-  In this case, we want our visualization to equivalent the ordering of neurons/dimensions in data points because the ordering is not important.
-  Conversely, when judging a vis, we should think about what this visualization emphasizes about the data and what it discards.
-  That is, we think of what the Grand Tour sees equivalent and whether it is aligned with our goals.
+  When designing a visualization, we should think about which parts of the data are artifacts that we should discard, and which contain the real knowledge we should <em>distill</em> from this representation. 
+  In this case, the rotational factors in linear transformations are not as important other factors such as scalings.
+  So by design, we use the Grand Tour because it is invariant to rotations in data.
+  In turn, the rotational components in our data (i.e. rotations in linear transformations), whenever complicate the visualization unnecessarily, should be explicitly discarded.
 </p>
 <p>
-  To see whether the Grand Tour is a desired visualization in viewing a linear transformation, we take advantage of a central theorem of linear algebra. 
-  The <em>Singular Value Decomposition</em> (SVD) theorem shows that <em>any</em> linear transformation can be decomposed into a sequence of very simple operations: a rotation, a scaling, and another rotation. 
+  To see how it works in reality, we take advantage of a central theorem of linear algebra. 
+  The <em>Singular Value Decomposition</em> (SVD) theorem shows that <em>any</em> linear transformation can be decomposed into a sequence of very simple operations: a rotation, a scaling, and another rotation<d-cite key="austin2009svd"></d-cite>. 
 
   <!-- (From another perspective, any linear operation in standard bases is a scaling operation with appropriately chosen orthonormal bases on both sides.  -->
   <!-- We will use this perspective later when we discuss what part of the data representation is discarded by the Grand Tour. ) -->
-
   Applying a matrix <d-math>A</d-math> to a vector <d-math>x</d-math> is then equivalent to applying those simple operations: <d-math>x A = x U \Sigma V^T</d-math>.
   But remember that the Grand Tour works by rotating the dataset and then projecting it to 2D.
   Combined, these two facts mean that as far as the Grand Tour is concerned, visualizing a vector <d-math>x</d-math> is the same as visualizing <d-math>x U</d-math>, and visualizing a vector <d-math>x U \Sigma V^T</d-math> is the same as visualizing <d-math>x U \Sigma</d-math>. 
   This means that any linear transformation seen by the Grand Tour is equivalent to the transition between <d-math>x U</d-math> and <d-math>x U \Sigma</d-math> - a simple (coordinate-wise) scaling. 
   This is explicitly saying that any linear operation (whose matrix is represented in standard bases) is a scaling operation with appropriately chosen orthonormal bases on both sides.
-  So the Grand Tour provides a natural, elegant and computationally efficient way to <em>align</em> visualizations of activations separated by a fully-connected layer! 
+  So the Grand Tour provides a natural, elegant and computationally efficient way to <em>align</em> visualizations of activations separated by a fully-connected (linear) layer.
   Note that for convolutional layers, they can also be seen as linear transformations between flattened feature maps, so the same aligning mechanism applies to convolutional layers as well.
 </p>
 
 <p>
-  Since we have activations of all layers, to reduce the data size, we cut the number of data points to 500 and epochs to 50.
+  Since we have activations of all layers, to reduce the size of data, we cut the number of data points to 500 and epochs to 50.
   Despite less points and epochs are shown, now we are able to trace a behavior we observed in softmax back to any layers.
   In fashion-MNIST, for example, we observe a separation of shoes (sandals, sneakers and ankle boots as a group) from all other classes in the softmax layer. 
   Tracing it back to earlier layers, we can see that this separation happened as early as <a onclick="lt2Figure.onscreen()">layer 5</a>:
@@ -867,15 +872,19 @@ lt2Figure.onscreen();
 lt2.overlay.layerPlayButton.on('click')();
 ">this view</a>.</p>
 
+<p>We found this early separation with manipulations <em>directly on data points</em>, which we will explain right now.</p>
+
 <h3>From Basis to Instances: Extending Direct Manipulations</h3>
 <p> 
-  Unlike the softmax layer, there is one problem with our axis handles in high dimensional hidden layers.
-  Although we have preprocessed data (we chose up to 45 principle components through PCA) so that their dimensionality is at manageable size for the Grand Tour, the axes lines still make a hair ball, and more importantly, these axes in hidden layers do not possess as much meaning as the softmax. 
-  Unlike the softmax or pre-softmax where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics.
-  But even we used some feature visualizations, these derived meanings are hard to remember or encode in the Grand Tour. 
-  Thus we do not have axes handles to change the view of the Grand Tour.
-  However, we can regard <em>data points</em> as handles this time. 
-  An orange circle would show up after brushing a subset of data points and we can use it as handles to rotate the view. 
+  Unlike the softmax layer, there is one problem with axis handles in hidden layers.
+  Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case. 
+  <!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -->
+  <!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -->
+  Thus we should not have axis handles anymore.
+  Instead, we can regard <em>data points</em> as handles this time. 
+  In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection. 
+  It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well.
+  Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics.
   We will cover how it works in <a href="#technical-details">technical details</a>.
 </p>
 
@@ -927,7 +936,7 @@ lt2.overlay.layerPlayButton.on('click')();
   They are only studied in specific settings, for example, in dynamic graph drawing <d-cite key="archambault2010animation"></d-cite> and people have raised concerns about incomparable contents <d-cite key="tversky2002animation"></d-cite> in some of these studies.
   In our case, however, the use of animation comes naturally from our direct manipulation.
   Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections. 
-  Although we could have used small multiples over animations for training and layer dynamics, without specific support that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
+  Although we could have used small multiples over animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
 </p>
 
 
@@ -952,7 +961,6 @@ lt2.overlay.layerPlayButton.on('click')();
 <p>
   Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
 </p>
-
 <p>
   In the interest of completeness, the remainder of the article provides a number of technical details about the implementation of the techniques we described above.
 </p>
