@@ -795,26 +795,19 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   Despite that, two problems need to be solved first:
   <ul>
     <li>
-      The handles on axes of softmax layer were very convenient, but it is only practical when dimensionality is small.
-      With hundreds of dimensions, for example, the axis handles would look like a hairball, making them impossible in interact with.
-      Another problem is that hidden layers do not have clear semantics as the softmax layer.
-      Although we can interpret axes in intermediate layers using other techniques <d-cite key="olah2017feature"></d-cite><d-cite key="kim2017tcav"></d-cite>, keeping many abstract concepts in head and manipulating them can be cumbersome.
-    </li>
-    <li>
       While we want to trace out the activation patterns through different layers, the points going under a linear transformation can be hard to trace in Grand Tour.
       Under linear transformations, the dimensionality might change, and each neuron in a later layer is resulted from mixing activation of all neurons in the previous layer. 
+    </li>
+    <li>
+      The handles on axes of softmax layer were very convenient, but it is only practical when dimensionality is small.
+      With hundreds of dimensions, for example, the axis handles would look like a hairball, making them impossible in interact with.
+      Moreover, hidden layers do not have as clear semantics as the softmax layer, so manipulating axes in hidden layers would not be as natural and reasonable. 
     </li>
   </ul>
 </p>
 
 <p>
-  We address the first problem by allowing users to directly manipulate a subset of <em>points</em>.
-  When axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should have no difficulty in dragging the axes. 
-  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions to make a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
-</p>
-
-<p>
-  To tackle the second, we simplify the linear transformations by observing that they are equivalent to simple scalings under the view of the Grand Tour.
+  To address the first problem, we simplify the linear transformations by observing that they are equivalent to simple scalings under the view of the Grand Tour.
   To see how a linear transformation can be viewed unnecessarily complicated, think about a neural network layer <d-math>A</d-math> that negates two axis in 2D, in matrix form:
   <d-math block>
     A = \begin{bmatrix}
@@ -829,7 +822,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   </d-math>
   for <d-math>t \in [0,1].</d-math>
 
-  If we apply this interpolation on all data points, they will cross the origin at the same time <d-math>t=0.5</d-math>, making it impossible trace individual points. 
+  If we apply this interpolation on all data points, they will cross the origin at the same time (<d-math>t=0.5</d-math>), making it impossible trace individual points. 
   Moreover, this interpolation complicates a simple 180 degree rotation in data.
   In the Grand Tour, matrix <d-math>A</d-math> should be considered doing nearly nothing, for it only rotates the data while the Grand Tour is also a rotation.
   However, when visualizing this by the simple linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) stays the same.
@@ -875,6 +868,9 @@ lt2.overlay.layerPlayButton.on('click')();
 <p>We found this early separation with manipulations <em>directly on data points</em>, which we will explain right now.</p>
 
 <h3>From Basis to Instances: Extending Direct Manipulations</h3>
+<p>
+  We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>.
+</p>
 <p> 
   Unlike the softmax layer, there is one problem with axis handles in hidden layers.
   Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case. 
@@ -887,7 +883,12 @@ lt2.overlay.layerPlayButton.on('click')();
   Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics.
   We will cover how it works in <a href="#technical-details">technical details</a>.
 </p>
-
+<p>
+  To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components.
+  To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead.
+  We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes. 
+  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
+</p>
 
 
 <h2>The Grand Tour of Adversarial Dynamics</h2>
