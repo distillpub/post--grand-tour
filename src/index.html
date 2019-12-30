@@ -147,19 +147,20 @@
   <div class="flex-item" style="flex: 1;"></div>
 </div>
 <div class='base-grid'>
-<p class='caption' style="grid-column: text;">With the Grand Tour<d-cite key="asimov1985grand"></d-cite>, we learned that 
+  <p class='caption' style="grid-column: text;">The Grand Tour<d-cite key="asimov1985grand"></d-cite> in action. This visualization shows the behavior of the final 10-dimensional layer
+    of a neural network as it is trained on the MNIST dataset. With this technique, it is possible to see interesting training behavior. For example, the network appears to learn to classify digits 
   <span 
     style="color: #ff7f0e; cursor: pointer;" 
     onmouseover="teaser.overlay.onSelectLegend(1);"
-    onmouseout="teaser.overlay.restoreAlpha()">digit 1 
+    onmouseout="teaser.overlay.restoreAlpha()">1 
   </span> 
   and 
   <span
     style="color: #7f7f7f; cursor: pointer;"
     onmouseover="teaser.overlay.onSelectLegend(7);"
-    onmouseout="teaser.overlay.restoreAlpha()">digit 7
+    onmouseout="teaser.overlay.restoreAlpha()">7
   </span> 
-  are classified correctly after training epoch 14 and 21 respectively, later than all the other digits.
+  in an almost discontinuous manner, after training epochs 14 and 21 respectively.
 </p>
 </div>
 
@@ -185,10 +186,19 @@
 -->
 
 <p>
-  The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a classic visualization technique for high-dimensional point clouds.
-  Although it has fallen out of favor for modern methods such as UMAP <d-cite key="mcinnes2018umap"></d-cite> and t-SNE<d-cite key="maaten2008visualizing"></d-cite>, the Grand Tour offers unique properties in the visualization of the behavior of neural networks.
-  Because the Grand Tour is fundamentally a <em>linear</em> method, the patterns it shows more directly correspond to patterns of interest in the neural network.
-  We present three use cases of interest: visualizing the training process as the network weights change, visualizing the layer-to-layer behavior as the data travel through the network and visualizing adversarial examples.
+  The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a classic visualization technique for high-dimensional point clouds that <em>projects</em> a high-dimensional dataset into two dimensions.
+
+  Over time, the Grand Tour smoothly animates its projection so that every possible view of the dataset is (eventually) presented to the viewer.
+
+  Unlike modern nonlinear projection methods such as t-SNE<d-cite key="maaten2008visualizing"></d-cite> and UMAP<d-cite key="mcinnes2018umap"></d-cite>, the Grand Tour is fundamentally a <em>linear</em> method.
+
+  In this article, we show how to leverage the linearity of the Grand Tour to enable a number of capabilities that are uniquely useful to visualize the behavior of neural networks.
+  
+  <!-- Although this means that each offers unique properties in the visualization of the behavior of neural networks. -->
+  
+  <!-- Because the Grand Tour is fundamentally a <em>linear</em> method, the patterns it shows more directly correspond to patterns of interest in the neural network. -->
+  
+  Concretely, we present three use cases of interest: visualizing the training process as the network weights change, visualizing the layer-to-layer behavior as the data goes through the network and visualizing both how adversarial examples<d-cite key="szegedy2013intriguing"></d-cite> are crafted and how they fool a neural network.
   
   <!-- The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting it to 2D. -->
   <!-- With the Grand Tour, user interaction is easy to incorporate, allowing a natural mixed-initiative mode of visual exploration. -->
