@@ -304,24 +304,29 @@
   <d-footnote>
     MNIST<d-cite key="lecun2010mnist"></d-cite> contains images of 10 digits
     <img 
-    style="width: 70%; display: block" 
+    class="img-center" 
+    style="width: 70%;" 
     src="figs/mnist.png" />
     Image credit to <a href="https://en.wikipedia.org/wiki/File:MnistExamples.png">https://en.wikipedia.org/wiki/File:MnistExamples.png</a> 
   </d-footnote>,
   fashion-MNIST
   <d-footnote>
-    Fashion-MNIST<d-cite key="xiao2017fashion"></d-cite> contains 10 classes of clothes/shoes:
+    Fashion-MNIST<d-cite key="xiao2017fashion"></d-cite> contains 10 classes of clothes, bags and shoes:
     <img 
-    style="width: 70%; display: block" 
+    class="img-center" 
+    style="width: 70%;" 
     src="figs/fashion-mnist.png" />
-    Image credit to <a href="https://github.com/zalandoresearch/fashion-mnist">https://github.com/zalandoresearch/fashion-mnist</a> 
+    <!-- Image credit to <a href="https://github.com/zalandoresearch/fashion-mnist">https://github.com/zalandoresearch/fashion-mnist</a>  -->
+    Image credit to <a href="https://towardsdatascience.com/multi-label-classification-and-class-activation-map-on-fashion-mnist-1454f09f5925">https://towardsdatascience.com/multi-label-classification-and-class-activation-map-on-fashion-mnist-1454f09f5925</a> 
+
   </d-footnote>
 
   and CIFAR-10
   <d-footnote>
     CIFAR-10<d-cite key="krizhevsky2009cifar10"></d-cite> contains colored images of 10 classes of objects
     <img 
-    style="width: 70%; display: block" 
+    class="img-center" 
+    style="width: 70%;" 
     src="figs/cifar-10.png" />
     Image credit to <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a> 
   </d-footnote>. 
@@ -381,17 +386,47 @@
    
 <p>
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
-  In our classifier, the pipeline has convolutional and fully-connected linear layers, and rectified linear units (ReLU) as non-linear layers.
-  Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations in the end.
+  In our classifier, the pipeline has convolutional
+  <d-footnote>
+    A convolution calculates weighted sums of regions in the input. 
+    In neural networks, the learnable weights in convolutional layers are referred to as the kernel.
+    For example
+    <img src="figs/conv.gif" style="width:70%" class="img-center">
+    Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>.<br>
+    See also <a href="https://github.com/vdumoulin/conv_arithmetic">Convolution arithmetic.</a>
+  </d-footnote> 
+   and fully-connected linear layers, and rectified linear units (ReLU)
+  <d-footnote>
+    First introduced by Nair and Hinton<d-cite key="nair2010relu"></d-cite>, ReLU calculates <d-math>f(x)=max(0,x)</d-math> for each entry in a vector input. Graphically, it is a hinge at the origin: <img src="figs/relu.png" style="width:60%" class="img-center">
+    Image credit to <a href="https://pytorch.org/docs/stable/nn.html#relu">https://pytorch.org/docs/stable/nn.html#relu</a>
+  </d-footnote>
+  as non-linear layers.
+  Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations
+  <d-footnote>
+    Softmax function calculates <d-math>S(y_i)=\frac{e^{y_i}}{\Sigma_{j=1}^{N} e^{y_j}}</d-math> for each entry (<d-math>y_i</d-math>) in a vector input (<d-math>y</d-math>). For example, <img src="figs/softmax.png" style="width:75%" class="img-center">
+    Image credit to <a href="https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/">https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/</a>
+  </d-footnote> 
+  in the end.
 
   For images, the input is a 2D array of scalar values for gray scale images or RGB triples for colored images.
-  When needed, one can always flatten the 2D array into an equivalent <d-math>w \cdot h \cdot c</d-math> -dimensional vector.
+  When needed, one can always flatten the 2D array into an equivalent (<d-math>w \cdot h \cdot c</d-math>) -dimensional vector.
   Similarly, the intermediate value after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in the layer. 
   The softmax, for example, can be seen as a 10-vector whose values are positive real numbers that sum up to 1.
   This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also hints us on how to visualize them in a better way.
 
-  Most of the simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations or ReLU activations).
-  (Some operations, notably max-pooling and softmax, do not fall into either categories. We will come back to this later.)
+  Most of the simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations<d-footnote>
+    Sigmoid calculates <d-math>S(x)=\frac{e^{x}}{e^{x}+1}</d-math> for each entry (<d-math>x</d-math>) in a vector input. Graphically, it is an S-shaped curve.
+    <img src="figs/sigmoid.png" style="width:60%" class="img-center">
+    Image credit to <a href="https://en.wikipedia.org/wiki/Sigmoid_function">https://en.wikipedia.org/wiki/Sigmoid_function</a>
+  </d-footnote> 
+  or ReLU activations).
+  (Some operations, notably max-pooling<d-footnote>
+    Max-pooling calculates maximum of a region in the input. For example
+    <!-- <img src="figs/maxpool.png" style="width:60%" class="img-center">
+    Image credit to <a href="https://computersciencewiki.org/index.php/Max-pooling_/_Pooling">https://computersciencewiki.org/index.php/Max-pooling_/_Pooling</a> -->
+    <img src="figs/maxpool.gif" style="width:70%" class="img-center">
+    Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>
+  </d-footnote>  and softmax, do not fall into either categories. We will come back to this later.)
   We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
   Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. 
   However, in the above view we look at examples one at a time, we lose the full picture: what does the network do to <em>all</em> examples?
@@ -930,14 +965,15 @@ lt2.overlay.layerPlayButton.on('click')();
 <h2>Discussion</h2>
 
 <h3>The Power of Animation and Direct Manipulation</h3>
-
 <p>
-  When comparing the Grand Tour with other dimensionality reduction techniques, we used small multiples that cover different training epochs and dimensionality reduction methods. 
-  When comparing small multiples and animation, there is no general conclusion on which one is better than the other in the literature. 
-  They are only studied in specific settings, for example, in dynamic graph drawing <d-cite key="archambault2010animation"></d-cite> and people have raised concerns about incomparable contents <d-cite key="tversky2002animation"></d-cite> in some of these studies.
-  In our case, however, the use of animation comes naturally from our direct manipulation.
+  When comparing linear projections with non-linear dimensionality reductions, we used small multiples that go over different training epochs and dimensionality reduction methods. 
+  Later when we used the Grand Tour alone, however, we used a single view with animations.
+  When comparing small multiples and animations, there is no general conclusion on which one is better than the other in the literature. 
+  They are only studied in specific settings, for example, in dynamic graph drawing <d-cite key="archambault2010animation"></d-cite>.
+  There has been concerns about the incomparable contents <d-cite key="tversky2002animation"></d-cite> between small multiples and animated plots in some of these studies.
+  Despite these concerns, however, the use of animation comes naturally from the direct manipulation in our case.
   Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections. 
-  Although we could have used small multiples over animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
+  Although we could have used small multiples rather than animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
 </p>
 
 
