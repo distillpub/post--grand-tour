@@ -212,105 +212,56 @@
 
 <d-article>
 <h2>Introduction</h2>
+
 <p>
-  Neural networks have outperformed other methods in supervised learning contests such as Imagenet Large Scale Visual Recognition Challenge (ILSVRC)<d-cite key="ILSVRC15"></d-cite>, sometimes performing at the same level as humans in a number of tasks.
+  Deep neural networks often achieve best-in-class performance in supervised learning contests such as the ImageNet Large Scale Visual Recognition Challenge (ILSVRC)<d-cite key="ILSVRC15"></d-cite>.
+  
   Unfortunately, their decision process is notoriously hard to interpret<d-cite key="lipton2016mythos"></d-cite>, and their training process is often hard to debug<d-cite key="wongsuphasawat2018visualizing"></d-cite>.
-  We present a method to visualize the responses of a neural network using an under-appreciated visualization method.
-  The <em>Grand Tour</em> works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. 
-  This is a <em>linear</em> process.
-  <!-- The Grand Tour works well for visualizing neural networks because, as we will see, neural networks are <em>also</em> (mostly) linear<d-cite key="lee2019wide"></d-cite> transformations from inputs to outputs. -->
-  The Grand Tour works well for visualizing neural networks because, as we will see, the linear transformations in neural networks can be simplified in the Grand Tour.
-  We will find this data-visual correspondence crucial to the visualization design, especially when compared to other non-linear methods.
+  
+  In this article, we present a method to visualize the responses of a neural network which leverages properties of deep neural networks and properties of the <em>Grand Tour</em>.
+
+  Notably, our method enables us to more directly reason about the relationship between <em>changes in the data</em> and <em>changes in the resulting visualization</em><d-cite key="kindlmann2014algebraic"></d-cite>.
+
+  As we will show, this data-visual correspondence is central to the method we present, especially when compared to other non-linear projection methods like UMAP and t-SNE.
 </p>
-<p>
-  To understand a neural network, we often try to observe its action on input examples.
-  These kinds of visualizations are useful to elucidate the activation patterns of a neural network for a single example, but they offer little insight about the relationship between different examples, different states of the network as it's being trained, or the same example as it is transformed by the different layers of a single network.
-  Therefore, we should instead aim to visualize the <em>context around</em> our examples of interest. 
-  This context is precisely the structure that linear methods preserve well.
-  To fully understand the neural network process, it is not enough to "open the black box".
-  We need a visualization that opens the box, but crucially, does not destroy the patterns we are hoping to find.
-  As a concrete example of how visualizations can fail <d-cite key="kindlmann2014algebraic"></d-cite>, if our visualization is not consistent throughout a sequence of training epochs, then changes in the visualization might not be due to any meaningful change in the network itself. 
-  Just as importantly, changes in the network might not be reflected in the visualization.
-</p>
+  <!-- considers the str -->
 
-
-<h2>Motivation and Background</h2>
-
-<!-- <p>
-  There is a number of great videos and blogs that explain what a neural network is (for example the one made by <a href="https://www.youtube.com/watch?v=aircAruvnKk">3Blue1Brown</a>).
-  There are also numerous sources explaining <em>different aspects</em> of understanding the internal of a neural network.
-  The <d-cite key="smilkov2017direct">Tensorflow Playground</d-cite> by Smilkov and Carter extended the of work of <d-cite key="ConvnetJS">Karpathy</d-cite>. Their visualization benefits from the dimensionality of input being 2, utilizing (x,y) location in a canvas to represent input domain and colors to represent activation levels. If it were more than 2, it would be not as straightforward to visualize in a 2D screen. 
-  Nielsen gave <d-cite key="neuralnetcomputeany">a visual proof that neural nets can compute any function</d-cite> in his online book on deep neural networks. In its chapter 4, interactive visualizations are used to visually convey a hard-to-proof concept in deep learning. By letting readers tune the weights in a neural network any visually see the model created, readers convince themselves that a neural network can represent any function. 
-  <d-cite key="goh2017why">Goh</d-cite> demonstrate visually why momentum works in optimization algorithms. Because stochastic gradient descent algorithm is the essence of training a neural network, his work gave both an intuition and a mathematical justification of the importance of momentum in the training process.
+  <!-- Deep neural networks are -->
+  
+  <!-- The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. Notably, this is a <em>linear</em> process. -->
+  <!-- This linearity is particularly useful  -->
+  <!-- This linearity is particularly useful when visualizing afor visualizing deep neural networks because, as we will see, the linear transformations in neural networks can be simplified in the Grand Tour. -->
+  
 </p>
 
 <p>
-  Despite the various aspects of "understanding a neural network", in this work we will demonstrate a tool for <em>understanding the resultant behavior and performance</em> of neural networks. 
-  We first give some necessary background of a neural network. Then we explain the technique we adapt called the Grand Tour, and describe the novel interaction we added onto it for direct user manipulation. 
-</p> -->
-<!-- <p>
-  At a very high level, a neural network is a black box that answers a very specific type of question. 
-  Taking a classic example, if we want a machine that helps us read hand written digits, a neural network can do it. 
-  The process of automatically tuning a neural network for a specific use (in this case, recognizing digits) is called <em>training</em>. 
-  A complete training round during which the network sees all training examples once is often referred to as an <em>epoch</em>.
-</p> -->
-<!-- <p>
-  As you will see in a later demonstration, the trained network may make incorrect claims about some images. This is mostly because the machine only see finite number of training examples (in <em>training dataset</em>) but we test the machine with new, unseen examples. To test how the machine perform on real data, we often prepare a separated <em>testing dataset</em> that machine has never seen in training.
-  We could feed our testing examples into the neural network, one at a time, to see if any of them has a wrong answer.
-  However, to diagnose the overall performance, we shall not only test with one example at a time. Instead we often look at a <em>summary</em> of many testing examples. 
+  To understand a neural network, we often try to observe its action on input examples (both real and synthesized)<d-cite key="olah2017feature"></d-cite>.
+  
+  These kinds of visualizations are useful to elucidate the activation patterns of a neural network for a single example, but they might offer less insight about the relationship between different examples, different states of the network as it's being trained, or how the data in the example flows through the different layers of a single network.
+  
+  Therefore, we instead aim to enable visualizations of the <em>context around</em> our objects of interest: what is the difference between the present training epoch and the next one? How does the classification of a network converge (or diverge) as the image is fed through the network?
 
-  Following this principle we often group all testing images by a pair of their properties - (true_class, predicted_class). 
-  Presumably the network could perform well on some easy classes but perform bad on some other hard classes. In that's the case we will see interesting counting patterns among different groups. 
-  If we count the number of images that falls into different groups, we end up what is called a <em>confusion matrix</em>. 
-   
-  See the figure below as an example of confusion matrix for our classifier, shown as a heatmap. 
-  The more yellow a cell has, the more image examples fall into the corresponding group, i.e. the higher count.
-  The color map are consistent through epochs, normalized by maximum of off-diagonal entries from epoch 25 to epoch 99. Under this design, most diagonal entries are likely to saturate because the count of correct predictions is often more than wrong predictions on any off-diagonal cells.
-  You can click play button or drag the slider bar handle to see how network performance improved throughout training epochs. Hovering over a cell will show the actual count in the group.
-</p> -->
+  Linear methods are attractive because they are particularly easy to reason about.
 
-<!-- <d-figure id='confusionMatrix'>
-  <script>
-    const cmFigure = document.querySelector("d-figure#confusionMatrix");
-    let cm;
+  The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen: both are linear processes.
 
-    cmFigure.addEventListener("ready", function() {
-      console.log('cmFigure ready');
+  Although deep neural networks are clearly not linear processes, they often confine their nonlinearity to a small set of operations, enabling us to still reason about their behavior.
 
-      cm = new ConfusionMatrixRenderer('#confusionMatrix');
-      let urls = ['data/'+utils.getDataset()+'/bin/confusion.bin'];
-      utils.loadDataToRenderer(urls, cm);
+  Our proposed method better preserves context by providing more
+  consistency: it should be possible to know <em>how the visualization
+  would change, if the data had been different in a particular
+  way</em>.
+</p>
 
+<h2>Background</h2>
 
-      utils.addDatasetListener(function(){
-        let urls = ['data/'+utils.getDataset()+'/bin/confusion.bin'];
-        delete cm.dataObj;
-        cm.isDataReady = false;
-        utils.loadDataToRenderer(urls, cm);
-      });
-      window.addEventListener('resize', ()=>{
-        cm.resize();
-      });
-    });
-  </script>
-</d-figure> -->
-
-
-<!-- <p>
-  We can see interesting things happening. For example, when <a onclick="utils.setDataset('mnist'); cm.setEpoch(19)" href="#confusionMatrix">looking at epoch 19 of MNIST dataset</a>, we notice that the network incorrectly predicts many digit 7 images to classes of digit 0,1,2,3 and 9. However on epoch 21, those wrong predictions are fixed. 
-  Although confusion matrix gives a general summary of how our neural network behaves, we have no means of further investigate the behavior of individual images, because we lose the information about how individual images contributed to this summary. 
-  That is why a simple confusion matrix can never answer questions like "which image is hard to predict". We would benefit from a more detailed instance-by-instance look about our network.
-</p> -->
-
-
-
-<h3>Opening the Black Box</h3>
+<h3>A working example</h3>
 
 <p>
-  We trained deep CNN models with 3 common image classification datasets: 
+  We trained deep neural network models (DNNs) with 3 common image classification datasets: 
   MNIST
   <d-footnote>
-    MNIST<d-cite key="lecun2010mnist"></d-cite> contains images of 10 digits
+    MNIST<d-cite key="lecun2010mnist"></d-cite> contains grayscale images of 10 handwritten digits
     <img 
     class="img-center" 
     style="width: 70%;" 
@@ -319,7 +270,7 @@
   </d-footnote>,
   fashion-MNIST
   <d-footnote>
-    Fashion-MNIST<d-cite key="xiao2017fashion"></d-cite> contains 10 classes of clothes, bags and shoes:
+    Fashion-MNIST<d-cite key="xiao2017fashion"></d-cite> contains grayscale images of 10 types of fashion items:
     <img 
     class="img-center" 
     style="width: 70%;" 
@@ -331,22 +282,14 @@
 
   and CIFAR-10
   <d-footnote>
-    CIFAR-10<d-cite key="krizhevsky2009cifar10"></d-cite> contains colored images of 10 classes of objects
+    CIFAR-10<d-cite key="krizhevsky2009cifar10"></d-cite> contains RGB images of 10 classes of objects
     <img 
     class="img-center" 
     style="width: 70%;" 
     src="figs/cifar-10.png" />
     Image credit to <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a> 
   </d-footnote>. 
-  Our architecture is simpler in structure than state-of-the-arts but is complex enough to demonstrate the power of the Grand Tour. 
-  <!-- Our CNN models are sequential, meaning that the prediction (<d-math>y</d-math>) is derived from input (<d-math>x</d-math>) passing through a sequence of functions, or "layers" in neural network terminology.
-  <d-math block>
-    y :=  f_L \cdots f_2 \circ f_1(x)
-  </d-math> -->
-  <!-- For images, the input is not a single scalar but a 2D array of scalar values for gray scale images or RGB triples for colored images, written as <d-math>x \in \mathbb{R}^{w \times h \times c}</d-math>, where <d-math>w</d-math>, <d-math>h</d-math> and <d-math>c</d-math> are width, height and number of channels (<d-math>c = </d-math>1 or 3) respectively.
-  When needed, one can always flatten the 2D array into an equivalent <d-math>w \cdot h \cdot c</d-math> -dimensional vector.
-  Similarly, the intermediate values after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in a layer. 
-  This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also gives us a way of thinking the design visualizing our data. -->
+  Our architecture is simpler and smaller than current DNNs but is indicative of modern networks, and complex enough to demonstrate both our proposed techniques and shortcomings of typical approaches.
 </p>
 <p>
   When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
