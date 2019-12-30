@@ -26,18 +26,17 @@ teaserFigure.addEventListener("ready", function() {
   teaser = utils.loadDataToRenderer(urls, teaser);
 
   utils.addDatasetListener(function(){
-    var urls = utils.getTeaserDataURL();
+    // var urls = utils.getTeaserDataURL();
     
-    teaser = utils.loadDataToRenderer(urls, teaser);
-    teaser.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
-    teaser.overlay.resize();
+    // teaser = utils.loadDataToRenderer(urls, teaser);
+    // teaser.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
+    // teaser.overlay.resize();
 
-    if(utils.getDataset() == 'cifar10'){
-      teaser.setColorFactor(0.0);
-    }else{
-      teaser.setColorFactor(utils.COLOR_FACTOR);
-    }
-
+    // if(utils.getDataset() == 'cifar10'){
+    //   teaser.setColorFactor(0.0);
+    // }else{
+    //   teaser.setColorFactor(utils.COLOR_FACTOR);
+    // }
   });
   
   window.addEventListener('resize', ()=>{
