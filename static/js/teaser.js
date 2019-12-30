@@ -18,7 +18,8 @@ teaserFigure.addEventListener("ready", function() {
   teaser = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(teaser);
   
-  teaser.overlay.fullScreenButton.remove();
+  teaser.overlay.fullScreenButton.style('top', '18px');
+  // teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();
   teaser.overlay.zoomSlider.remove();
   // teaser.overlay.grandtourButton.remove();
@@ -40,7 +41,7 @@ teaserFigure.addEventListener("ready", function() {
   });
   
   window.addEventListener('resize', ()=>{
-    teaser.overlay.resize();
+    // teaser.overlay.resize();
     teaser.setFullScreen(teaser.isFullScreen);
   });
 

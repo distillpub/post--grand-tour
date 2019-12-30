@@ -49,7 +49,7 @@ function TeaserOverlay(renderer, kwargs) {
 
   this.playButton = figure
     .insert('i', ':first-child')
-    .attr('class', 'play-button tooltip fa fa-pause')
+    .attr('class', "play-button tooltip fa " + (renderer.shouldAutoNextEpoch?"fa-pause":"fa-play") )
     .on('mouseover', function() {
       d3.select(this).style('opacity', 1);
     })
@@ -91,8 +91,9 @@ function TeaserOverlay(renderer, kwargs) {
       }
     })
     .on('click', function(){
+
       renderer.setFullScreen(!renderer.isFullScreen);
-      that.resize();
+      // that.resize();
 
       if(renderer.isFullScreen){
         d3.select(this).style('opacity', 0.7);
