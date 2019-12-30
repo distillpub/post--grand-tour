@@ -152,6 +152,12 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     .attr('height', height)
     .on('dblclick', function() {
       // renderer.shouldPlayGrandTour = !renderer.shouldPlayGrandTour;
+    })
+    .on('mousemove', ()=>{
+      if (renderer.shouldRender == false){
+        renderer.shouldRender = true;
+        renderer.play();
+      }
     });
 
   this.trainingText = this.svg.append('text')

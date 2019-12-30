@@ -10,8 +10,9 @@ function TeaserOverlay(renderer, kwargs) {
   });
 
   let that = this;
+  let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
 
-  this.zoomSlider = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.zoomSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
     .attr('class', 'slider zoomSlider')
@@ -24,7 +25,7 @@ function TeaserOverlay(renderer, kwargs) {
       renderer.setScaleFactor(value);
     });
 
-  this.epochSlider = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.epochSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
     .attr('class', 'slider epochSlider')
@@ -46,7 +47,7 @@ function TeaserOverlay(renderer, kwargs) {
   }
 
 
-  this.playButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.playButton = figure
     .insert('i', ':first-child')
     .attr('class', 'play-button tooltip fa fa-pause')
     .on('mouseover', function() {
@@ -76,7 +77,7 @@ function TeaserOverlay(renderer, kwargs) {
   }
 
 
-  this.fullScreenButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.fullScreenButton = figure
     .insert('i', ':first-child')
     .attr('class', 'tooltip teaser-fullscreenButton fas fa-expand-arrows-alt')
     .on('mouseover', function() {
@@ -104,7 +105,7 @@ function TeaserOverlay(renderer, kwargs) {
     .attr('class', 'tooltipTextBottom')
     .text('Toggle fullscreen');
 
-  this.grandtourButton = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.grandtourButton = figure
     .insert('i', ':first-child')
     .attr('class', 'teaser-grandtourButton tooltip fas fa-globe-americas')
     .attr('width', 32)
@@ -153,22 +154,31 @@ function TeaserOverlay(renderer, kwargs) {
     });
 
 
-  this.svg = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.svg = figure
     .insert('svg', ':first-child')
     .attr('class', 'overlay')
     .attr('width', width)
     .attr('height', height)
     .on('dblclick', function() {
       // renderer.shouldPlayGrandTour = !renderer.shouldPlayGrandTour;
+    })
+    .on('mousemove', ()=>{
+      if (renderer.shouldRender == false){
+        renderer.shouldRender = true;
+        if(renderer.animId === null){
+          renderer.play();
+        }
+      }
     });
+
 
   this.epochIndicator = this.svg.append('text')
     .attr('id', 'epochIndicator')
     .attr('text-anchor', 'middle')
-    .text('Epoch: ');
+    .text(`Epoch: ${renderer.epochIndex}/99`);
   
   
-  this.controlOptionGroup = d3.select('d-figure.'+renderer.gl.canvas.id)
+  this.controlOptionGroup = figure
     .insert('div', ':first-child');
 
   this.modeOption = this.controlOptionGroup
@@ -280,26 +290,6 @@ function TeaserOverlay(renderer, kwargs) {
     if (this.annotate !== undefined){
       this.annotate(this.renderer);
     }
-    this.initZoom();
-  };
-
-
-  this.initZoom = function(){
-    // let zoomed = ()=>{
-    //   let k = d3.event.transform.k;
-
-    //   if(this.renderer.scaleFactor>=0.5 && this.renderer.scaleFactor<=3){
-    //     this.renderer.scaleFactor *= 1.0 + (k-1.0) * 0.5;
-    //   }
-    //   if(this.renderer.scaleFactor<=0.5){
-    //     this.renderer.scaleFactor = 0.5;
-    //   }
-    //   if(this.renderer.scaleFactor>3){
-    //     this.renderer.scaleFactor = 3;
-    //   }
-    // };
-    // this.zoom = d3.zoom().on('zoom', zoomed);
-    // this.svg.call(this.zoom);
   };
 
 

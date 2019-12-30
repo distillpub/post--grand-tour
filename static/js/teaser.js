@@ -21,11 +21,9 @@ teaserFigure.addEventListener("ready", function() {
   teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();
   teaser.overlay.zoomSlider.remove();
-  
   // teaser.overlay.grandtourButton.remove();
   
   teaser = utils.loadDataToRenderer(urls, teaser);
-  
 
   utils.addDatasetListener(function(){
     var urls = utils.getTeaserDataURL();
@@ -50,7 +48,7 @@ teaserFigure.addEventListener("ready", function() {
 });
 
 teaserFigure.addEventListener("onscreen", function() {
-  console.log('onscreen');
+  console.log('teaser onscreen');
   if(teaser && teaser.play){
     teaser.shouldRender = true;
     teaser.play();
@@ -63,7 +61,6 @@ teaserFigure.addEventListener("onscreen", function() {
 });
 
 teaserFigure.addEventListener("offscreen", function() {
-  console.log('offscreen');
   if(teaser && teaser.pause){
     teaser.pause();
   }

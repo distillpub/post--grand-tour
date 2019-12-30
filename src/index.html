@@ -545,11 +545,11 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 </d-figure>
 <p class='caption'>
   From
-  <a onclick="nngt.gt.setMatrix(DIGIT17_MATRIX)">this linear projection</a>, the learning of 
+  <a onclick="nngt.gt.setMatrix(DIGIT17_MATRIX)">this linear projection</a>, we can easily identify the learning of 
   <span style="color: #ff7f0e;">&#x2B24; digit 1</span> on 
   <a onclick="nngt.setEpochIndex(13)">epoch 14</a> and <br>
   <span style="color: #7f7f7f;">&#x2B24; digit 7</span> on 
-  <a onclick="nngt.setEpochIndex(19)">epoch 21</a> is obvious.
+  <a onclick="nngt.setEpochIndex(19)">epoch 21</a>.
 </p>
 
 <p>
@@ -944,8 +944,8 @@ lt2.overlay.layerPlayButton.on('click')();
 <h3>Non-sequential Models</h3>
 <p>
   In our work we have walked through models that are purely sequential. 
-  In modern architectures it is common to have non-sequential parts such as small ephemeral highway <d-cite key="srivastava2015highway"></d-cite> branches or dedicated branches for different tasks <d-cite key="szegedy2015going"></d-cite>. 
-  With our technique, technically one can visualize neuron activations on each such branch, but more interesting to us in future work is how in theory our visual encoding could be extended in order to efficiently interpret such complex architectures.
+  In modern architectures it is common to have non-sequential parts such as highway <d-cite key="srivastava2015highway"></d-cite> branches or dedicated branches for different tasks <d-cite key="szegedy2015going"></d-cite>. 
+  With our technique, one can visualize neuron activations on each such branch, but more interesting to us in the future is how to visually incorporate multiple branches and interpret much more complex architectures.
 </p>
 
 

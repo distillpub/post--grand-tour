@@ -53,7 +53,6 @@ seFigure0.addEventListener("onscreen", function() {
 });
 
 seFigure0.addEventListener("offscreen", function() {
-  console.log('se0 offscreen');
   if(se0 && se0.pause){
     se0.pause();
   }

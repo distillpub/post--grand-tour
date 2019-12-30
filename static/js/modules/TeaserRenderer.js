@@ -214,44 +214,41 @@ function TeaserRenderer(gl, program, kwargs) {
   this.shouldRender = true;
   this.s = 0;
 
+  this.play = (t=0)=>{
+    let dt = 0;
+    
 
-  this.play = function() {
-      let dt = 0;
-
-
-      if (this.shouldRender 
-        && (this.shouldPlayGrandTour 
-            || this.shouldAutoNextEpoch)) {
-        
-        if (this.shouldPlayGrandTour) {
-          dt = 1/60;
-        } else {
-          dt = 0;
+    if (this.shouldRender 
+      && (this.shouldPlayGrandTour || this.shouldAutoNextEpoch)) {
+      
+      if (this.shouldPlayGrandTour){
+        dt = 1/60;
+      }
+    
+      if (this.shouldAutoNextEpoch) {
+        this.s += 1;
+        if (this.s % this.framesPerEpoch == 0) {
+          this.nextEpoch();
         }
-
-        if (this.shouldAutoNextEpoch) {
-          this.s += 1;
-          if (this.s % this.framesPerEpoch == 0) {
-            this.nextEpoch();
-          }
-        }else{
-          this.setEpochIndex(this.epochIndex);
-        }
-
+      }else{
+        this.setEpochIndex(this.epochIndex);
       }
+    }
 
-      if (this.isScaleInTransition 
-        && this.scaleTransitionProgress<=1
-        && this.scaleTransitionProgress>=0){
-        this.scaleTransitionProgress += this.scaleTransitionDelta;
-      }
+    if (this.isScaleInTransition 
+      && this.scaleTransitionProgress<=1
+      && this.scaleTransitionProgress>=0){
+      this.scaleTransitionProgress += this.scaleTransitionDelta;
+    }
 
-      if (this.shouldRender) {
-        this.render(dt);
-        this.overlay.redrawAxis();
-      }
-      this.animId = requestAnimationFrame(this.play.bind(this));
+    if (this.shouldRender) {
+      this.render(dt);
+      this.overlay.redrawAxis();
+    }
+
+    this.animId = requestAnimationFrame(this.play.bind(this));
   };
+
 
   this.setColorFactor = function(f) {
     this.colorFactor = f;
@@ -425,8 +422,6 @@ function TeaserRenderer(gl, program, kwargs) {
       gl.drawArrays(gl.LINES, dataObj.npoint*6, dataObj.ndim*2);
       this.setMode('image');
     }
-
-    
     return;
   };
 }
