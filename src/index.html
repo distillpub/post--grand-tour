@@ -253,9 +253,7 @@
   way</em>.
 </p>
 
-<h2>Background</h2>
-
-<h3>A working example</h3>
+<h2>A working example</h2>
 
 <p>
   We trained deep neural network models (DNNs) with 3 common image classification datasets: 
@@ -291,31 +289,8 @@
   </d-footnote>. 
   Our architecture is simpler and smaller than current DNNs but is indicative of modern networks, and complex enough to demonstrate both our proposed techniques and shortcomings of typical approaches.
 </p>
-<p>
-  When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
-  We want the loss to keep decreasing, so we monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
-  Taking the training of an MNIST classifier as an example, the testing loss during training evolves like the following
-</p>
 
-<d-figure class='lh' style="">
-  <svg id='lh' height=300 style='width: 100%; height: 300px;'></svg>
-  <script src='js/lh.js'></script>
-</d-figure>
 
-<p>
-  Although its general trend meets what we expected, the loss keeps decreasing, we see something weird around epoch 14 and 21: the curve went flat before it dropped again.
-  What happened? What caused that?
-</p>
-
-<d-figure class='lh-per-class' style="">
-  <svg id='lh-per-class' height=300 style='width: 100%; height: 300px;'></svg>
-  <script src='js/lh-per-class.js'></script>
-</d-figure>
-
-<p>
-  If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we learned that the two drops were caused by the class of digit 1 and 7 - the model learns different classes at very different times in the training process. 
-  Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
-</p>
 <p>
   Perhaps the next question is: were these late learning caused by some outliers in the dataset or it is a feature for all 1s or 7s?
   To explore this we need to break the per-class losses further down to individual input examples.
@@ -385,6 +360,35 @@
   We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
   Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. 
   However, in the above view we look at examples one at a time, we lose the full picture: what does the network do to <em>all</em> examples?
+</p>
+
+
+<h2>Using visualization to understand DNNs</h2>
+
+<p>
+  When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
+  We want the loss to keep decreasing, so we monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
+  Taking the training of an MNIST classifier as an example, the testing loss during training evolves like the following
+</p>
+
+<d-figure class='lh' style="">
+  <svg id='lh' height=300 style='width: 100%; height: 300px;'></svg>
+  <script src='js/lh.js'></script>
+</d-figure>
+
+<p>
+  Although its general trend meets what we expected, the loss keeps decreasing, we see something weird around epoch 14 and 21: the curve went flat before it dropped again.
+  What happened? What caused that?
+</p>
+
+<d-figure class='lh-per-class' style="">
+  <svg id='lh-per-class' height=300 style='width: 100%; height: 300px;'></svg>
+  <script src='js/lh-per-class.js'></script>
+</d-figure>
+
+<p>
+  If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we learned that the two drops were caused by the class of digit 1 and 7 - the model learns different classes at very different times in the training process. 
+  Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
 </p>
 
 
