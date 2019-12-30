@@ -151,15 +151,13 @@
   <span 
     style="color: #ff7f0e; cursor: pointer;" 
     onmouseover="teaser.overlay.onSelectLegend(1);"
-    onmouseout="teaser.overlay.restoreAlpha()">
-    &#x2B24; digit 1 
+    onmouseout="teaser.overlay.restoreAlpha()">digit 1 
   </span> 
   and 
   <span
     style="color: #7f7f7f; cursor: pointer;"
     onmouseover="teaser.overlay.onSelectLegend(7);"
-    onmouseout="teaser.overlay.restoreAlpha()">
-    &#x2B24; digit 7
+    onmouseout="teaser.overlay.restoreAlpha()">digit 7
   </span> 
   are classified correctly after training epoch 14 and 21 respectively, later than all the other digits.
 </p>
@@ -342,8 +340,8 @@
 </p>
 <p>
   When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
-  Because we want our optimization algorithm to keep decreasing the loss, it is common to monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
-  Taking the training of an MNIST classifier as an example, the testing loss in the training looks like the following
+  We want the loss to keep decreasing, so we monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
+  Taking the training of an MNIST classifier as an example, the testing loss during training evolves like the following
 </p>
 
 <d-figure class='lh' style="">
@@ -393,9 +391,13 @@
     For example
     <img src="figs/conv.gif" style="width:70%" class="img-center">
     Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>.<br>
-    See also <a href="https://github.com/vdumoulin/conv_arithmetic">Convolution arithmetic.</a>
+    See also <a href="https://github.com/vdumoulin/conv_arithmetic">Convolution arithmetic</a>.
   </d-footnote> 
-   and fully-connected linear layers, and rectified linear units (ReLU)
+   and fully-connected (linear) layers
+  <d-footnote>
+    A fully-connected layer computes output neurons as weighted sum of input neurons. In matrix form, it is a matrix that linearly transforms the input vector into the output vector.
+  </d-footnote>
+   , and rectified linear units (ReLU)
   <d-footnote>
     First introduced by Nair and Hinton<d-cite key="nair2010relu"></d-cite>, ReLU calculates <d-math>f(x)=max(0,x)</d-math> for each entry in a vector input. Graphically, it is a hinge at the origin: <img src="figs/relu.png" style="width:60%" class="img-center">
     Image credit to <a href="https://pytorch.org/docs/stable/nn.html#relu">https://pytorch.org/docs/stable/nn.html#relu</a>
@@ -581,9 +583,9 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
 <p class='caption'>
   From
   <a onclick="nngt.gt.setMatrix(DIGIT17_MATRIX)">this linear projection</a>, we can easily identify the learning of 
-  <span style="color: #ff7f0e;">&#x2B24; digit 1</span> on 
+  <span style="color: #ff7f0e;">digit 1</span> on 
   <a onclick="nngt.setEpochIndex(13)">epoch 14</a> and <br>
-  <span style="color: #7f7f7f;">&#x2B24; digit 7</span> on 
+  <span style="color: #7f7f7f;">digit 7</span> on 
   <a onclick="nngt.setEpochIndex(19)">epoch 21</a>.
 </p>
 
@@ -808,11 +810,11 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
     nngt2.overlay.playButton.on('click')();
     ">
   this view of CIFAR-10</a> , 
-  the color of points are more mixed in testing (right) than training (left), showing an over-fitting in the training process.
+  the color of points are more mixed in testing (right) than training (left) set, showing an over-fitting in the training process.
   Also see this comparison in 
   <a onclick="utils.setDataset('mnist');">MNIST</a>
   or <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a>, 
-  where there is less difference between training and testing set.
+  where there is less difference between training and testing sets.
 </p>
 
 
@@ -943,9 +945,9 @@ lt2.overlay.layerPlayButton.on('click')();
 </d-figure>
 <p class="caption">
   From <a onclick="ltaFigure.onscreen()">this view of softmax</a>, we can see how  
-  <span style="color: #444444">&#x2B24; adversarial examples</span> 
-  evolved from <span style="color: #bcbd22">&#x2B24; 8s</span> 
-  into <span style="color: #1f77b4">&#x2B24; 0s</span>.
+  <span style="color: #444444">adversarial examples</span> 
+  evolved from <span style="color: #bcbd22">8s</span> 
+  into <span style="color: #1f77b4">0s</span>.
   In the corresponding <a onclick="ltaFigure.onscreen(); lta.overlay.onLayerSliderInput(10);">pre-softmax</a> however, these adversarial examples stop around the decision boundary of two classes. 
   Show data as <a onclick="lta.setMode('image')">images</a> to see the actual images generated in each step, or <a onclick="lta.setMode('point')">dots</a> colored by labels.
 </p>
