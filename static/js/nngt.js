@@ -14,6 +14,7 @@ nngtFigure.addEventListener("ready", function() {
     epochs,
     init_matrix: DIGIT17_MATRIX,
     shouldPlayGrandTour: false,
+    shouldAutoNextEpoch: true, 
   };
   nngt = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(nngt);

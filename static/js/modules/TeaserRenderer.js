@@ -18,6 +18,9 @@ function TeaserRenderer(gl, program, kwargs) {
   if (this.shouldPlayGrandTour === undefined){
     this.shouldPlayGrandTour = true;
   }
+  if (!this.hasOwnProperty('shouldAutoNextEpoch')){
+    this.shouldAutoNextEpoch = true;
+  }
 
 
   this.overlay = new TeaserOverlay(this, this.overlayKwargs);
@@ -97,23 +100,21 @@ function TeaserRenderer(gl, program, kwargs) {
     let canvas = this.gl.canvas;
     let canvasSelection = d3.select('#'+canvas.id);
 
-    let topBarHeight = d3.select('nav').node().clientHeight;
+    let topBarHeight = 0 || d3.select('nav').node().clientHeight;
+
     d3.select(canvas.parentNode)
       .classed('fullscreen', shouldSet);
 
     if (shouldSet) {
       canvasSelection
-        .attr('width', window.innerWidth)
-        .attr('height', window.innerHeight - topBarHeight)
         .classed('fullscreen', true);
     } else {
       canvasSelection
-        .attr('width', 1000)
-        .attr('height', 1000)
         .classed('fullscreen', false);
     }
 
     utils.resizeCanvas(canvas);
+    this.overlay.resize();
     gl.uniform1f(this.canvasWidthLoc, canvas.clientWidth);
     gl.uniform1f(this.canvasHeightLoc, canvas.clientHeight);
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -206,9 +207,7 @@ function TeaserRenderer(gl, program, kwargs) {
 
   
   this.shouldCentralizeOrigin = this.shouldPlayGrandTour;
-  if (!this.hasOwnProperty('shouldAutoNextEpoch')){
-    this.shouldAutoNextEpoch = true;
-  }
+  
 
 
   this.shouldRender = true;

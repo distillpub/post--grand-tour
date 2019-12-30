@@ -18,7 +18,8 @@ teaserFigure.addEventListener("ready", function() {
   teaser = new TeaserRenderer(gl, programs[0], kwargs);
   allViews.push(teaser);
   
-  teaser.overlay.fullScreenButton.remove();
+  teaser.overlay.fullScreenButton.style('top', '18px');
+  // teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();
   teaser.overlay.zoomSlider.remove();
   // teaser.overlay.grandtourButton.remove();
@@ -26,22 +27,21 @@ teaserFigure.addEventListener("ready", function() {
   teaser = utils.loadDataToRenderer(urls, teaser);
 
   utils.addDatasetListener(function(){
-    var urls = utils.getTeaserDataURL();
+    // var urls = utils.getTeaserDataURL();
     
-    teaser = utils.loadDataToRenderer(urls, teaser);
-    teaser.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
-    teaser.overlay.resize();
+    // teaser = utils.loadDataToRenderer(urls, teaser);
+    // teaser.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
+    // teaser.overlay.resize();
 
-    if(utils.getDataset() == 'cifar10'){
-      teaser.setColorFactor(0.0);
-    }else{
-      teaser.setColorFactor(utils.COLOR_FACTOR);
-    }
-
+    // if(utils.getDataset() == 'cifar10'){
+    //   teaser.setColorFactor(0.0);
+    // }else{
+    //   teaser.setColorFactor(utils.COLOR_FACTOR);
+    // }
   });
   
   window.addEventListener('resize', ()=>{
-    teaser.overlay.resize();
+    // teaser.overlay.resize();
     teaser.setFullScreen(teaser.isFullScreen);
   });
 

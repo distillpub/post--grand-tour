@@ -204,13 +204,15 @@ svg.confusionMatrix text{
 
 
 d-figure{
-    position: relative;
-    grid-column: text;
-    /*margin: 1rem 0;*/
+  position: relative;
+  grid-column: text;
+  /*margin: 1rem 0;*/
 }
 
+
+
 d-figure.fullscreen{
-    grid-column: screen;
+  grid-column: screen;
 }
 
 d-figure.nngt2{
@@ -220,17 +222,33 @@ d-figure.nngt2.fullscreen{
   grid-column: screen;
 }
 
+d-figure.teaser{
+  display: block;
+  width: 50%;
+  height: 280px;
+  margin-left: auto; 
+  margin-right: auto; 
+}
+d-figure.teaser.fullscreen{
+  width: 100%;
+  height: calc(100vh - 60px); /* viewport_height - navbar_height (40px)*/
+}
+#teaser{
+    width: 100%;     
+    height: 100%;
+}
+
+
 canvas.grandtour{
     width: 100%; 
     height: 400px;
     /*height: 100%;*/
 }
-
 canvas.grandtour.fullscreen{
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100vh - 60px);
     grid-column: page;
 }
 
