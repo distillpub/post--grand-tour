@@ -495,38 +495,14 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   </p> -->
 
 
-
-
-
-<h3>Linear Methods to the Rescue</h3>
+<h2>Linear Methods to the Rescue</h2>
 
 <p>
   When given the option, then, we should prefer methods for which changes in the data produce predictable, visually salient changes in the result.
   Linear dimensionality reductions often have this property. 
   They are more interpretable than non-linear methods due to a good data-visual correspondence.
-  Principle Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
-  It works by choosing directions that preserve the most variance in data.
-  However, the distribution of data in softmax layers, if trained almost perfectly, has almost <em>equal</em> variance in every axis directions because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help much in making sense of the data either. </d-footnote>.
-  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third. 
-  So which of them should we choose? 
-  <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
-  <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
-  So instead of PCA, we visualize this equal variance data by choosing random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
-  The Grand Tour is a linear method which generates infinitely many projections and interpolate them smoothly.
 </p>
 
-<d-figure class='nngt-single-epoch-0' style="">
-  <canvas id='nngt-single-epoch-0' class='grandtour'></canvas>
-  <script src='js/se0.js'></script>
-</d-figure>
-<p class='caption'>The Grand Tour of the softmax layer. Drag the handle on each axis to move that axis.</p>
-
-
-<p>
-  When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections that reveals important patterns in the data. 
-  In the above view we can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 or 7 in MNIST, or the three-way confusion in Fashion-MNIST.
-  But see how much easier this time than previous non-linear methods.
-</p>
 <p>
   Direct manipulation handles are not only for <em>exploratory</em> visual analysis, they are also friendly for <em>explanatory</em> visualizations/presentations. 
   To illustrate the late learning of digit 1 and 7 in the MNIST classifier, for example, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas. 
@@ -545,111 +521,6 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
   <span style="color: #7f7f7f;">digit 7</span> on 
   <a onclick="nngt.setEpochIndex(19)">epoch 21</a>.
 </p>
-
-<p>
-  Now, let us take a closer look at the Grand Tour technique itself.
-</p>
-
-
-<!-- <p>
-  Although with the Grand Tour we have observed interesting phenomenon, there are other ways of looking at the same kind of data. 
-  For example, the
-  <d-cite key="ren2017squares">Squares</d-cite>
-  visualizes the softmax layer using parallel coordinates. 
-  However, one draw back of using parallel coordinates is that it does not emphasize the spatial relation among multiple dimensions. 
-  What makes it not ideal, is that the order of different dimension is predetermined so that any non-neighboring dimensions are hard to compare and correlate. 
-  In our use case, where relation among dimensions are of the greatest interest, parallel coordinates would not provide an straightforward view of multi-way confusions among classes. 
-</p> -->
-
-
-<!-- this fails at providing an overview among all instances-->
-<!-- <p>Similar illustrations exist, for example, by <d-cite key="harley2015isvc">Harley</d-cite>, where activations are arranged in a 2D or 3D canvas</p> -->
-<!-- <p>
-Mathematically, a neural network can be represented as a function. 
-To make a neural network well modularized and easy to build and train, internally the mathematical function is composed by multiple simpler building-block functions, which are often called layers in neural network context. Such building-block functions serve different purposes. 
-The labels on each colored rectangle denote what kind of building-block functions were used in our network. 
-When an example image were passed through the network, each building-block function transforms the image to a different numerical representation and as the functions works in a chain, the image is transformed from one representation to another. 
-The representations can be in the form of a scale, vector or tensor. 
-In the diagram above, we illustrated some of these representations by gray-scale heatmaps. The whiter a pixel is, the larger value stored in the corresponding entry. To better use the drawing space, we reshaped these representation closer to squares.
-A worth noting representation is the 10-vector produced in the last <em>softmax</em>layer. 
-In this layer, the networks is trained to represent an one-hot encoding of the image class label, so normally only the entry corresponding to the true class of the image are fired up. 
-For example, a digit 0 should have a white spot in the first column, first row. 
-A digit 1 image should fire up the cell in first column, second row.
-</p>
-<p>
-  One nice property of the softmax layer is that each entries are non-negative and the sum of them equals to 1. This property gives us an attractive interpretation of this layer - for any given image, the final softmax layer represents the <em>confidence</em> of the network about this image belonging to each class. In stead of looking at one image at a time, we would like to see their <em>distribution</em> in this nice interpretable softmax layer. 
-  To see how this 10-vector is activated by the <em>set</em> of images, we turned to an old technique called the Grand Tour to reveal spatial relations among dimensions.
-</p> -->
-
-<h3>The Grand Tour</h3>
-<p>
-The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
-Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then project it down to 2D for display. 
-Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
-</p>
-<ul>
-<li>On a square, the Grand Tour rotates it with a constant angular velocity.</li> 
-<li>On a cube, the Grand Tour rotates it in 3D, and its 2D projection let us see every facet of the cube. </li>
-<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projections.</li>
-</ul>
-<d-figure class='tesseract' style="grid-column: text;">
-<canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
-<p class='caption'>Grand tours of a square, a cube and a tesseract</p>
-<script src='js/tesseract.js'></script>
-</d-figure>
-
-<!-- <p>
-  Mathematically, the Grand Tour provides us a sequence of <d-math>p-dimensional</d-math> to 2D projections, which can be represented by a function from a time variable <d-math>t</d-math> to p-by-2 matrices. 
-  The p-by-2 matrices can be seen as a composition of a p-by-p orthogonal matrix, <d-math>GT \in SO(p)</d-math>, followed by a simple projection <d-math>\pi_2</d-math> that picks up the first two coordinates of p-dimensional vectors:
-  <d-math block>
-    t \mapsto \pi_2 \circ GT 
-  </d-math>
-  We will need the above detail for direct manipulation in <a href="#technical-details">technical details</a>.
-</p> -->
-<p>
-  For more details about the Grand Tour, we recommend curious readers to consult the original paper by Asimov<d-cite key="asimov1985grand"></d-cite>.
-</p>
-
-
-<p>
-  We have to emphasize one favorable property of the Grand Tour in visualizing neural networks: 
-  it is invariant about the (orthonormal) basis chosen for the data representation. 
-  Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view. 
-  In the mean time, linear transformations in neural networks are also invariant under change of basis. 
-  Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation<d-cite key="austin2009svd"></d-cite>.
-  We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour. 
-</p>
-
-
-<h2>The Grand Tour of the Softmax Layer</h2>
-<p>
-  We first look at the Grand Tour of the softmax layer. 
-  The softmax layer is relatively easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
-  With this nice semantics, direct manipulations with axis handles come more handy.
-  For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly.
-</p>
-
-<i id="nngt-single-epoch-a"></i>
-
-<d-figure class='nngt-single-epoch-1' style="">
-  <canvas id='nngt-single-epoch-1' class='grandtour'></canvas>
-  <script src='js/se1.js'></script>
-</d-figure>
-<p class='caption'>
-  The Grand Tour of softmax layer in the last (99<sup>th</sup>) epoch, with 
-  <a onclick="utils.setDataset('mnist');">MNIST</a>, 
-  <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a> or 
-  <a onclick="utils.setDataset('cifar10');">CIFAR-10</a> dataset.
-</p>
-
-<p>
-  First, the Grand Tour of the softmax layer let us qualitatively judge the performance of our model.
-  In addition, since we used similar architecture on three datasets, the performance also reflects the relative complexity of the dataset. 
-  We can see that data points are most clustered for the MNIST dataset, the digits are close to one of the ten corners of the softmax space, while fashion-MNIST or CIFAR-10, the separation were not as extreme and more points live <em>inside</em> the volume.
-  <!-- <strong><br><br>[TODO Figure showing all three datasets side-by-side]<br><br></strong> -->
-</p>
-
-<h3>Direct Manipulation on the Axes</h3>
 
 <p>
   In fashion-MNIST, we see how the model confuses between classes.
@@ -720,12 +591,147 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   <span style="color: #bcbd22;">ships</span>.
   Both projections are found by direct manipulations.
 </p>
+
+
+<h2>The Grand Tour</h2>
+
 <p>
-  We will explain how direct manipulation works in <a href="#technical-details">technical details</a>.
+  In the previous section, we took advantage of the fact that we knew which classes to visualize. That meant it was easy to design a linear projection for our use case. But what if we don't know which projection to choose from?
+  Principal Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
+  It works by choosing directions that preserve the most variance in data.
+  However, the distribution of data in softmax layers, if trained well, has almost <em>equal</em> variance in each axis direction because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help much in making sense of the data either. </d-footnote>.
+  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third. 
+  So which of them should we choose? 
+  <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
+  <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
+  So instead of PCA, we visualize this equal variance data by choosing random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
+  The Grand Tour is a linear method which generates infinitely many projections and interpolate them smoothly.
 </p>
 
+<p>
+The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
+Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then project it down to 2D for display. 
+Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
+</p>
+<ul>
+<li>On a square, the Grand Tour rotates it with a constant angular velocity.</li> 
+<li>On a cube, the Grand Tour rotates it in 3D, and its 2D projection let us see every facet of the cube. </li>
+<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projections.</li>
+</ul>
+<d-figure class='tesseract' style="grid-column: text;">
+<canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
+<p class='caption'>Grand tours of a square, a cube and a tesseract</p>
+<script src='js/tesseract.js'></script>
+</d-figure>
 
-<h2>The Grand Tour of Training Dynamics</h2>
+<!-- <d-figure class='nngt-single-epoch-0' style=""> -->
+<!--   <canvas id='nngt-single-epoch-0' class='grandtour'></canvas> -->
+<!--   <script src='js/se0.js'></script> -->
+<!-- </d-figure> -->
+<!-- <p class='caption'>The Grand Tour of the softmax layer. Drag the handle on each axis to move that axis.</p> -->
+
+<!-- <p> -->
+<!--   When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections that reveals important patterns in the data.  -->
+<!--   In the above view we can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 or 7 in MNIST, or the three-way confusion in Fashion-MNIST. -->
+<!--   But see how much easier this time than previous non-linear methods. -->
+<!-- </p> -->
+
+<!-- <p> -->
+<!--   Now, let us take a closer look at the Grand Tour technique itself. -->
+<!-- </p> -->
+
+
+<!-- <p>
+  Although with the Grand Tour we have observed interesting phenomenon, there are other ways of looking at the same kind of data. 
+  For example, the
+  <d-cite key="ren2017squares">Squares</d-cite>
+  visualizes the softmax layer using parallel coordinates. 
+  However, one draw back of using parallel coordinates is that it does not emphasize the spatial relation among multiple dimensions. 
+  What makes it not ideal, is that the order of different dimension is predetermined so that any non-neighboring dimensions are hard to compare and correlate. 
+  In our use case, where relation among dimensions are of the greatest interest, parallel coordinates would not provide an straightforward view of multi-way confusions among classes. 
+</p> -->
+
+
+<!-- this fails at providing an overview among all instances-->
+<!-- <p>Similar illustrations exist, for example, by <d-cite key="harley2015isvc">Harley</d-cite>, where activations are arranged in a 2D or 3D canvas</p> -->
+<!-- <p>
+Mathematically, a neural network can be represented as a function. 
+To make a neural network well modularized and easy to build and train, internally the mathematical function is composed by multiple simpler building-block functions, which are often called layers in neural network context. Such building-block functions serve different purposes. 
+The labels on each colored rectangle denote what kind of building-block functions were used in our network. 
+When an example image were passed through the network, each building-block function transforms the image to a different numerical representation and as the functions works in a chain, the image is transformed from one representation to another. 
+The representations can be in the form of a scale, vector or tensor. 
+In the diagram above, we illustrated some of these representations by gray-scale heatmaps. The whiter a pixel is, the larger value stored in the corresponding entry. To better use the drawing space, we reshaped these representation closer to squares.
+A worth noting representation is the 10-vector produced in the last <em>softmax</em>layer. 
+In this layer, the networks is trained to represent an one-hot encoding of the image class label, so normally only the entry corresponding to the true class of the image are fired up. 
+For example, a digit 0 should have a white spot in the first column, first row. 
+A digit 1 image should fire up the cell in first column, second row.
+</p>
+<p>
+  One nice property of the softmax layer is that each entries are non-negative and the sum of them equals to 1. This property gives us an attractive interpretation of this layer - for any given image, the final softmax layer represents the <em>confidence</em> of the network about this image belonging to each class. In stead of looking at one image at a time, we would like to see their <em>distribution</em> in this nice interpretable softmax layer. 
+  To see how this 10-vector is activated by the <em>set</em> of images, we turned to an old technique called the Grand Tour to reveal spatial relations among dimensions.
+</p> -->
+
+<!-- <h3>The Grand Tour</h3> -->
+
+<!-- <p>
+  Mathematically, the Grand Tour provides us a sequence of <d-math>p-dimensional</d-math> to 2D projections, which can be represented by a function from a time variable <d-math>t</d-math> to p-by-2 matrices. 
+  The p-by-2 matrices can be seen as a composition of a p-by-p orthogonal matrix, <d-math>GT \in SO(p)</d-math>, followed by a simple projection <d-math>\pi_2</d-math> that picks up the first two coordinates of p-dimensional vectors:
+  <d-math block>
+    t \mapsto \pi_2 \circ GT 
+  </d-math>
+  We will need the above detail for direct manipulation in <a href="#technical-details">technical details</a>.
+</p> -->
+<!-- <p> -->
+<!--   For more details about the Grand Tour, we recommend curious readers to consult the original paper by Asimov<d-cite key="asimov1985grand"></d-cite>. -->
+<!-- </p> -->
+
+
+<!-- <p> -->
+<!--   We have to emphasize one favorable property of the Grand Tour in visualizing neural networks:  -->
+<!--   it is invariant about the (orthonormal) basis chosen for the data representation.  -->
+<!--   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view.  -->
+<!--   In the mean time, linear transformations in neural networks are also invariant under change of basis.  -->
+<!--   Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation<d-cite key="austin2009svd"></d-cite>. -->
+<!--   We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour.  -->
+<!-- </p> -->
+
+
+<h3>The Grand Tour of the Softmax Layer</h3>
+<p>
+  We first look at the Grand Tour of the softmax layer. 
+  The softmax layer is relatively easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
+  With this nice semantics, direct manipulations with axis handles come more handy.
+  For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly.
+</p>
+
+<i id="nngt-single-epoch-a"></i>
+
+<d-figure class='nngt-single-epoch-1' style="">
+  <canvas id='nngt-single-epoch-1' class='grandtour'></canvas>
+  <script src='js/se1.js'></script>
+</d-figure>
+<p class='caption'>
+  The Grand Tour of softmax layer in the last (99<sup>th</sup>) epoch, with 
+  <a onclick="utils.setDataset('mnist');">MNIST</a>, 
+  <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a> or 
+  <a onclick="utils.setDataset('cifar10');">CIFAR-10</a> dataset.
+</p>
+
+<p>
+  First, the Grand Tour of the softmax layer let us qualitatively judge the performance of our model.
+  In addition, since we used similar architecture on three datasets, the performance also reflects the relative complexity of the dataset. 
+  We can see that data points are most clustered for the MNIST dataset, the digits are close to one of the ten corners of the softmax space, while fashion-MNIST or CIFAR-10, the separation were not as extreme and more points live <em>inside</em> the volume.
+  <!-- <strong><br><br>[TODO Figure showing all three datasets side-by-side]<br><br></strong> -->
+</p>
+
+<!-- <h3>Direct Manipulation on the Axes</h3> -->
+
+<!-- <p> -->
+<!--   We will explain how direct manipulation works in <a href="#technical-details">technical details</a>. -->
+<!-- </p> -->
+
+
+<h3>The Grand Tour of Training Dynamics</h3>
 
 <p>
   We trained 99 epochs and recorded the entire history of neuron activations on subsets of training and testing examples. 
@@ -778,7 +784,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 
 
 
-<h2 name="layer-dynamics">The Grand Tour of layer dynamics</h2>
+<h3 name="layer-dynamics">The Grand Tour of layer dynamics</h3>
 <!-- <p>
   Up till now we have seen the last softmax layer of out neural network model. 
   But what happens to other intermediate layers? Can we look at them in the similar way we did for the last layer? One challenge of looking at intermediate layers, it that axis no longer have a semantic meaning, as in the last layer we know that each of the 10 directions correspond to one of the ten label classes. Another challenge is that directions in two different layers do not align with each other by default. Thus making sense of how the model transforms data points between two consecutive layers is non-trivial.
@@ -859,33 +865,9 @@ lt2Figure.onscreen();
 lt2.overlay.layerPlayButton.on('click')();
 ">this view</a>.</p>
 
-<p>We found this early separation with manipulations <em>directly on data points</em>, which we will explain right now.</p>
+<!-- <p>We found this early separation with manipulations <em>directly on data points</em>, which we will explain right now.</p> -->
 
-<h3>From Basis to Instances: Extending Direct Manipulations</h3>
-<p>
-  We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>.
-</p>
-<p> 
-  Unlike the softmax layer, there is one problem with axis handles in hidden layers.
-  Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case. 
-  <!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -->
-  <!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -->
-  Thus we should not have axis handles anymore.
-  Instead, we can regard <em>data points</em> as handles this time. 
-  In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection. 
-  It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well.
-  Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics.
-  We will cover how it works in <a href="#technical-details">technical details</a>.
-</p>
-<p>
-  To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components.
-  To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead.
-  We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes. 
-  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
-</p>
-
-
-<h2>The Grand Tour of Adversarial Dynamics</h2>
+<h3>The Grand Tour of Adversarial Dynamics</h3>
 <p>
   The Grand Tour can also elucidate adversarial examples <d-cite key="szegedy2013intriguing"></d-cite> as they are processed by a neural network.
   For this illustration, we adversarially add perturbations to 89 digit 8s to fool the network into thinking they are 0s.
@@ -950,17 +932,6 @@ lt2.overlay.layerPlayButton.on('click')();
   For the sake of simplicity, in this article we brute-forced the computation of the alignment of such convolutional layers by writing out their explicit matrix representation. 
   However, the singular value decomposition of multi-channel 2D convolutions can be computed efficiently <d-cite key="sedghi2018singular"></d-cite>, which can be then be directly used for alignment, as we described above.
 </p>
-
-
-<h2>Conclusion</h2>
-
-<p>
-  Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
-</p>
-<p>
-  In the interest of completeness, the remainder of the article provides a number of technical details about the implementation of the techniques we described above.
-</p>
-
 
 
 <script>
@@ -1179,7 +1150,33 @@ style="width: 40%"
   In axis mode, the <d-math>i^{th}</d-math>-row-first Grand-Schmidt does the rotation and change of basis in one step.
 </p>
 </div> <!-- div-data-point-mode -->
+
+<h3>(CARLOS MOVED THIS BUT DOESN'T KNOW WHERE TO PUT IT) From Basis to Instances: Extending Direct Manipulations</h3>
+<p>
+  We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>.
+</p>
+<p> 
+  Unlike the softmax layer, there is one problem with axis handles in hidden layers.
+  Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case. 
+  <!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -->
+  <!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -->
+  Thus we should not have axis handles anymore.
+  Instead, we can regard <em>data points</em> as handles this time. 
+  In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection. 
+  It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well.
+  Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics.
+  We will cover how it works in <a href="#technical-details">technical details</a>.
+</p>
+<p>
+  To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components.
+  To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead.
+  We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes. 
+  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
+</p>
+
 </div> <!-- div-direct-manipulation -->
+
+
 
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-align-representation')">
@@ -1246,6 +1243,11 @@ style="width: 40%"
 
 
 
+<h2>Conclusion</h2>
+
+<p>
+  Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
+</p>
 </d-article>
 
 
