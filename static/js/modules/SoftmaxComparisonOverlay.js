@@ -206,7 +206,35 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     .append('option')
     .text((d)=>d);
 
-  
+  this.datasetOption = this.controlOptionGroup
+    .insert('div', ':first-child')
+    .attr('class', 'form-group datasetOption');
+  this.datasetOption.append('label')
+    .text('Dataset: ');
+  this.datasetSelection = this.datasetOption.append('select')
+    .attr('id', 'datasetSelection')
+    .on('change', function() {
+      let dataset = d3.select(this).property('value');
+      utils.setDataset(dataset)
+    });
+  this.datasetSelection.selectAll('option')
+    .data([
+      {value:'mnist',text:'MNIST'}, 
+      {value:'fashion-mnist',text:'fashion-MNIST'},
+      {value:'cifar10',text:'CIFAR-10'}])
+    .enter()
+    .append('option')
+    .text(d=>d.text)
+    .attr('value', d=>d.value)
+    .property('selected', d=>{
+      //show default selection
+      if (this.renderer.init_dataset !== undefined){
+        return d.value == this.renderer.init_dataset;
+      }else{
+        return d.value == utils.getDataset();
+      }
+    });
+
 
   function clamp(min, max, v) {
     if (v>max){

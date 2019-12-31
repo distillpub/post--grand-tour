@@ -114,7 +114,7 @@ button{
 }
 
 
-.modeOption, .grandtourButton{
+.modeOption, .datasetOption, .grandtourButton{
     display: inline;
     margin-right: 10px;
 }

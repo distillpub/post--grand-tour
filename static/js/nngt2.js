@@ -48,6 +48,12 @@ nngt2Figure.addEventListener("ready", function() {
       train:true, 
       test:true
     };
+
+    nngt2.overlay.datasetSelection.selectAll('option')
+    .property('selected', d=>{
+      return d.value == utils.getDataset();
+    });
+    
   });
 
   window.addEventListener('resize', ()=>{

@@ -59,8 +59,8 @@ lt2Figure.addEventListener("ready", function() {
   });
 
 
-  lt2.onDatasetChange = function(dataset = utils.getDataset()){
-
+  lt2.onDatasetChange = function(dataset){
+    dataset = dataset || utils.getDataset();
     lt2.pause();
     lt2.overlay.pause();
 
@@ -78,7 +78,10 @@ lt2Figure.addEventListener("ready", function() {
     lt2.dataObj.dataTensor = [];
     lt2.dataObj.views = [];
     lt2 = utils.loadDataToRenderer(urls, lt2, ()=>{
-      lt2.overlay.initLegend();
+      lt2.overlay.initLegend(
+        utils.baseColors.slice(0, 10), 
+        utils.getLabelNames(false, dataset)
+      );
       lt2.overlay.selectedClasses = new Set();
       lt2.overlay.onSelectLegend(d3.range(10));
 
@@ -107,6 +110,10 @@ lt2Figure.addEventListener("ready", function() {
       lt2.shouldRecalculateColorRect = true;
     });
 
+    lt2.overlay.datasetSelection.selectAll('option')
+    .property('selected', d=>{
+      return d.value == dataset;
+    });
 
   };
 

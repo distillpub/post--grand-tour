@@ -4,37 +4,45 @@ var nngt;
 nngtFigure.addEventListener("ready", function() {
   console.log('nngtFigure ready');
   var epochs = d3.range(0,100,1);
-  var urls = utils.getTeaserDataURL();
+  let fixed_dataset = 'mnist';
+  var urls = utils.getTeaserDataURL(fixed_dataset);
   var [gl, programs] = utils.initGL(
     '#nngt', 
     [['shaders/teaser_vertex.glsl', 'shaders/teaser_fragment.glsl']]
   );
+
 
   var kwargs = {
     epochs,
     init_matrix: DIGIT17_MATRIX,
     shouldPlayGrandTour: false,
     shouldAutoNextEpoch: true, 
+    fixed_dataset,
+    overlayKwargs: {
+      // fixed_dataset,
+    }
   };
   nngt = new TeaserRenderer(gl, programs[0], kwargs);
+  nngt.overlay.datasetOption.remove();
+
   allViews.push(nngt);
   nngt = utils.loadDataToRenderer(urls, nngt);
 
   utils.addDatasetListener(function(){
-    nngt.pause();
-    // nngt.dataObj.dataTensor = null;
-    // nngt.dataObj.labels = null;
+    // nngt.pause();
+    // // nngt.dataObj.dataTensor = null;
+    // // nngt.dataObj.labels = null;
     
-    var urls = utils.getTeaserDataURL(utils.getDataset());
-    nngt = utils.loadDataToRenderer(urls, nngt);
-    nngt.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
-    if(utils.getDataset() == 'cifar10'){
-      nngt.setColorFactor(0.0);
-    }else{
-      nngt.setColorFactor(utils.COLOR_FACTOR);
-    }
-    nngt.shouldRecalculateColorRect = true;
-
+    // var urls = utils.getTeaserDataURL(utils.getDataset());
+    // nngt = utils.loadDataToRenderer(urls, nngt);
+    // nngt.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames());
+    // if(utils.getDataset() == 'cifar10'){
+    //   nngt.setColorFactor(0.0);
+    // }else{
+    //   nngt.setColorFactor(utils.COLOR_FACTOR);
+    // }
+    // nngt.shouldRecalculateColorRect = true;
+    // 
   });
   
   window.addEventListener('resize', ()=>{

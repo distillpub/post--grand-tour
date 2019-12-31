@@ -79,6 +79,7 @@
 
 <body>
 
+<distill-header></distill-header>
 <d-front-matter>
 <script id='distill-front-matter' type="text/json">{
     "title": "Visualizing neural networks with the Grand Tour",
@@ -114,7 +115,7 @@
 </d-front-matter>
 
 
-<nav class='options navbar navbar-expand-lg navbar-dark bg-dark'>
+<!-- <nav class='options navbar navbar-expand-lg navbar-dark bg-dark'>
   <div class="collapse navbar-collapse" id="">
     <ul class="navbar-nav mr-auto">
       
@@ -134,7 +135,7 @@
       </li>
     </ul>
   </div>
-</nav>
+</nav> -->
 
 
 <!-- teaser -->
@@ -782,7 +783,9 @@ A digit 1 image should fire up the cell in first column, second row.
     ">
   this view of CIFAR-10</a> , 
   the color of points are more mixed in testing (right) than training (left) set, showing an over-fitting in the training process.
-  Also see this comparison in 
+  Compare 
+  <a onclick="utils.setDataset('cifar10');">CIFAR-10</a> 
+  with 
   <a onclick="utils.setDataset('mnist');">MNIST</a>
   or <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a>, 
   where there is less difference between training and testing sets.

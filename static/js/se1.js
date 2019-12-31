@@ -32,6 +32,11 @@ seFigure1.addEventListener("ready", function() {
     }else{
       se1.setColorFactor(utils.COLOR_FACTOR);
     }
+
+    se1.overlay.datasetSelection.selectAll('option')
+    .property('selected', d=>{
+      return d.value == utils.getDataset();
+    });
   });
   
   window.addEventListener('resize', ()=>{

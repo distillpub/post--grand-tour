@@ -111,6 +111,7 @@ seFigure2.addEventListener("ready", function() {
       annotate: annotate2,
     }
   });
+  se2.overlay.datasetOption.remove();
 
   // se2.overlay = new TeaserOverlay(se2, );
   // se2.overlay.epochIndicator.remove();

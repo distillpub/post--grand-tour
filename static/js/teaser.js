@@ -21,6 +21,7 @@ teaserFigure.addEventListener("ready", function() {
   teaser.overlay.fullScreenButton.style('top', '18px');
   // teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();
+  teaser.overlay.datasetOption.remove();
   teaser.overlay.zoomSlider.remove();
   // teaser.overlay.grandtourButton.remove();
   

@@ -108,10 +108,11 @@ seFigure3.addEventListener("ready", function() {
     mode: 'point',
     fixed_dataset,
     overlayKwargs: {
-      fixed_dataset,
+      // fixed_dataset,
       annotate: annotate3,
     }
   });
+  se3.overlay.datasetOption.remove();
 
   // se3.overlay = new TeaserOverlay(se3, );
   // se3.overlay.epochIndicator.remove();

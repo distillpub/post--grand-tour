@@ -185,9 +185,7 @@ function TeaserOverlay(renderer, kwargs) {
   this.modeOption = this.controlOptionGroup
     .insert('div', ':first-child')
     .attr('class', 'form-group modeOption');
-
   this.modeOption.append('label')
-    // .attr('for', 'modeOption')
     .text('Instances as: ');
 
   let select = this.modeOption.append('select')
@@ -207,7 +205,31 @@ function TeaserOverlay(renderer, kwargs) {
       return (d == this.renderer.mode) ? 'selected':null;
     });
 
-  
+
+  this.datasetOption = this.controlOptionGroup
+    .insert('div', ':first-child')
+    .attr('class', 'form-group datasetOption');
+  this.datasetOption.append('label')
+    .text('Dataset: ');
+  this.datasetSelection = this.datasetOption.append('select')
+    .attr('id', 'datasetSelection')
+    .on('change', function() {
+      let dataset = d3.select(this).property('value');
+      utils.setDataset(dataset)
+    });
+  this.datasetSelection.selectAll('option')
+    .data([
+      {value:'mnist',text:'MNIST'}, 
+      {value:'fashion-mnist',text:'fashion-MNIST'},
+      {value:'cifar10',text:'CIFAR-10'}])
+    .enter()
+    .append('option')
+    .text(d=>d.text)
+    .attr('value', d=>d.value)
+    .property('selected', d=>{
+      //show default selection
+        return d.value == utils.getDataset();
+    });
 
   function clamp(min, max, v) {
     return Math.max(max, Math.min(min, v));
@@ -285,7 +307,7 @@ function TeaserOverlay(renderer, kwargs) {
 
 
   this.init = function() {
-    this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, this.fixed_dataset || undefined));
+    this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, this.renderer.fixed_dataset || undefined));
     this.resize();
     this.initAxisHandle();
     if (this.annotate !== undefined){

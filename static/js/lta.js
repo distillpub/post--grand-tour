@@ -50,6 +50,8 @@ ltaFigure.addEventListener("ready", function() {
       ltaFigure.onscreen();
     }
   });
+  lta.overlay.datasetOption.remove();
+
 
   window.addEventListener('resize', ()=>{
       // sm0.resize();

@@ -653,9 +653,9 @@ function LayerTransitionOverlay(renderer, kwargs) {
     this.renderer.render(0);
   };
 
-  this.initLegend = function(){
+  this.initLegend = function(colors, labels){
     //legend
-    if(this.legend_sx === undefined){ //if first called
+    if(this.legend_sx === undefined){ //if first on init
       this.legend_sx = d3.scaleLinear()
         .domain([0, 1])
         .range([width-130, width-10]);
@@ -690,9 +690,11 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
       let classNames = utils.getLabelNames(this.hasAdversarial, renderer.init_dataset || utils.getDataset());
       let classCount = classNames.length;
+      colors = colors || utils.baseColors.slice(0, classCount);
+      labels = labels || classNames;
 
       this.legendText = this.svg.selectAll('.legendText')
-        .data(classNames)
+        .data(labels)
         .enter()
         .append('text')
         .attr('class', 'legendText')
@@ -705,9 +707,8 @@ function LayerTransitionOverlay(renderer, kwargs) {
         .on('mouseout', onMouseOut)
         .on('click', onClick);
 
-
       this.legendRect = this.svg.selectAll('.legendRect')
-        .data(utils.baseColors.slice(0, classCount))
+        .data(colors)
         .enter()
         .append('rect')
         .attr('class', 'legendRect')
@@ -720,9 +721,9 @@ function LayerTransitionOverlay(renderer, kwargs) {
         .on('mouseout', onMouseOut)
         .on('click', onClick);
     }else{//if called on dataset change
-      let classNames = utils.getLabelNames(this.hasAdversarial, utils.getDataset());
+      labels = labels || utils.getLabelNames(this.hasAdversarial, utils.getDataset());
       this.legendText
-        .data(classNames)
+        .data(labels)
         .text(d=>d);
     }
     
@@ -764,13 +765,34 @@ function LayerTransitionOverlay(renderer, kwargs) {
       return (d == this.renderer.mode) ? 'selected':null;
     });
 
-  // this.datasetOption = this.controlOptionGroup
-  //   .append('div')
-  //   .attr('class', 'form-group datasetOption');
-  // this.datasetOption.append('label')
-  //   // .attr('for', 'modeOption')
-  //   .text('dataset type: ');
-    
+  this.datasetOption = this.controlOptionGroup
+    .insert('div', ':first-child')
+    .attr('class', 'form-group datasetOption');
+  this.datasetOption.append('label')
+    .text('Dataset: ');
+  this.datasetSelection = this.datasetOption.append('select')
+    .attr('id', 'datasetSelection')
+    .on('change', function() {
+      let dataset = d3.select(this).property('value');
+      utils.setDataset(dataset)
+    });
+  this.datasetSelection.selectAll('option')
+    .data([
+      {value:'mnist',text:'MNIST'}, 
+      {value:'fashion-mnist',text:'fashion-MNIST'},
+      {value:'cifar10',text:'CIFAR-10'}])
+    .enter()
+    .append('option')
+    .text(d=>d.text)
+    .attr('value', d=>d.value)
+    .property('selected', d=>{
+      //show default selection
+      if (this.renderer.init_dataset !== undefined){
+        return d.value == this.renderer.init_dataset;
+      }else{
+        return d.value == utils.getDataset();
+      }
+    });
 
 
 
