@@ -262,10 +262,11 @@
   way</em>.
 </p>
 
-<h2>A working example</h2>
+<h2>Working examples</h2>
 
 <p>
-  We trained deep neural network models (DNNs) with 3 common image classification datasets: 
+  To illustrate the technique we will present, we trained deep neural
+  network models (DNNs) with 3 common image classification datasets:
   MNIST
   <d-footnote>
     MNIST<d-cite key="lecun2010mnist"></d-cite> contains grayscale images of 10 handwritten digits
@@ -296,21 +297,40 @@
     src="figs/cifar-10.png" />
     Image credit to <a href="https://www.cs.toronto.edu/~kriz/cifar.html">https://www.cs.toronto.edu/~kriz/cifar.html</a> 
   </d-footnote>. 
-  Our architecture is simpler and smaller than current DNNs but is indicative of modern networks, and complex enough to demonstrate both our proposed techniques and shortcomings of typical approaches.
+  While our architecture is simpler and smaller than current DNNs, it's still indicative of modern networks, and is complex enough to demonstrate both our proposed techniques and shortcomings of typical approaches.
 </p>
 
 
+<!-- <p> -->
+<!--   Perhaps the next question is: were these late learning caused by some outliers in the dataset or it is a feature for all 1s or 7s? -->
+<!--   To explore this we need to break the per-class losses further down to individual input examples. -->
+<!--   <\!-- TODO smoother transition -\-> -->
+<!--   But instead of looking at losses, we can directly look at the softmax activations.  -->
+<!--   The softmax layer has 10 neurons that can be seen as the (predicted) probability, one for each class.  -->
+<!--   Together these 10 neurons can also be seen as a 10-vector, which will become useful later. -->
+<!--   We expect, for example, that the 7th (0-indexed) neuron fired up for hand written 7s. -->
+<!--   In fact, since we have access to not only the softmax but also all hidden layers, we can probe the network with input examples to see how it reacts on <em>each</em> layer. -->
+<!--   In this way we are trying to open the "black box" and understand the internal of a neural network. -->
+<!--   Here is a typical view of the opened box: -->
+    <!-- </p> -->
+
 <p>
-  Perhaps the next question is: were these late learning caused by some outliers in the dataset or it is a feature for all 1s or 7s?
-  To explore this we need to break the per-class losses further down to individual input examples.
-  <!-- TODO smoother transition -->
-  But instead of looking at losses, we can directly look at the softmax activations. 
-  The softmax layer has 10 neurons that can be seen as the (predicted) probability, one for each class. 
-  Together these 10 neurons can also be seen as a 10-vector, which will become useful later.
-  We expect, for example, that the 7th (0-indexed) neuron fired up for hand written 7s.
-  In fact, since we have access to not only the softmax but also all hidden layers, we can probe the network with input examples to see how it reacts on <em>each</em> layer.
-  In this way we are trying to open the "black box" and understand the internal of a neural network.
-  Here is a typical view of the opened box:
+  The following figure presents a simple functional diagram of the neural network we will use throughout the article. The neural network is a sequence of linear (both convolutional<d-footnote>
+    A convolution calculates weighted sums of regions in the input. 
+    In neural networks, the learnable weights in convolutional layers are referred to as the kernel.
+    For example
+    <img src="figs/conv.gif" style="width:70%" class="img-center">
+    Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>.<br>
+    See also <a href="https://github.com/vdumoulin/conv_arithmetic">Convolution arithmetic</a>.
+  </d-footnote> and fully-connected<d-footnote>
+    A fully-connected layer computes output neurons as weighted sum of input neurons. In matrix form, it is a matrix that linearly transforms the input vector into the output vector.
+  </d-footnote>), max-pooling, and ReLU<d-footnote>
+    First introduced by Nair and Hinton<d-cite key="nair2010relu"></d-cite>, ReLU calculates <d-math>f(x)=max(0,x)</d-math> for each entry in a vector input. Graphically, it is a hinge at the origin: <img src="figs/relu.png" style="width:60%" class="img-center">
+    Image credit to <a href="https://pytorch.org/docs/stable/nn.html#relu">https://pytorch.org/docs/stable/nn.html#relu</a>
+  </d-footnote> layers, culminating in a softmax<d-footnote>
+    Softmax function calculates <d-math>S(y_i)=\frac{e^{y_i}}{\Sigma_{j=1}^{N} e^{y_j}}</d-math> for each entry (<d-math>y_i</d-math>) in a vector input (<d-math>y</d-math>). For example, <img src="figs/softmax.png" style="width:75%" class="img-center">
+    Image credit to <a href="https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/">https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/</a>
+  </d-footnote> layer.
 </p>
 
 <d-figure class='nn2' style="grid-column: page; ">
@@ -321,63 +341,43 @@
    
 <p>
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
-  In our classifier, the pipeline has convolutional
-  <d-footnote>
-    A convolution calculates weighted sums of regions in the input. 
-    In neural networks, the learnable weights in convolutional layers are referred to as the kernel.
-    For example
-    <img src="figs/conv.gif" style="width:70%" class="img-center">
-    Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>.<br>
-    See also <a href="https://github.com/vdumoulin/conv_arithmetic">Convolution arithmetic</a>.
-  </d-footnote> 
-   and fully-connected (linear) layers
-  <d-footnote>
-    A fully-connected layer computes output neurons as weighted sum of input neurons. In matrix form, it is a matrix that linearly transforms the input vector into the output vector.
-  </d-footnote>
-   , and rectified linear units (ReLU)
-  <d-footnote>
-    First introduced by Nair and Hinton<d-cite key="nair2010relu"></d-cite>, ReLU calculates <d-math>f(x)=max(0,x)</d-math> for each entry in a vector input. Graphically, it is a hinge at the origin: <img src="figs/relu.png" style="width:60%" class="img-center">
-    Image credit to <a href="https://pytorch.org/docs/stable/nn.html#relu">https://pytorch.org/docs/stable/nn.html#relu</a>
-  </d-footnote>
-  as non-linear layers.
-  Passing an input image through this function pipeline, we have it transformed to different activations patterns in hidden layers until the softmax activations
-  <d-footnote>
-    Softmax function calculates <d-math>S(y_i)=\frac{e^{y_i}}{\Sigma_{j=1}^{N} e^{y_j}}</d-math> for each entry (<d-math>y_i</d-math>) in a vector input (<d-math>y</d-math>). For example, <img src="figs/softmax.png" style="width:75%" class="img-center">
-    Image credit to <a href="https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/">https://ljvmiranda921.github.io/notebook/2017/08/13/softmax-and-the-negative-log-likelihood/</a>
-  </d-footnote> 
-  in the end.
-
   For images, the input is a 2D array of scalar values for gray scale images or RGB triples for colored images.
   When needed, one can always flatten the 2D array into an equivalent (<d-math>w \cdot h \cdot c</d-math>) -dimensional vector.
   Similarly, the intermediate value after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in the layer. 
   The softmax, for example, can be seen as a 10-vector whose values are positive real numbers that sum up to 1.
   This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also hints us on how to visualize them in a better way.
+</p>
 
+<p>
   Most of the simple functions fall into two categories: they are either linear transformations of their inputs (like fully-connected layers or convolutional layers), or relatively simple non-linear functions that work component-wise (like sigmoid activations<d-footnote>
     Sigmoid calculates <d-math>S(x)=\frac{e^{x}}{e^{x}+1}</d-math> for each entry (<d-math>x</d-math>) in a vector input. Graphically, it is an S-shaped curve.
     <img src="figs/sigmoid.png" style="width:60%" class="img-center">
     Image credit to <a href="https://en.wikipedia.org/wiki/Sigmoid_function">https://en.wikipedia.org/wiki/Sigmoid_function</a>
   </d-footnote> 
   or ReLU activations).
-  (Some operations, notably max-pooling<d-footnote>
+  Some operations, notably max-pooling<d-footnote>
     Max-pooling calculates maximum of a region in the input. For example
     <!-- <img src="figs/maxpool.png" style="width:60%" class="img-center">
     Image credit to <a href="https://computersciencewiki.org/index.php/Max-pooling_/_Pooling">https://computersciencewiki.org/index.php/Max-pooling_/_Pooling</a> -->
     <img src="figs/maxpool.gif" style="width:70%" class="img-center">
     Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>
-  </d-footnote>  and softmax, do not fall into either categories. We will come back to this later.)
-  We will later see that this categorization is essential when we try to untangle the complex internal of the neural network.
-  Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. 
-  However, in the above view we look at examples one at a time, we lose the full picture: what does the network do to <em>all</em> examples?
+  </d-footnote> and softmax, do not fall into either categories. We will come back to this later.
+  <!-- This categorization into "linear or componentwise" will be essential to untangle the internal workings of the neural network. -->
+  <!-- Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. -->
+</p>
+
+<p>
+  The above figure helps us look at a single image at a time; however, it does not provide much context to understand the relationship between layers, between different examples, or between different class labels. For that, researchers often turn to more sophisticated visualizations.
 </p>
 
 
 <h2>Using visualization to understand DNNs</h2>
 
 <p>
-  When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function.
+  Let's start by considering the problem of visualizing the training process of a DNN.
+  When training neural networks, we optimize parameters in the function to minimize a scalar-valued loss function, typically through some form of gradient descent.
   We want the loss to keep decreasing, so we monitor the whole history of training and testing losses over rounds of training (or "epochs"), to make sure that the loss decreases over time. 
-  Taking the training of an MNIST classifier as an example, the testing loss during training evolves like the following
+  The following figure shows a line plot of the training loss for the MNIST classifier.
 </p>
 
 <d-figure class='lh' style="">
