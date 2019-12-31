@@ -386,7 +386,7 @@
 </d-figure>
 
 <p>
-  Although its general trend meets what we expected, the loss keeps decreasing, we see something weird around epoch 14 and 21: the curve went flat before it dropped again.
+  Although its general trend meets our expectation as the loss steadily decreases, we see something strange around epochs 14 and 21: the curve goes almost flat before starting to drop again.
   What happened? What caused that?
 </p>
 
@@ -396,10 +396,10 @@
 </d-figure>
 
 <p>
-  If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we learned that the two drops were caused by the class of digit 1 and 7 - the model learns different classes at very different times in the training process. 
+  If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we see that the two drops were caused by the classses 1 and 7; the model learns different classes at very different times in the training process. 
   Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
+  If we <em>knew</em> to be looking for class-specific error rates, this chart is appropriate. But what if we didn't really know what to look for?
 </p>
-
 
 <!-- <p>
   TODO NEED THIS LATER?
@@ -412,21 +412,24 @@
 </p> -->
 
 <p>
-Now we want to look at neuron activations (e.g. in the softmax layer) of all examples at once.
-Should there be only two neurons/dimensions, a simple scatter plot of these two dimensions would suffice.
-However, the points in the softmax layer are 10 dimensional, thus we need to either show two dimensions at a time which does not scale well (as there would be 45 scatter plots - a quadric to the dimensionality - to look at),
-or we can use <em>dimensionality reduction</em> to map the data into a two dimensional space and show them in a single plot. 
+  In that case, we could consider visualizations of the neuron activations (e.g. in the last softmax layer) of <em>all</em> examples at once.
+  Should there be only two neurons in that layer (or three classes in the softmax layer), a simple two-dimensional scatter plot of these would suffice.
+  However, the points in the softmax layer for our example datasets are 10 dimensional (and in larger-scale classification problems this number can be much larger).
+  We need to either show two dimensions at a time (which does not scale well as the number of possible charts grows quadratically),
+  or we can use <em>dimensionality reduction</em> to map the data into a two dimensional space and show them in a single plot. 
 </p>
 
 <i id="sm0-a"></i>
 <h3>The State-of-the-art Dimensionality Reduction is Non-linear</h3>
 <p>
+  Modern dimensionality reduction techniques such as t-SNE and UMAP are capable of impressive feats of summarization, providing two-dimensional images where similar points tend to be clustered together very effectively.
+  However, these methods are not particularly good to understand the behavior of neuron activations at a fine scale.
   Consider the aforementioned intriguing feature about the different learning rate that the MNIST classifier has on digit 1 and 7: the network did not learn to recognize digit 1 until epoch 14, digit 7 until epoch 21.
-  With that in mind, look for changes of digit 1 around epochs 14 and changes of digit 7 around epochs 21 in the visualizations below. 
-  The network behavior is not subtle, every digit in those classes is misclassified until the critical epoch. 
-  Yet, note how hard to spot it in any of the plots below at first glance. 
-  In fact, if inspected carefully, we can see that in the UMAP <d-cite key="mcinnes2018umap"></d-cite> (last row), the digit 1 which cluttered in the bottom in epoch 13 becomes a new tentacle in epoch 14. 
-  Use the buttons on the right to identify the change.
+  We compute t-SNE, Dynamic t-SNE<d-cite key="rauber2016visualizing"></d-cite>, and UMAP projections of the epochs where the phenomenon we described happens.
+  Consider now the task of identifying this particular class-specific behavior in digits 1 and 7, around epochs 14 and 21 respectively.
+  While the behavior is not particularly subtle&emdash;digit goes from misclassified to correctly classified&emdash; it is hard to spot it in any of the plots below at first glance. 
+  Only on careful inspection we can notice that (for example) in the UMAP plot, the digit 1 which clustered in the bottom in epoch 13 becomes a new tentacle-like feature in epoch 14. 
+  <!-- Use the buttons on the right to identify the change. -->
 </p>
 <d-figure id='smallmultiple1' class='smallmultiple' style="">
   <canvas id='sm1' class='smallmultiple' width='100' height='200'></canvas>
@@ -436,22 +439,21 @@ or we can use <em>dimensionality reduction</em> to map the data into a two dimen
     'mnist', true, highlight_digits);
 </script>
 </d-figure>
-<p class='caption'>Softmax activations of the MNIST classifier with non-linear dimensionality reduction</p>
+<p class='caption'>Softmax activations of the MNIST classifier with non-linear dimensionality reduction. Use the buttons on the right to highlight digits 1 and 7 in the plot, or drag rectangles around the charts to select particular point subsets to highlight in the other charts.</p>
 
 <p>
-  The reason that non-linear embeddings fail in spotting the fundamental change in data is that they did not fulfill the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>:
-  we design visualizations to reveal signals in data, so that a change in data is reflected in its visualization correspondingly. 
-  Ideally, we further want the changes in two parts (data and its visualization) to <em>match in magnitude</em>: a barely noticeable change in visualization reflects the smallest possible change in data, and a salient change in visualization reflects a significant one in data.
-  Here in non-linear embeddings, a significant change happened in only a <em>subset</em> of data (e.g. all points of digit 1 from epoch 13 to 14), but <em>all</em> points in the visualization move dramatically.
-  In most non-linear embeddings, the position of each single point depends on the whole data distribution in such embedding algorithms.
-  This property is not ideal for visualization because it fails the data-visual correspondence. 
-  The lack of data-visual correspondence make it hard to <em>infer</em> the underlying change in data from the visualization.
+  One reason that non-linear embeddings fail in elucidating this phenomenon is that, for the particular change in the data, the fail the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>. More concretely, the principle states that specific visualization tasks should be modeled as functions that change the data; the visualization sends this change from data to visuals, and
+  we can study the extent to which the visualization changes are easily perceptible.
+  Ideally, we want the changes in data and visualization to <em>match in magnitude</em>: a barely noticeable change in visualization should be due to the smallest possible change in data, and a salient change in visualization should reflect a significant one in data.
+  Here, a significant change happened in only a <em>subset</em> of data (e.g. all points of digit 1 from epoch 13 to 14), but <em>all</em> points in the visualization move dramatically.
+  For both UMAP and t-SNE, the position of each single point depends non-trivially on the whole data distribution in such embedding algorithms.
+  This property is not ideal for visualization because it fails the data-visual correspondence, making it hard to <em>infer</em> the underlying change in data from the change in the visualization.
 </p>
 
 <p>
   Non-linear embeddings that have non-convex objectives also tend to be sensitive to initial conditions.
-  For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30 and 99.
-  But even with spatial regularization (e.g. Dynamic t-SNE<d-cite key="rauber2016visualizing"></d-cite>), these non-linear methods suffer from interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
+  For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30, 31, 32, and 33 (in fact, all the way to 99).
+  Temporal regularization techniques (such as Dynamic t-SNE) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
 </p>
 
 <d-figure id='smallmultiple2' class='smallmultiple' style="">
