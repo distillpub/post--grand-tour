@@ -1,4 +1,6 @@
-
+a, d-article a{
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+}
 
 
 d-article h4 {
@@ -392,4 +394,3 @@ canvas.layertransition {
   position: relative;
   margin-right: 0.25em;
 }
-

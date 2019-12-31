@@ -264,7 +264,6 @@ function TeaserRenderer(gl, program, kwargs) {
     console.log('paused');
   };
 
-
   this.setEpochIndex = (i)=>{
     this.epochIndex = i;
     this.overlay.epochSlider
@@ -274,6 +273,11 @@ function TeaserRenderer(gl, program, kwargs) {
       .text(`Epoch: ${this.epochIndex}/${(this.dataObj.nepoch-1)}`);
   };
 
+  this.playFromEpoch = function(epoch){
+    this.shouldAutoNextEpoch = true;
+    this.setEpochIndex(epoch);
+    this.overlay.playButton.attr('class', 'tooltip play-button fa fa-pause');
+  };
 
   this.nextEpoch = function() {
     if (this.epochs.length == 1){
