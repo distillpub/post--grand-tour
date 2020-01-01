@@ -402,7 +402,7 @@
 <p>
   If we separate input examples by their true labels/classes and plot the <em>per-class</em> loss like above, we see that the two drops were caused by the classses 1 and 7; the model learns different classes at very different times in the training process. 
   Although the network learns to recognize digits 0, 2, 3, 4, 5, 6, 8 and 9 early on, it is not until epoch 14 that it starts successfully recognizing digit 1, or until epoch 21 that it recognizes digit 7.
-  If we <em>knew</em> to be looking for class-specific error rates, this chart is appropriate. But what if we didn't really know what to look for?
+  If we knew ahead of time to be looking for class-specific error rates, then this chart works well. But what if we didn't really know what to look for?
 </p>
 
 <!-- <p>
@@ -416,8 +416,9 @@
 </p> -->
 
 <p>
-  In that case, we could consider visualizations of the neuron activations (e.g. in the last softmax layer) of <em>all</em> examples at once.
-  Should there be only two neurons in that layer (or three classes in the softmax layer), a simple two-dimensional scatter plot of these would suffice.
+  In that case, we could consider visualizations of neuron activations (e.g. in the last softmax layer) for <em>all</em> examples at once, looking
+  to find patterns like class-specific behavior, and other patterns besides.
+  Should there be only two neurons in that layer, a simple two-dimensional scatter plot would work.
   However, the points in the softmax layer for our example datasets are 10 dimensional (and in larger-scale classification problems this number can be much larger).
   We need to either show two dimensions at a time (which does not scale well as the number of possible charts grows quadratically),
   or we can use <em>dimensionality reduction</em> to map the data into a two dimensional space and show them in a single plot. 
@@ -525,7 +526,8 @@
 </p>
 
 <p>  
-  This setup provides additional nice properties that explain the salient patterns in the previous illustrations. For example, because projections are linear and the coefficients of vectors in the classification layer sum to one, classification outputs that are halfway confident between two classes are projected to vectors that are halfway between the class handles.
+  This setup provides additional nice properties that explain the salient patterns in the previous illustrations.
+  For example, because projections are linear and the coefficients of vectors in the classification layer sum to one, classification outputs that are halfway confident between two classes are projected to vectors that are halfway between the class handles.
   <!-- Direct manipulation handles are not only for <em>exploratory</em> visual analysis, they are also friendly for <em>explanatory</em> visualizations/presentations.  -->
   <!-- To illustrate the late learning of digit 1 and 7 in the MNIST classifier, for example, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas.  -->
   <!-- Without much difficulty, we can convince the viewers that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the good data-visual correspondence in the Grand Tour/linear projections.  -->
@@ -545,9 +547,8 @@
 </p>
 
 <p>
-  In fashion-MNIST, we see how the model confuses between classes.
-  For example, the model confuses among sandals, sneakers and ankle boots, as we see data points form a triangular frame in the softmax layer.
-  In the figure below, drag any handle on the axes to change the projection:
+  This particular property is illustrated clearly in the Fashion-MNIST example below.
+  The model confuses sandals, sneakers and ankle boots, as data points form a triangular shape in the softmax layer.
 </p>
 
 <d-figure class='nngt-single-epoch-2' style="">
@@ -579,16 +580,16 @@
 </p>
 
 <p>
-  Examples that fall between sandal and sneaker classes indicate that the model has low confidence in distinguishing the two, same thing happens between sneaker and ankle boot classes. 
-  But the model has less confusion between sandal and ankle boot classes, as not many examples fall between these two classes. 
-  Moreover, all but one example falls in the interior of the triangle, while others live close to the boundary. 
+  Examples falling between classes indicate that the model has trouble distinguishing the two, such as sandals vs. sneakers, and sneakers vs. ankle boot classes. 
+  Note, however, that this does not happen as much for sandals vs. ankle boots: not many examples fall between these two classes. 
+  Moreover, most data points are projected close to the edge of the triangle. 
   This tells us that most confusions happen between two out of the three classes, they are really two-way confusions.
 
   Within the same dataset, we can also see pullovers, coats and shirts filling a triangular <em>plane</em>.
   This is different from the sandal-sneaker-ankle-boot case, as examples not only fall on the boundary of a triangle, but also in its interior: a true three-way confusion. 
 
   Similarly, in the CIFAR-10 dataset we can see confusion between dogs and cats, airplanes and ships.
-  The mixing pattern in CIFAR-10 is not as clear as in fashion-MNIST, because a lot of examples are misclassified.
+  The mixing pattern in CIFAR-10 is not as clear as in fashion-MNIST, because many more examples are misclassified.
 </p>
 
 
@@ -614,31 +615,30 @@
   Both projections are found by direct manipulations.
 </p>
 
-
 <h2>The Grand Tour</h2>
 
 <p>
-  In the previous section, we took advantage of the fact that we knew which classes to visualize. That meant it was easy to design a linear projection for our use case. But what if we don't know which projection to choose from?
-  Principal Component Analysis (PCA) is often the first thing to try when doing linear dimensionality reduction. 
-  It works by choosing directions that preserve the most variance in data.
-  However, the distribution of data in softmax layers, if trained well, has almost <em>equal</em> variance in each axis direction because along each axis there concentrates similar number of examples around the one-hot vector<d-footnote>We are assuming a class-balanced training dataset, otherwise PCA will prefer dimensions with more examples, which might not help much in making sense of the data either. </d-footnote>.
-  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third. 
-  So which of them should we choose? 
+  In the previous section, we took advantage of the fact that we knew which classes to visualize.
+  That meant it was easy to design linear projections for the particular tasks at hand.
+  But what if we don't know ahead of time which projection to choose from, because we don't quite know what to look for?
+  Principal Component Analysis (PCA) is the quintessential linear dimensionality reduction method,
+  choosing to project the data so as to preserve the most variance possible. 
+  However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not be help much either.</d-footnote>
+  As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third.
+  So which of them should we choose?
   <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
   <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
-  So instead of PCA, we visualize this equal variance data by choosing random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
-  The Grand Tour is a linear method which generates infinitely many projections and interpolate them smoothly.
+  Instead of PCA, we propose to visualize this data by smoothly animating random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
 </p>
 
 <p>
-The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a technique for high dimensional data visualization. 
-Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then project it down to 2D for display. 
+Starting with a random velocity, it smoothly rotates data points around the origin in high dimensional space, and then projects it down to 2D for display. 
 Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 </p>
 <ul>
 <li>On a square, the Grand Tour rotates it with a constant angular velocity.</li> 
 <li>On a cube, the Grand Tour rotates it in 3D, and its 2D projection let us see every facet of the cube. </li>
-<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projections.</li>
+<li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projection.</li>
 </ul>
 <d-figure class='tesseract' style="grid-column: text;">
 <canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
@@ -717,13 +717,12 @@ A digit 1 image should fire up the cell in first column, second row.
 <!--   We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour.  -->
 <!-- </p> -->
 
-
 <h3>The Grand Tour of the Softmax Layer</h3>
 <p>
   We first look at the Grand Tour of the softmax layer. 
-  The softmax layer is relatively easy to understand because its axes have strong semantics - the <d-math>i^{th}</d-math> axis corresponds to network's <em>confidence</em> on the <d-math>i^{th}</d-math> class label. 
-  With this nice semantics, direct manipulations with axis handles come more handy.
-  For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly.
+  The softmax layer is relatively easy to understand because its axes have strong semantics. As we described earlier, the <d-math>i</d-math>-th axis corresponds to network's <em>confidence</em> about predicting that the given input belongs to the<d-math>i</d-math>-th class. 
+  <!-- With this nice semantics, direct manipulations with axis handles come more handy. -->
+  <!-- For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly. -->
 </p>
 
 <i id="nngt-single-epoch-a"></i>
@@ -740,10 +739,9 @@ A digit 1 image should fire up the cell in first column, second row.
 </p>
 
 <p>
-  First, the Grand Tour of the softmax layer let us qualitatively judge the performance of our model.
-  In addition, since we used similar architecture on three datasets, the performance also reflects the relative complexity of the dataset. 
-  We can see that data points are most clustered for the MNIST dataset, the digits are close to one of the ten corners of the softmax space, while fashion-MNIST or CIFAR-10, the separation were not as extreme and more points live <em>inside</em> the volume.
-  <!-- <strong><br><br>[TODO Figure showing all three datasets side-by-side]<br><br></strong> -->
+  The Grand Tour of the softmax layer lets us qualitatively assess the performance of our model.
+  In the particular case of this article, since we used comparable architectures for three datasets, this also allows us to gauge the relative difficulty of classifying each dataset. 
+  We can see that data points are most confidently classified for the MNIST dataset, where the digits are close to one of the ten corners of the softmax space. For Fashion-MNIST or CIFAR-10, the separation is not as clean, and more points appear <em>inside</em> the volume.
 </p>
 
 <!-- <h3>Direct Manipulation on the Axes</h3> -->
@@ -756,9 +754,9 @@ A digit 1 image should fire up the cell in first column, second row.
 <h3>The Grand Tour of Training Dynamics</h3>
 
 <p>
-  We trained 99 epochs and recorded the entire history of neuron activations on subsets of training and testing examples. 
-  In the beginning when neural network first randomly initialized, all examples are placed around the origin of softmax space. 
-  Through training, examples are pushed to their correct "class corners" - the one hot vectors - in the softmax space.
+  Linear projection methods naturally give a formulation that is independent of the input points, allowing us to keep the projection fixed while the
+  data changes.
+  To recap our working example, we trained each of the neural networks for 99 epochs and recorded the entire history of neuron activations on a subset of training and testing examples. We can use the Grand Tour, then, to visualize the actual training process of these networks.
 </p>
 
   <!-- In softmax layer, our neural networks aim to match each image to its 'one-hot' encoding of the corresponding class label. 
@@ -774,7 +772,9 @@ A digit 1 image should fire up the cell in first column, second row.
   The image view is best accompanied with an expanded canvas.  -->
 
 <p>
-  Comparing the difference between training and testing datasets gives us an estimation about over-fitting. 
+  In the beginning when the neural networks are randomly initialized, all examples are placed around the center of the softmax space, with equal weights to each class. 
+  Through training, examples move to class vectors in the softmax space. The Grand Tour also lets us
+  compare visualizations of the training and testing data, giving us a qualitative assessment of over-fitting. 
   In the MNIST dataset, the trajectory of testing images through training is consistent with the training set. 
   Data points went directly toward the corner of its true class and all classes are stabilized after about 50 epochs.
   On the other hand, in CIFAR-10 there is an <em>inconsistency</em> between the training and testing sets. Images from the testing set keep oscillating while most images from training converges to the corresponding class corner. 
@@ -815,17 +815,15 @@ A digit 1 image should fire up the cell in first column, second row.
 </p>  --> 
 
 <p>
-  Given the presented techniques of the Grand Tour and direct manipulations on the axes, we are in theory able to visualize and manipulate any intermediate layer of a neural network. 
-  Despite that, two problems need to be solved first:
+  Given the presented techniques of the Grand Tour and direct manipulations on the axes, we can in theory visualize and manipulate any intermediate layer of a neural network by itself.  Nevertheless, this is not a very satisfying approach, for two reasons:
   <ul>
     <li>
-      While we want to trace out the activation patterns through different layers, the points going under a linear transformation can be hard to trace in Grand Tour.
-      Under linear transformations, the dimensionality might change, and each neuron in a later layer is resulted from mixing activation of all neurons in the previous layer. 
+      In the same way that we've kept the projection fixed as the training data changed, we would like to "keep the projection fixed", as the data moves through the layers in the neural network. However, this is not straightforward. For example, different layers in a neural network have different dimensions. How do we connect rotations of one layer to rotations of the other?
     </li>
     <li>
-      The handles on axes of softmax layer were very convenient, but it is only practical when dimensionality is small.
-      With hundreds of dimensions, for example, the axis handles would look like a hairball, making them impossible in interact with.
-      Moreover, hidden layers do not have as clear semantics as the softmax layer, so manipulating axes in hidden layers would not be as natural and reasonable. 
+      The class "axis handles" in the softmax layer convenient, but that's only practical when the dimensionality of the layer is relatively small.
+      With hundreds of dimensions, for example, there would be too many axis handles to naturally interact with.
+      In addition, hidden layers do not have as clear semantics as the softmax layer, so manipulating them would not be as intuitive.
     </li>
   </ul>
 </p>
