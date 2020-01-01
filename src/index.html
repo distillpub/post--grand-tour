@@ -107,7 +107,7 @@
     ],
     "katex": {
       "delimiters": [
-        {"left": "$$", "right": "$$", "display": false}
+        {"left": "$", "right": "$", "display": false}
       ]
     }
   }
@@ -266,7 +266,7 @@
   way</em>.
 </p>
 
-<h2>Working examples</h2>
+<h2>Working Examples</h2>
 
 <p>
   To illustrate the technique we will present, we trained deep neural
@@ -347,7 +347,7 @@
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
   For images, the input is a 2D array of scalar values for gray scale images or RGB triples for colored images.
   When needed, one can always flatten the 2D array into an equivalent (<d-math>w \cdot h \cdot c</d-math>) -dimensional vector.
-  Similarly, the intermediate value after any one of the functions in composition, or activations of neurons after a layer, can also be seen as a vector in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in the layer. 
+  Similarly, the intermediate values after any one of the functions in composition, or activations of neurons after a layer, can also be seen as vectors in <d-math>\mathbb{R}^n</d-math>, where <d-math>n</d-math> is the number of neurons in the layer. 
   The softmax, for example, can be seen as a 10-vector whose values are positive real numbers that sum up to 1.
   This vector view of data in neural network not only allows us represent complex data in a mathematically compact form, but also hints us on how to visualize them in a better way.
 </p>
@@ -375,7 +375,7 @@
 </p>
 
 
-<h2>Using visualization to understand DNNs</h2>
+<h2>Using Visualization to Understand DNNs</h2>
 
 <p>
   Let's start by considering the problem of visualizing the training process of a DNN.
@@ -467,7 +467,7 @@
 
 <p>
   Now, let's consider another task, that of identifying classes which the neural network tends to confuse.
-  For this example, we will use the Fashion-MNIST dataset and classifier, and consider the confusino among sandals, sneakers and ankle boots.
+  For this example, we will use the Fashion-MNIST dataset and classifier, and consider the confusion among sandals, sneakers and ankle boots.
   If we know ahead of time that these three classes are likely to confuse the classifier, then we can directly design an appropriate linear projection, as can be seen in the last row of the following figure (we found this particular projection using both the Grand Tour and the direct manipulation technique we later describe). The pattern in this case is quite salient, forming a triangle.
   T-SNE, in contrast, incorrectly separates the class clusters (possibly because of an inappropriately-chosen hyperparameter).
   UMAP successfully isolates the three classes, but even in this case it's not possible to distinguish between three-way confusion for the classifier in epochs 5 and 10 (portrayed in a linear method by the presence of points near the center of the triangle), and multiple two-way confusions in later epochs (evidences by an "empty" center).
@@ -808,7 +808,7 @@ A digit 1 image should fire up the cell in first column, second row.
 
 
 
-<h3 name="layer-dynamics">The Grand Tour of layer dynamics</h3>
+<h3 name="layer-dynamics">The Grand Tour of Layer Dynamics</h3>
 <!-- <p>
   Up till now we have seen the last softmax layer of out neural network model. 
   But what happens to other intermediate layers? Can we look at them in the similar way we did for the last layer? One challenge of looking at intermediate layers, it that axis no longer have a semantic meaning, as in the last layer we know that each of the 10 directions correspond to one of the ten label classes. Another challenge is that directions in two different layers do not align with each other by default. Thus making sense of how the model transforms data points between two consecutive layers is non-trivial.
@@ -1024,7 +1024,7 @@ Further, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>
 is nicely aligned with the formula.
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-direct-manipulation')">
-Direct manipulation
+Direct Manipulation
 </h3>
 <div id='div-direct-manipulation' class=''>
 
