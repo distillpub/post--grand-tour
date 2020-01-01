@@ -458,7 +458,7 @@
 <p>
   Non-linear embeddings that have non-convex objectives also tend to be sensitive to initial conditions.
   For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30, 31, 32, and 33 (in fact, all the way to 99).
-  Temporal regularization techniques (such as Dynamic t-SNE) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
+  Temporal regularization techniques (such as Dynamic t-SNE<d-cite key="rauber2016visualizing"></d-cite>) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
 </p>
 
 <d-figure id='smallmultiple2' class='smallmultiple' style="">
@@ -623,7 +623,7 @@
   But what if we don't know ahead of time which projection to choose from, because we don't quite know what to look for?
   Principal Component Analysis (PCA) is the quintessential linear dimensionality reduction method,
   choosing to project the data so as to preserve the most variance possible. 
-  However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not be help much either.</d-footnote>
+  However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not help much either.</d-footnote>
   As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third.
   So which of them should we choose?
   <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
@@ -821,7 +821,7 @@ A digit 1 image should fire up the cell in first column, second row.
       In the same way that we've kept the projection fixed as the training data changed, we would like to "keep the projection fixed", as the data moves through the layers in the neural network. However, this is not straightforward. For example, different layers in a neural network have different dimensions. How do we connect rotations of one layer to rotations of the other?
     </li>
     <li>
-      The class "axis handles" in the softmax layer convenient, but that's only practical when the dimensionality of the layer is relatively small.
+      The class "axis handles" in the softmax layer are convenient, but that's only practical when the dimensionality of the layer is relatively small.
       With hundreds of dimensions, for example, there would be too many axis handles to naturally interact with.
       In addition, hidden layers do not have as clear semantics as the softmax layer, so manipulating them would not be as intuitive.
     </li>
