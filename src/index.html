@@ -829,35 +829,41 @@ A digit 1 image should fire up the cell in first column, second row.
 </p>
 
 <p>
-  To address the first problem, we simplify the linear transformations by observing that they are equivalent to simple scalings under the view of the Grand Tour.
-  To see how a linear transformation can be viewed unnecessarily complicated, think about a neural network layer <d-math>A</d-math> that negates two axis in 2D, in matrix form:
+  To address the first problem, we will need to pay closer attention to the way in which layers transform the data that they are given.  
+  To see how a linear transformation can be visualized in a particularly ineffective way, consider the following (very simple) weights (represented by a matrix <d-math>A</d-math>) which take a 2-dimensional hidden layer $k$ and produce activations in another 2-dimensional layer $k+1$. The weights simply negate two activations in 2D:
   <d-math block>
     A = \begin{bmatrix}
     -1, 0 \\
     0, -1
     \end{bmatrix}
   </d-math>
-  One way to interpolate the source <d-math>x_0</d-math> and destination <d-math>x_1 = A(x_0) = -x_0</d-math> of this action <d-math>A</d-math> is by a simple linear interpolation
+  Imagine that we wish to visualize the behavior of network as the data moves from layer to layer. One way to interpolate the source <d-math>x_0</d-math> and destination <d-math>x_1 = A(x_0) = -x_0</d-math> of this action <d-math>A</d-math> is by a simple linear interpolation
 
   <d-math block>
   x_t = (1-t) \cdot x_0 + t \cdot x_1 = (1-2t) \cdot x_0    
   </d-math>
   for <d-math>t \in [0,1].</d-math>
 
-  If we apply this interpolation on all data points, they will cross the origin at the same time (<d-math>t=0.5</d-math>), making it impossible trace individual points. 
-  Moreover, this interpolation complicates a simple 180 degree rotation in data.
-  In the Grand Tour, matrix <d-math>A</d-math> should be considered doing nearly nothing, for it only rotates the data while the Grand Tour is also a rotation.
-  However, when visualizing this by the simple linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) stays the same.
-  Therefore, this interpolation fails to meet the principle of data-visual correspondence: a simple change in data (negation in 2D/ 180 degree rotation) results in a drastic change in visualization (all points cross the origin).
+  Effectively, this strategy reuses the linear projection coefficients from one layer to the next. This is a natural thought, since they have the same dimension.
+  However, notice the following: the transformation given by A is a simple rotation of the data. Every linear transformation of the layer $k+1$ could be encoded simply as a linear transformation of the layer $k$, if only that transformation operated on the negative values of the entries.
+  In addition, since the Grand Tour has a rotation itself built-in, for every configuration that gives a certain picture of the layer $k$, there exists a <em>different</em> configuration that would yield the same picture for layer $k+1$, by taking the action of $A$ into account.
+  <!-- at the same time (<d-math>t=0.5</d-math>), making it impossible trace individual points.  -->
+  <!-- Moreover, this interpolation complicates a simple 180 degree rotation in data. -->
+  <!-- In the Grand Tour, matrix <d-math>A</d-math> should be considered doing nearly nothing, for it only rotates the data while the Grand Tour is also a rotation. -->
+  <!-- However, when visualizing this by the simple linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) stays the same. -->
+  In effect, the naive interpolation fails the principle of data-visual correspondence: a simple change in data (negation in 2D/ 180 degree rotation) results in a drastic change in visualization (all points cross the origin).
 </p>
+
 <p>
-  When designing a visualization, we should think about which parts of the data are artifacts that we should discard, and which contain the real knowledge we should <em>distill</em> from this representation. 
-  In this case, the rotational factors in linear transformations are not as important other factors such as scalings.
-  So by design, we use the Grand Tour because it is invariant to rotations in data.
-  In turn, the rotational components in our data (i.e. rotations in linear transformations), whenever complicate the visualization unnecessarily, should be explicitly discarded.
+  This observation points to a more general strategy: when designing a visualization, we should be as explicit as possible about which parts of the input (or process) we seek to capture in our visualizations.
+  We should seek to explicitly articulate what are purely representational artifacts that we should discard, and what are the real features a visualization we should <em>distill</em> from the representation.
+  Here, we claim that rotational factors in linear transformations of neural networks are significantly less important than other factors such as scalings and nonlinearities.
+  As we will show, the Grand Tour is particularly attractive in this case because it is can be made to be invariant to rotations in data.
+  As a result, the rotational components in the linear transformations of a neural network will be explicitly made invisible.
 </p>
+
 <p>
-  To see how it works in reality, we take advantage of a central theorem of linear algebra. 
+  Concretely, we achieve this by taking advantage of a central theorem of linear algebra. 
   The <em>Singular Value Decomposition</em> (SVD) theorem shows that <em>any</em> linear transformation can be decomposed into a sequence of very simple operations: a rotation, a scaling, and another rotation<d-cite key="austin2009svd"></d-cite>. 
 
   <!-- (From another perspective, any linear operation in standard bases is a scaling operation with appropriately chosen orthonormal bases on both sides.  -->
