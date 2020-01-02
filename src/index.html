@@ -137,17 +137,6 @@
   </div>
 </nav> -->
 
-
-<!-- teaser -->
-<!-- <div id="teaser-flex-container" class="flex-container" style="display:flex;"> -->
-<!--   <div class="flex-item" style="flex: 1;"></div> -->
-<!--   <d-figure class='teaser flex-item' style=" flex: 3; margin: 0rem 0;"> -->
-<!--     <canvas id='teaser' class='grandtour' style="height:280px; flex-grow: 1"></canvas> -->
-<!--   </d-figure> -->
-<!--   <script src='js/teaser.js'></script> -->
-<!--   <div class="flex-item" style="flex: 1;"></div> -->
-<!-- </div> -->
-
 <div id="teaser-container" style="background-color:rgb(247, 247, 247);">
   <d-figure class="teaser" style="">
     <canvas id='teaser' class="" ></canvas>
@@ -185,18 +174,6 @@
 </script>
 
 <d-title>
-<!-- 
-  grid-template-columns: 
-  [screen-start] 1fr 
-  [page-start kicker-start] 60px 
-  [middle-start] 60px 
-  [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px 
-  [text-end gutter-start] 60px 
-  [middle-end] 60px 
-  [page-end gutter-end] 
-  1fr 
-  [screen-end]; 
--->
 
 <p>
   The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a classic visualization technique for high-dimensional point clouds that <em>projects</em> a high-dimensional dataset into two dimensions.
@@ -207,19 +184,8 @@
 
   In this article, we show how to leverage the linearity of the Grand Tour to enable a number of capabilities that are uniquely useful to visualize the behavior of neural networks.
   
-  <!-- Although this means that each offers unique properties in the visualization of the behavior of neural networks. -->
-  
-  <!-- Because the Grand Tour is fundamentally a <em>linear</em> method, the patterns it shows more directly correspond to patterns of interest in the neural network. -->
-  
   Concretely, we present three use cases of interest: visualizing the training process as the network weights change, visualizing the layer-to-layer behavior as the data goes through the network and visualizing both how adversarial examples<d-cite key="szegedy2013intriguing"></d-cite> are crafted and how they fool a neural network.
-  
-  <!-- The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting it to 2D. -->
-  <!-- With the Grand Tour, user interaction is easy to incorporate, allowing a natural mixed-initiative mode of visual exploration. -->
-  <!-- In the figure above, we use the Grand Tour to display how 1000 images activate the final softmax layer of a 10-class neural network classifier. -->
-  <!-- The point color represents the true class of each image. -->
-  <!-- Unlike other methods, the Grand Tour offers good consistency with respect to changes in the data, allowing the visualization of training dynamics of a neural network. -->
-  <!-- Notice how it is possible to notice how different classes are learned at different epochs of the training process: in the case of MNIST digits, the network learns most digits from the beginning, but it did not -->
-  <!-- give a correct answer to most of digit 1 until <a onclick="utils.setTeaser(teaser, 'mnist', 10, [1,])" href="#teaser">epoch 14</a>, or digit 7 until <a onclick="utils.setTeaser(teaser, 'mnist', 17, [7,])" href="#teaser">epoch 21</a>. -->
+ 
 </p>
 </d-title>
 
@@ -237,14 +203,6 @@
 
   As we will show, this data-visual correspondence is central to the method we present, especially when compared to other non-linear projection methods like UMAP and t-SNE.
 </p>
-  <!-- considers the str -->
-
-  <!-- Deep neural networks are -->
-  
-  <!-- The Grand Tour works by generating a random, smoothly changing rotation of the dataset, and then projecting the data to the two-dimensional screen. Notably, this is a <em>linear</em> process. -->
-  <!-- This linearity is particularly useful  -->
-  <!-- This linearity is particularly useful when visualizing afor visualizing deep neural networks because, as we will see, the linear transformations in neural networks can be simplified in the Grand Tour. -->
-  
 </p>
 
 <p>
@@ -304,20 +262,6 @@
   While our architecture is simpler and smaller than current DNNs, it's still indicative of modern networks, and is complex enough to demonstrate both our proposed techniques and shortcomings of typical approaches.
 </p>
 
-
-<!-- <p> -->
-<!--   Perhaps the next question is: were these late learning caused by some outliers in the dataset or it is a feature for all 1s or 7s? -->
-<!--   To explore this we need to break the per-class losses further down to individual input examples. -->
-<!--   <\!-- TODO smoother transition -\-> -->
-<!--   But instead of looking at losses, we can directly look at the softmax activations.  -->
-<!--   The softmax layer has 10 neurons that can be seen as the (predicted) probability, one for each class.  -->
-<!--   Together these 10 neurons can also be seen as a 10-vector, which will become useful later. -->
-<!--   We expect, for example, that the 7th (0-indexed) neuron fired up for hand written 7s. -->
-<!--   In fact, since we have access to not only the softmax but also all hidden layers, we can probe the network with input examples to see how it reacts on <em>each</em> layer. -->
-<!--   In this way we are trying to open the "black box" and understand the internal of a neural network. -->
-<!--   Here is a typical view of the opened box: -->
-    <!-- </p> -->
-
 <p>
   The following figure presents a simple functional diagram of the neural network we will use throughout the article. The neural network is a sequence of linear (both convolutional<d-footnote>
     A convolution calculates weighted sums of regions in the input. 
@@ -366,8 +310,6 @@
     <img src="figs/maxpool.gif" style="width:70%" class="img-center">
     Image credit to <a href="https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9">https://towardsdatascience.com/gentle-dive-into-math-behind-convolutional-neural-networks-79a07dd44cf9</a>
   </d-footnote> and softmax, do not fall into either categories. We will come back to this later.
-  <!-- This categorization into "linear or componentwise" will be essential to untangle the internal workings of the neural network. -->
-  <!-- Decomposing the whole pipeline into simpler functions gives details about what happened inside, in particular how neurons activate in different layers. -->
 </p>
 
 <p>
@@ -405,16 +347,6 @@
   If we knew ahead of time to be looking for class-specific error rates, then this chart works well. But what if we didn't really know what to look for?
 </p>
 
-<!-- <p>
-  TODO NEED THIS LATER?
-  In a neural network, it must be the effect of non-linear functions that cause its classification power, because linear methods are fundamentally limited in their predictive ability (CITE VC-DIMENSION).
-  However, notice that in neural networks, the non-linearities are in fact easy to understand because they tend to operate component-wise: in effect, one coordinate does not influence another.
-  On the other hand, linear layers <em>combine many coordinates</em> in their computation, making the overall behavior hard to understand in terms of the numbers being passed around.
-  In linear mappings, the activation of one neuron is potentially distributed to every neuron of the next layer.
-  In order to understand the behavior of a linear map, we have to think of all neurons in one layer as a whole.
-  In a sense, then, it is the <em>linear</em> parts of a neural network that need most help from visualization.
-</p> -->
-
 <p>
   In that case, we could consider visualizations of neuron activations (e.g. in the last softmax layer) for <em>all</em> examples at once, looking
   to find patterns like class-specific behavior, and other patterns besides.
@@ -434,7 +366,6 @@
   Consider now the task of identifying this class-specific behavior during training. As a reminder, in this case, the strange behavior happens with digits 1 and 7, around epochs 14 and 21 respectively.
   While the behavior is not particularly subtle&emdash;digit goes from misclassified to correctly classified&emdash; it is quite hard to notice it in any of the plots below. 
   Only on careful inspection we can notice that (for example) in the UMAP plot, the digit 1 which clustered in the bottom in epoch 13 becomes a new tentacle-like feature in epoch 14. 
-  <!-- Use the buttons on the right to identify the change. -->
 </p>
 <d-figure id='smallmultiple1' class='smallmultiple' style="">
   <canvas id='sm1' class='smallmultiple' width='100' height='200'></canvas>
@@ -483,41 +414,10 @@
 </d-figure>
 <p class='caption'>Three-way confusion in fashion-MNIST. Notice that in contrast to non-linear methods, a carefully-constructed linear projection can offer a better visualization of the classifier behavior.</p>
 
-<!-- <p> -->
-<!--    This can be seen below, where we compare a number of other DR methods: <d-cite key="maaten2008visualizing">t-SNE</d-cite>, <d-cite key="mcinnes2018umap">UMAP</d-cite>, <d-cite key="rauber2016visualizing">Dynamic t-SNE</d-cite> <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA), random linear projections, and a manually-selected linear projection by our direct manipulation in Grand Tour. -->
-<!-- </p> -->
-
-<!-- The small multiples are linked by brush so that one can filter points and link them to the same points in other views<i id="sm0-a"></i> -->
-  <!-- As emphasized in the abstract, in MNIST we observed different class difficulties.  -->
-  <!-- The network learned most digits from the beginning, but it did not -->
-  <!-- give correct answers to digit 1 until  -->
-  <!-- <\!-- TODO: optmized code -\-> -->
-  <!-- <a onclick="utils.setTeaser(nngt, 'mnist', 10, [1,])" href="#nngt-a"> -->
-  <!--   epoch 14 -->
-  <!-- </a>,  -->
-  <!-- or digit 7 until  -->
-  <!-- <a onclick="utils.setTeaser(nngt, 'mnist', 17, [7,])" href="#nngt-a"> -->
-  <!--   epoch 21 -->
-  <!-- </a>. -->
-  <!-- This visual clue about training dynamics is somewhat unique to the Grand Tour comparing to other dimensionality techniques. -->
-
-<!--   We plot the final softmax layer with a number of other dimensionality reduction methods: <d-cite key="maaten2008visualizing">t-SNE</d-cite>, <d-cite key="mcinnes2018umap">UMAP</d-cite>, <d-cite key="rauber2016visualizing">Dynamic t-SNE</d-cite> <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> (PCA), random linear projections, and a manually-selected linear projection by our direct manipulation in Grand Tour. The small multiples are linked by brush so that one can filter points and link them to the same points in other views<i id="sm0-a"></i>. -->
-<!-- </p> -->
-
-<!-- <p>
-  In addition, we use this section to highlight a current shortcoming of our present technique, namely that it only allows the visualization of a <em>single</em> projection.
-  With multiple plots, we can use <em>linked brushing and multiple views</em>.
-  This technique allows users to build an intuitive understanding of the projections by selecting points in one region of a plot and observing which points are highlighted on the other projections.
-  </p> -->
-
-
 <h2>Linear Methods to the Rescue</h2>
 
 <p>
   When given the chance, then, we should prefer methods for which changes in the data produce predictable, visually salient changes in the result, and linear dimensionality reductions often have this property.
-  <!-- They are more interpretable than non-linear methods due to a good data-visual correspondence. -->
-<!-- </p> -->
-<!-- <p> -->
   Here, we revisit the linear projections described above in an interface where the user can easily navigate between different training epochs.
   In addition, we introduce another useful capability which is only available to linear methods, that of direct manipulation.
   Each linear projection from $n$ dimensions to $2$ dimensions can be represented by $n$ 2-dimensional vectors which have an intuitive interpretation: they are the vectors that the $n$ canonical basis vector in the $n$-dimensional space will be projected to.
@@ -528,9 +428,6 @@
 <p>  
   This setup provides additional nice properties that explain the salient patterns in the previous illustrations.
   For example, because projections are linear and the coefficients of vectors in the classification layer sum to one, classification outputs that are halfway confident between two classes are projected to vectors that are halfway between the class handles.
-  <!-- Direct manipulation handles are not only for <em>exploratory</em> visual analysis, they are also friendly for <em>explanatory</em> visualizations/presentations.  -->
-  <!-- To illustrate the late learning of digit 1 and 7 in the MNIST classifier, for example, we find and recorded the following linear projection which project the first and and seventh axis on top of the canvas.  -->
-  <!-- Without much difficulty, we can convince the viewers that digit 1 and 7 get classified correctly starting from epoch 14 and 21, thanks to the good data-visual correspondence in the Grand Tour/linear projections.  -->
 </p>
 
 <d-figure class='nngt' style="">
@@ -626,8 +523,6 @@
   However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not be help much either.</d-footnote>
   As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third.
   So which of them should we choose?
-  <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
-  <!-- Random projections alleviate this issue but it is hard to link between many random projections and assure the quality of each of them. -->
   Instead of PCA, we propose to visualize this data by smoothly animating random projections, using a technique called the Grand Tour<d-cite key="asimov1985grand"></d-cite>.
 </p>
 
@@ -646,83 +541,10 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 <script src='js/tesseract.js'></script>
 </d-figure>
 
-<!-- <d-figure class='nngt-single-epoch-0' style=""> -->
-<!--   <canvas id='nngt-single-epoch-0' class='grandtour'></canvas> -->
-<!--   <script src='js/se0.js'></script> -->
-<!-- </d-figure> -->
-<!-- <p class='caption'>The Grand Tour of the softmax layer. Drag the handle on each axis to move that axis.</p> -->
-
-<!-- <p> -->
-<!--   When combined with interactive components such as sliders, data filters and direct manipulations, we can quickly find projections that reveals important patterns in the data.  -->
-<!--   In the above view we can click on legends, drag sliders and move the circular handle on each axis to (re)discover the late learning of digit 1 or 7 in MNIST, or the three-way confusion in Fashion-MNIST. -->
-<!--   But see how much easier this time than previous non-linear methods. -->
-<!-- </p> -->
-
-<!-- <p> -->
-<!--   Now, let us take a closer look at the Grand Tour technique itself. -->
-<!-- </p> -->
-
-
-<!-- <p>
-  Although with the Grand Tour we have observed interesting phenomenon, there are other ways of looking at the same kind of data. 
-  For example, the
-  <d-cite key="ren2017squares">Squares</d-cite>
-  visualizes the softmax layer using parallel coordinates. 
-  However, one draw back of using parallel coordinates is that it does not emphasize the spatial relation among multiple dimensions. 
-  What makes it not ideal, is that the order of different dimension is predetermined so that any non-neighboring dimensions are hard to compare and correlate. 
-  In our use case, where relation among dimensions are of the greatest interest, parallel coordinates would not provide an straightforward view of multi-way confusions among classes. 
-</p> -->
-
-
-<!-- this fails at providing an overview among all instances-->
-<!-- <p>Similar illustrations exist, for example, by <d-cite key="harley2015isvc">Harley</d-cite>, where activations are arranged in a 2D or 3D canvas</p> -->
-<!-- <p>
-Mathematically, a neural network can be represented as a function. 
-To make a neural network well modularized and easy to build and train, internally the mathematical function is composed by multiple simpler building-block functions, which are often called layers in neural network context. Such building-block functions serve different purposes. 
-The labels on each colored rectangle denote what kind of building-block functions were used in our network. 
-When an example image were passed through the network, each building-block function transforms the image to a different numerical representation and as the functions works in a chain, the image is transformed from one representation to another. 
-The representations can be in the form of a scale, vector or tensor. 
-In the diagram above, we illustrated some of these representations by gray-scale heatmaps. The whiter a pixel is, the larger value stored in the corresponding entry. To better use the drawing space, we reshaped these representation closer to squares.
-A worth noting representation is the 10-vector produced in the last <em>softmax</em>layer. 
-In this layer, the networks is trained to represent an one-hot encoding of the image class label, so normally only the entry corresponding to the true class of the image are fired up. 
-For example, a digit 0 should have a white spot in the first column, first row. 
-A digit 1 image should fire up the cell in first column, second row.
-</p>
-<p>
-  One nice property of the softmax layer is that each entries are non-negative and the sum of them equals to 1. This property gives us an attractive interpretation of this layer - for any given image, the final softmax layer represents the <em>confidence</em> of the network about this image belonging to each class. In stead of looking at one image at a time, we would like to see their <em>distribution</em> in this nice interpretable softmax layer. 
-  To see how this 10-vector is activated by the <em>set</em> of images, we turned to an old technique called the Grand Tour to reveal spatial relations among dimensions.
-</p> -->
-
-<!-- <h3>The Grand Tour</h3> -->
-
-<!-- <p>
-  Mathematically, the Grand Tour provides us a sequence of <d-math>p-dimensional</d-math> to 2D projections, which can be represented by a function from a time variable <d-math>t</d-math> to p-by-2 matrices. 
-  The p-by-2 matrices can be seen as a composition of a p-by-p orthogonal matrix, <d-math>GT \in SO(p)</d-math>, followed by a simple projection <d-math>\pi_2</d-math> that picks up the first two coordinates of p-dimensional vectors:
-  <d-math block>
-    t \mapsto \pi_2 \circ GT 
-  </d-math>
-  We will need the above detail for direct manipulation in <a href="#technical-details">technical details</a>.
-</p> -->
-<!-- <p> -->
-<!--   For more details about the Grand Tour, we recommend curious readers to consult the original paper by Asimov<d-cite key="asimov1985grand"></d-cite>. -->
-<!-- </p> -->
-
-
-<!-- <p> -->
-<!--   We have to emphasize one favorable property of the Grand Tour in visualizing neural networks:  -->
-<!--   it is invariant about the (orthonormal) basis chosen for the data representation.  -->
-<!--   Because the Grand Tour itself is a change of basis, every solid rotation in data space has a corresponding Grand Tour matrix that result in the same view.  -->
-<!--   In the mean time, linear transformations in neural networks are also invariant under change of basis.  -->
-<!--   Every linear transformations can be uniquely decomposed as a three-step action: rotation, projection followed by another rotation<d-cite key="austin2009svd"></d-cite>. -->
-<!--   We will later show that this connection suggests a way to simplify all linear transformations in the neural networks when viewing it in the Grand Tour.  -->
-<!-- </p> -->
-
 <h3>The Grand Tour of the Softmax Layer</h3>
 <p>
   We first look at the Grand Tour of the softmax layer. 
   The softmax layer is relatively easy to understand because its axes have strong semantics. As we described earlier, the <d-math>i</d-math>-th axis corresponds to network's <em>confidence</em> about predicting that the given input belongs to the <d-math>i</d-math>-th class. 
-  <!-- With this nice semantics, direct manipulations with axis handles come more handy. -->
-  <!-- For other intermediate layers, the axes are more abstract so we deployed another technique which we will see shortly. -->
 </p>
 
 <i id="nngt-single-epoch-a"></i>
@@ -744,13 +566,6 @@ A digit 1 image should fire up the cell in first column, second row.
   We can see that data points are most confidently classified for the MNIST dataset, where the digits are close to one of the ten corners of the softmax space. For Fashion-MNIST or CIFAR-10, the separation is not as clean, and more points appear <em>inside</em> the volume.
 </p>
 
-<!-- <h3>Direct Manipulation on the Axes</h3> -->
-
-<!-- <p> -->
-<!--   We will explain how direct manipulation works in <a href="#technical-details">technical details</a>. -->
-<!-- </p> -->
-
-
 <h3>The Grand Tour of Training Dynamics</h3>
 
 <p>
@@ -758,18 +573,6 @@ A digit 1 image should fire up the cell in first column, second row.
   data changes.
   To recap our working example, we trained each of the neural networks for 99 epochs and recorded the entire history of neuron activations on a subset of training and testing examples. We can use the Grand Tour, then, to visualize the actual training process of these networks.
 </p>
-
-  <!-- In softmax layer, our neural networks aim to match each image to its 'one-hot' encoding of the corresponding class label. 
-  Naturally, if we treat the one-hot encoding as a 10-dimensional vector, in the ideal case we want the neural network cluster instances of <d-math>i^{th}</d-math> class close to coordinate <d-math>e_i = (0,0,\cdots, 0, 1, 0, \cdots)</d-math>, with its <d-math>i^{th}</d-math> coordinate being 1 and 0 elsewhere. 
-  As a property of the softmax function we used, no coordinates exceed 1 and all the 10 coordiantes of an instance sum up to 1, so after the softmax function, our points live in a <d-math>10</d-math>-simplex.
-  Geometrically this means that we expect a well-trained network map images of one specific class to the corresponding corner of the <d-math>10</d-math>-simplex, as we have mentioned in the teaser figure. 
-  We repeated the same figure as below. 
-  To interact, you can switch to different datasets from the top menu in the navigation bar, 
-  filter images by its class by hovering over and clicking the legend. 
-  Dragging the 10 bubble handles at every tip of the ten axes will intervene the rotation. 
-  When the Grand Tour glides to or you manually find a good view, it is good to pause the rotation with the button provided on top left and look at how the network trained from that fixed perspective. 
-  We also provide a switch to look at the actual images instead of arbitrary points. 
-  The image view is best accompanied with an expanded canvas.  -->
 
 <p>
   In the beginning when the neural networks are randomly initialized, all examples are placed around the center of the softmax space, with equal weights to each class. 
@@ -809,10 +612,6 @@ A digit 1 image should fire up the cell in first column, second row.
 
 
 <h3 name="layer-dynamics">The Grand Tour of Layer Dynamics</h3>
-<!-- <p>
-  Up till now we have seen the last softmax layer of out neural network model. 
-  But what happens to other intermediate layers? Can we look at them in the similar way we did for the last layer? One challenge of looking at intermediate layers, it that axis no longer have a semantic meaning, as in the last layer we know that each of the 10 directions correspond to one of the ten label classes. Another challenge is that directions in two different layers do not align with each other by default. Thus making sense of how the model transforms data points between two consecutive layers is non-trivial.
-</p>  --> 
 
 <p>
   Given the presented techniques of the Grand Tour and direct manipulations on the axes, we can in theory visualize and manipulate any intermediate layer of a neural network by itself.  Nevertheless, this is not a very satisfying approach, for two reasons:
@@ -847,10 +646,6 @@ A digit 1 image should fire up the cell in first column, second row.
   Effectively, this strategy reuses the linear projection coefficients from one layer to the next. This is a natural thought, since they have the same dimension.
   However, notice the following: the transformation given by A is a simple rotation of the data. Every linear transformation of the layer $k+1$ could be encoded simply as a linear transformation of the layer $k$, if only that transformation operated on the negative values of the entries.
   In addition, since the Grand Tour has a rotation itself built-in, for every configuration that gives a certain picture of the layer $k$, there exists a <em>different</em> configuration that would yield the same picture for layer $k+1$, by taking the action of $A$ into account.
-  <!-- at the same time (<d-math>t=0.5</d-math>), making it impossible trace individual points.  -->
-  <!-- Moreover, this interpolation complicates a simple 180 degree rotation in data. -->
-  <!-- In the Grand Tour, matrix <d-math>A</d-math> should be considered doing nearly nothing, for it only rotates the data while the Grand Tour is also a rotation. -->
-  <!-- However, when visualizing this by the simple linear interpolation above, all points move dramatically, while the distribution of points (in a coordinate-free space) stays the same. -->
   In effect, the naive interpolation fails the principle of data-visual correspondence: a simple change in data (negation in 2D/180 degree rotation) results in a drastic change in visualization (all points cross the origin).
 </p>
 
@@ -866,8 +661,6 @@ A digit 1 image should fire up the cell in first column, second row.
   Concretely, we achieve this by taking advantage of a central theorem of linear algebra. 
   The <em>Singular Value Decomposition</em> (SVD) theorem shows that <em>any</em> linear transformation can be decomposed into a sequence of very simple operations: a rotation, a scaling, and another rotation<d-cite key="austin2009svd"></d-cite>. 
 
-  <!-- (From another perspective, any linear operation in standard bases is a scaling operation with appropriately chosen orthonormal bases on both sides.  -->
-  <!-- We will use this perspective later when we discuss what part of the data representation is discarded by the Grand Tour. ) -->
   Applying a matrix <d-math>A</d-math> to a vector <d-math>x</d-math> is then equivalent to applying those simple operations: <d-math>x A = x U \Sigma V^T</d-math>.
   But remember that the Grand Tour works by rotating the dataset and then projecting it to 2D.
   Combined, these two facts mean that as far as the Grand Tour is concerned, visualizing a vector <d-math>x</d-math> is the same as visualizing <d-math>x U</d-math>, and visualizing a vector <d-math>x U \Sigma V^T</d-math> is the same as visualizing <d-math>x U \Sigma</d-math>. 
@@ -933,10 +726,6 @@ lt2.overlay.layerPlayButton.on('click')();
   However, the state-of-the-art non-linear methods come with their own strength. 
   Whenever geometry is concerned, like the case of understanding multi-way confusions in the softmax layer, linear methods are more interpretable because they preserve certain geometrical structures of data in the projection. 
   When topology is the main focus, such as when we want to cluster the data or we need dimensionality reduction for downstream models that are less sensitive to geometry, we might choose non-linear methods such as UMAP or t-SNE for they have more freedom in projecting the data, and will generally make better use of the fewer dimensions available. 
-  <!-- As we have seen, linear methods become favorable in our case because of its consistency when data changes: in different training epochs or neural network layers, linear methods reveals the change of data without creating extra artifacts, thanks to their linear behavior.  -->
-  <!-- But the limitations of the Grand Tour also come from its linear restriction: there may not be a good linear projection that satisfy users' need, such as separating the data. -->
-  <!-- For the current state-of-the-art dimensionality reductions, it is more and more possible to combine the best of two worlds.  -->
-  <!-- For example, when visualizing adversarial training with the UMAP, it is possible to fit a UMAP embedding with the original dataset and predict the embeddings of adversarial examples.  -->
 </p>
 
 <h3>The Power of Animation and Direct Manipulation</h3>
@@ -946,8 +735,6 @@ lt2.overlay.layerPlayButton.on('click')();
   When comparing small multiples and animations, there is no general consensus on which one is better than the other in the literature, aside. 
   from specific settings such as dynamic graph drawing <d-cite key="archambault2010animation"></d-cite>, or concerns about incomparable contents <d-cite key="tversky2002animation"></d-cite> between small multiples and animated plots.
   Regardless of these concerns, in our scenarios, the use of animation comes naturally from the direct manipulation and the existence of a continuum of rotations for the Grand Tour to operate in.
-  <!-- Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections.  -->
-  <!-- Although we could have used small multiples rather than animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused. -->
 </p>
 
 <h3>Non-sequential Models</h3>
@@ -980,11 +767,6 @@ function toggle(event, id){
 </script>
 
 
-<!-- <h2 class="clickable clickable-active" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
-Technical Details
-</h2>
-<div id='div-technical-details' class=''> -->
-
 <h2 class="clickable" onclick="toggle(event, '#div-technical-details')"><a name="technical-details"></a>
 Technical Details
 </h2>
@@ -992,14 +774,12 @@ Technical Details
 
 This section presents the technical details necessary to implement the direct manipulation of axis handles and data points, as well as how to implement the projection consistency technique for layer transitions.
 
-<h3>
-Notations
-</h3>
+<h3>Notation</h3>
 
 <p>
-  In this section, our notational convention is that data are represented as row vectors. 
-  They form a matrix in which each row is a record and each column is a different feature/dimension.
-  As a result, when a linear transformation is applied to the data, the transformation matrix is multiplied on the right of the data matrix.
+  In this section, our notational convention is that data points are represented as row vectors.
+  An entire dataset is laid out as a matrix, where each row is a data point, and each column represents a different feature/dimension.
+  As a result, when a linear transformation is applied to the data, the row vectors (and the data matrix overall) are left-multiplied by the transformation matrix.
   This has a side benefit that when applying matrix multiplications in a chain, the formula reads from left to right and aligns with a commutative diagram.
   For example, when a data matrix <d-math>X</d-math> is multiplied by a matrix <d-math>M</d-math> to generate <d-math>Y</d-math>, in formula we write <d-math>XM = Y</d-math>, the letters have the same order in diagram:
 </p>
@@ -1010,14 +790,14 @@ Notations
     Y
 </d-math>
 
-Further, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>, we have <d-math>X U \Sigma V^{T} = Y</d-math>, while the diagram
+Furthermore, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>, we have <d-math>X U \Sigma V^{T} = Y</d-math>, and the diagram
 <d-math block>
     X 
     \overset{U}{\mapsto} <!-- XU  -->
     \overset{\Sigma}{\mapsto} <!-- XU\Sigma  -->
     \overset{V^T}{\mapsto} Y
 </d-math>
-is nicely aligned with the formula.
+nicely aligns with the formula.
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-direct-manipulation')">
 Direct Manipulation
@@ -1025,14 +805,12 @@ Direct Manipulation
 <div id='div-direct-manipulation' class=''>
 
 <p>
-  Our direct manipulations provide direct control over possible projections of data points.
-  It can be done either on the axes or on a group of data points. 
+  The direct manipulations we presented earlier provide explicit control over the possible projections for the data points.
+  We provide two modes: directly manipulating class axes (the "axis mode"), or directly manipulating a group of data points through their centroid (the "data point mode").
   Based on the dimensionality and axis semantics, as discussed in <a href='#layer-dynamics'>Layer Dynamics</a>, we may prefer one mode than the other.
   
-
-  The goal of direct manipulations is to change the linear projection according to user's demand, which is provided by for example mouse dragging. 
-  We will see that the axis mode is a special case of data point mode, because we can view an axis handle as a special point on the positive direction of the axis. 
-  But because of its simplicity, we will first introduce axis mode.
+  We will see that the axis mode is a special case of data point mode, because we can view an axis handle as a particular "fictitious" point in the dataset.
+  Because of its simplicity, we will first introduce the axis mode.
 </p>
 
 <h4 class="clickable clickable-active" onclick="toggle(event, '#div-axis-mode')">
@@ -1040,52 +818,48 @@ Direct Manipulation
 </h4>
 <div id='div-axis-mode' class=''>
 
-<p>
-  When a user drags an axis handle, he/she wants to move this vector in that direction.
-  Since the projection is done by the Grand Tour, the goal is to find a new Grand Tour projection so that the axis follows the user's direction.
+  <p>
+    The implied semantics of direct manipulation is that when a user drags an UI element (in this case, an axis handle), they are signaling to the system that they wished that the corresponding
+    data point had been projected to the location where the UI element was dropped, rather than where it was dragged from.
+    In our case the overall projection is a rotation (originally determined by the Grand Tour), and an arbitrary user manipulation might not necessarily generate a new projection that is also a rotation. Our goal, then, is to find a new rotation which satisfies the user request and is close to the previous state of the Grand Tour projection, so that the resulting state satisfies the user request.
 
-  In a nutshell, when user drags the <d-math>i^{th}</d-math> axis handle by <d-math>(dx, dy)</d-math>, we add them to the first two entries of the <d-math>i^{th}</d-math> row of the Grand Tour matrix, and do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of the new matrix
+  In a nutshell, when user drags the <d-math>i^{th}</d-math> axis handle by <d-math>(dx, dy)</d-math>, we add them to the first two entries of the <d-math>i^{th}</d-math> row of the Grand Tour matrix, and then perform <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of the new matrix.
   <d-footnote>
-    Rows have to be reordered such that the <d-math>i^{th}</d-math> row is considered first in the Gram-Schmidt.
-  </d-footnote>.
+    Rows have to be reordered such that the <d-math>i^{th}</d-math> row is considered first in the Gram-Schmidt procedure.
+  </d-footnote>
 </p>
 
 <p>
-  To see why, first, let us formalize the process of the Grand Tour on a standard basis vector <d-math>e_i</d-math>. 
+  Before we see in detail why this works well, let us formalize the process of the Grand Tour on a standard basis vector <d-math>e_i</d-math>. 
   As shown in the diagram below, <d-math>e_i</d-math> goes through an orthogonal Grand Tour matrix <d-math>GT</d-math> to produce a rotated version of itself, <d-math>\tilde{e_i}</d-math>. 
   Then, <d-math>\pi_2</d-math> is a function that keeps only the first two entries of <d-math>\tilde{e_i}</d-math> and gives the 2D coordinate of the handle to be shown in the plot, <d-math>(x_i, y_i)</d-math>.
 </p>
 
-<!-- <img 
-src="figs/direct-manipulation-axis-mode-commutative-diagram-0.png" 
-class="img-center"
-style="width: 40%"
-/> -->
 <d-math block>
   e_i \overset{GT}{\mapsto} \tilde{e_i} \overset{\pi_2}{\mapsto} (x_i, y_i)
 </d-math>
 <p>
-  When user drags an axis handle on canvas, he/she induces a delta change <d-math>\Delta = (dx, dy)</d-math>on the xy-plane. 
+  When user drags an axis handle on the screen canvas, they induce a delta change <d-math>\Delta = (dx, dy)</d-math> on the $xy$-plane. 
   The coordinate of the handle becomes:
   <d-math block>(x_i^{(new)}, y_i^{(new)}) := (x_i+dx, y_i+dy)</d-math>
-  Note that <d-math>(x_i, y_i)</d-math> is the first two coordinates of the axis handle in high dimension after the Grand Tour rotation, so a delta change on <d-math>(x_i, y_i)</d-math> induces a delta change <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> on <d-math>\tilde{e_i}</d-math>:
+  Note that $x_i$ and $y_i$ are the first two coordinates of the axis handle in high dimensions after the Grand Tour rotation, so a delta change on <d-math>(x_i, y_i)</d-math> induces a delta change <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> on <d-math>\tilde{e_i}</d-math>:
   <d-math block>\tilde{e_i} \overset{\tilde{\Delta}}{\mapsto} \tilde{e_i} + \tilde{\Delta}</d-math>
 </p>
 <p>
   To find a nearby Grand Tour rotation that respects this change, first note that <d-math>\tilde{e_i}</d-math> is exactly the <d-math>i^{th}</d-math> row of orthogonal Grand Tour matrix <d-math>GT</d-math> 
   <d-footnote>
-    Recall that the convention is that vectors are in row forms and linear transformations are matrices that are multiplied on the right.
-    So <d-math>e_i</d-math> is a row vector whose <d-math>i^{th}</d-math> is 1 and 0s elsewhere, and <d-math>\tilde{e_i} := e_i \cdot GT</d-math> is the <d-math>i^{th}</d-math> row of <d-math>GT</d-math>
+    Recall that the convention is that vectors are in row form and linear transformations are matrices that are multiplied on the right.
+    So <d-math>e_i</d-math> is a row vector whose $i$-th entry is $1$ (and $0$s elsewhere) and <d-math>\tilde{e_i} := e_i \cdot GT</d-math> is the $i$-th row of <d-math>GT</d-math>
   </d-footnote>. 
   Naturally, we want the new matrix to be the original <d-math>GT</d-math> with its <d-math>i^{th}</d-math> row replaced by <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, i.e. we should add <d-math>dx</d-math> and <d-math>dy</d-math> to the <d-math>(i,1)</d-math>-th entry and <d-math>(i,2)</d-math>-th entry of <d-math>GT</d-math> respectively:
-  <d-math block>\tilde{GT} \leftarrow GT</d-math>
-  <d-math block>\tilde{GT}_{i,1} \leftarrow GT_{i,1} + dx</d-math>
-  <d-math block>\tilde{GT}_{i,2} \leftarrow GT_{i,2} + dy</d-math>
-  However, <d-math>\tilde{GT}</d-math> is not orthogonal for arbitrary <d-math>(dx, dy)</d-math>.
-  In order to find an approximation to <d-math>\tilde{GT}</d-math> that is orthogonal, we apply <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of <d-math>\tilde{GT}</d-math>, with the <d-math>i^{th}</d-math> row considered first in the Gram-Schmidt process:
-  <d-math block>GT^{(new)} := GramSchmidt(\tilde{GT})</d-math>
+  <d-math block>\widetilde{GT} \leftarrow GT</d-math>
+  <d-math block>\widetilde{GT}_{i,1} \leftarrow GT_{i,1} + dx</d-math>
+  <d-math block>\widetilde{GT}_{i,2} \leftarrow GT_{i,2} + dy</d-math>
+  However, <d-math>\widetilde{GT}</d-math> is not orthogonal for arbitrary <d-math>(dx, dy)</d-math>.
+  In order to find an approximation to <d-math>\widetilde{GT}</d-math> that is orthogonal, we apply <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of <d-math>\widetilde{GT}</d-math>, with the <d-math>i^{th}</d-math> row considered first in the Gram-Schmidt process:
+  <d-math block>GT^{(new)} := \textsf{GramSchmidt}(\widetilde{GT})</d-math>
   Note that the <d-math>i^{th}</d-math> row is normalized to a unit vector during the Gram-Schmidt, so the resulting position of the handle is 
-  <d-math>\tilde{e_i}^{(new)} = normalize(\tilde{e_i} + \tilde{\Delta})</d-math>
+  <d-math>\tilde{e_i}^{(new)} = \textsf{normalize}(\tilde{e_i} + \tilde{\Delta})</d-math>
   which may not be exactly the same as <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, as the following figure shows
   <d-footnote>
     However, for any <d-math>\tilde{\Delta}</d-math>, the norm of the difference is bounded above by <d-math>||\tilde{\Delta}||</d-math>, as the following figure proves.
@@ -1111,9 +885,9 @@ style="width: 40%"
   This induces a delta change in the <d-math>i^{th}</d-math> row of the Grand Tour matrix <d-math>GT</d-math>.
   Next, as the first step in Gram-Schmidt, we normalized this row: 
   <d-math block>
-    GT_i^{(new)} := normalize(\tilde{GT}_i) = normalize(\tilde{e_i} + \tilde{\Delta})
+    GT_i^{(new)} := \textsf{normalize}(\widetilde{GT}_i) = \textsf{normalize}(\tilde{e_i} + \tilde{\Delta})
   </d-math>
-  These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := normalize(\tilde{e_i}+\tilde{\Delta})</d-math>.
+  These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := \textsf{normalize}(\tilde{e_i}+\tilde{\Delta})</d-math>.
 </p>
 <p>
   Looking at the geometry of this movement, the "add-delta-then-normalize" on <d-math>\tilde{e_i}</d-math> is equivalent to a <em>rotation</em> from <d-math>\tilde{e_i}</d-math> towards <d-math>\tilde{e_i}^{(new)}</d-math>, illustrated in the figure below. 
@@ -1136,16 +910,12 @@ style="width: 40%"
 <img src="figs/direct-manipulation-rotation-2d-perp.png" style="width: 40%" class="img-center"/>
 <p>
   First, the angle of rotation can be found by their cosine similarity:
-  <d-math block> \theta = arccos(
-    \frac{
-      \langle \tilde{c}, \tilde{c}^{(new)} \rangle
-    }{
-      ||\tilde{c}|| \cdot ||\tilde{c}^{(new)}||
-    }
+  <d-math block> \theta = \textrm{arccos}(
+    \frac{\langle \tilde{c}, \tilde{c}^{(new)} \rangle}{||\tilde{c}|| \cdot ||\tilde{c}^{(new)}||}
   )</d-math>
   Next, to find the matrix form of the rotation, we need a convenient basis.
-  Let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>.
-  For example, we can let its first row to be <d-math>normalize(\tilde{c})</d-math>, second row to be its orthonormal complement <d-math>normalize(\tilde{c}^{(new)}_{\perp})</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, and the remaining rows complete the whole space:
+  Let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>.
+  For example, we can let its first row to be <d-math>\textsf{normalize}(\tilde{c})</d-math>, second row to be its orthonormal complement <d-math>\textsf{normalize}(\tilde{c}^{(new)}_{\perp})</d-math> in <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>, and the remaining rows complete the whole space:
   <d-math block>
   \tilde{c}^{(new)}_{\perp} 
   := \tilde{c} - ||\tilde{c}|| \cdot cos \theta \frac{\tilde{c}^{(new)}}{||\tilde{c}^{(new)}||}
@@ -1154,19 +924,19 @@ style="width: 40%"
   <d-math block>
     Q :=
     \begin{bmatrix}
-    \cdots normalize(\tilde{c}) \cdots \\
-    \cdots normalize(\tilde{c}^{(new)}_{\perp}) \cdots \\
+    \cdots \textsf{normalize}(\tilde{c}) \cdots \\
+    \cdots \textsf{normalize}(\tilde{c}^{(new)}_{\perp}) \cdots \\
     P
     \end{bmatrix}
   </d-math>
   where <d-math>P</d-math> completes the remaining space.
 
-  Making use of <d-math>Q</d-math>, we can find the matrix that rotates the plane <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math> by the angle <d-math>\theta</d-math>:
+  Making use of <d-math>Q</d-math>, we can find the matrix that rotates the plane <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math> by the angle <d-math>\theta</d-math>:
   <d-math block>
     \rho = Q^T
     \begin{bmatrix}
-    cos \theta& sin \theta&  0&  0& \cdots\\
-    -sin \theta& cos \theta&  0&  0& \cdots\\
+    \cos \theta& \sin \theta&  0&  0& \cdots\\
+    -\sin \theta& \cos \theta&  0&  0& \cdots\\
     0& 0&  \\ 
     \vdots& \vdots& & I& \\
     \end{bmatrix}
@@ -1178,37 +948,12 @@ style="width: 40%"
     GT^{(new)} := GT \cdot \rho
   </d-math>
   Now we should be able to see the connection between axis mode and data point mode.
-  In data point mode, finding <d-math>Q</d-math> can be done by Grand-Schmidt: Let the first basis be <d-math>\tilde{c}</d-math>, find the orthogonal component of <d-math>\tilde{c}^{(new)}</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, repeatedly take a random vector, find its orthogonal component to the span of the current basis vectors and add it to the basis set. 
-  In axis mode, the <d-math>i^{th}</d-math>-row-first Grand-Schmidt does the rotation and change of basis in one step.
+  In data point mode, finding <d-math>Q</d-math> can be done by Gram-Schmidt: Let the first basis be <d-math>\tilde{c}</d-math>, find the orthogonal component of <d-math>\tilde{c}^{(new)}</d-math> in <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>, repeatedly take a random vector, find its orthogonal component to the span of the current basis vectors and add it to the basis set. 
+  In axis mode, the <d-math>i^{th}</d-math>-row-first Gram-Schmidt does the rotation and change of basis in one step.
 </p>
 </div> <!-- div-data-point-mode -->
 
-<!-- <h3>(CARLOS MOVED THIS BUT DOESN'T KNOW WHERE TO PUT IT) From Basis to Instances: Extending Direct Manipulations</h3> -->
-<!-- <p> -->
-<!--   We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>. -->
-<!-- </p> -->
-<!-- <p>  -->
-<!--   Unlike the softmax layer, there is one problem with axis handles in hidden layers. -->
-<!--   Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case.  -->
-<!--   <\!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -\-> -->
-<!--   <\!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -\-> -->
-<!--   Thus we should not have axis handles anymore. -->
-<!--   Instead, we can regard <em>data points</em> as handles this time.  -->
-<!--   In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection.  -->
-<!--   It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well. -->
-<!--   Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics. -->
-<!--   We will cover how it works in <a href="#technical-details">technical details</a>. -->
-<!-- </p> -->
-<!-- <p> -->
-<!--   To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components. -->
-<!--   To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead. -->
-<!--   We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes.  -->
-<!--   In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem).  -->
-<!-- </p> -->
-
 </div> <!-- div-direct-manipulation -->
-
-
 
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-align-representation')">
@@ -1218,7 +963,7 @@ style="width: 40%"
 <div id='div-align-representation' class=''>
 
 <h4 class="clickable clickable-active" onclick="toggle(event, '#div-relu')">
-  <d-math>ReLU</d-math> Layers
+  ReLU Layers
 </h4>
 <div id='div-relu' class=''>
   When the <d-math>l^{th}</d-math> layer is a ReLU function, the output activation is <d-math>X^{l} = ReLU(X^{l-1})</d-math>. Since ReLU does not change the dimensionality and the function is taken coordinate wise, we can animate the transition by a simple linear interpolation: for a time parameter <d-math>t \in [0,1]</d-math>,
@@ -1231,13 +976,13 @@ style="width: 40%"
   Linear Layers
 </h4>
 <div id='div-linear' class=''>
-  Linear layers can seem complicated with a inappropriate basis. 
-  For example, if <d-math>X^{l} = X^{l-1} M</d-math> where <d-math>M \in \mathbb{R}^{m \times n}</d-math> is the matrix of a linear transformation, then it has a singular value decomposition (SVD):
+  Transitions between linear layers can seem complicated, but as we will show, this comes from choosing mismatching bases on either side of the transition. 
+  If <d-math>X^{l} = X^{l-1} M</d-math> where <d-math>M \in \mathbb{R}^{m \times n}</d-math> is the matrix of a linear transformation, then it has a singular value decomposition (SVD):
   <d-math block>M = U \Sigma V^T</d-math>
   where <d-math>U \in \mathbb{R}^{m \times m}</d-math> and <d-math>V^T \in \mathbb{R}^{n \times n}</d-math> are orthogonal, <d-math>\Sigma \in \mathbb{R}^{m \times n}</d-math> is diagonal.
   For arbitrary <d-math>U</d-math> and <d-math>V^T</d-math>, the transformation on <d-math>X^{l-1}</d-math> is a composition of a rotation (<d-math>U</d-math>), scaling (<d-math>\Sigma</d-math>) and another rotation (<d-math>V^T</d-math>), which can look complicated. 
-  However, when thinking about these actions in Grand Tour which is rotations, we notice that <d-math>U</d-math> and <d-math>V^T</d-math> will have no significance in it - they are just another two rotations to the view.
-  Hence, instead of showing <d-math>M</d-math>, we should animate <d-math>\Sigma</d-math> only.
+  However, consider the problem of relating the Grand Tour view of layer $X^{l}$ to that of layer $X^{l+1}$. The Grand Tour has a single parameter that represents the current rotation of the dataset. Since our goal is to keep the transition consistent, we notice that <d-math>U</d-math> and <d-math>V^T</d-math> have essentially no significance - they are just rotations to the view that can be exactly "canceled" by changing the rotation parameter of the Grand Tour in either layer.
+  Hence, instead of showing <d-math>M</d-math>, we seek for the transition to animate only the effect of <d-math>\Sigma</d-math>.
   <d-math>\Sigma</d-math> is a coordinate-wise scaling, so we can animate it similar to the ReLU after the proper change of basis.
   Given <d-math>X^{l} = X^{l-1} U \Sigma V^T</d-math>, we have
   <d-math block>
@@ -1265,9 +1010,12 @@ style="width: 40%"
   Max-pooling Layers
 </h4>
 <div id='div-maxpool' class=''>
-  Animating max-pooling layers can be tricky since its not linear <d-footnote>A max-pooling layer is piece-wise linear</d-footnote> or coordinate-wise.
-  We approximate it by average-pooling. 
-  Similar to convolutional layers, we find the matrix form of average-pooling and use its SVD to align the view before and after this layer. 
+  Animating max-pooling layers is nontrivial because max-pooling is neither linear <d-footnote>A max-pooling layer is piece-wise linear</d-footnote> or coordinate-wise.
+  We replace it by average-pooling and scaling by the ratio of the average to the max.
+  We compute the matrix form of average-pooling and use its SVD to align the view before and after this layer. 
+  Functionally, our operations have equivalent results to max-pooling, but this introduces
+  unexpected artifacts. For example, the max-pooling version of the vector $[0.9, 0.9, 0.9, 1.0]$ should "give no credit" to the $0.9$ entries; our implementation, however, will
+  attribute about 25% of the result in the downstream layer to each those coordinates.
 </div> <!-- #div-maxpool -->
 </div> <!-- #div-align-representation -->
 
@@ -1278,7 +1026,8 @@ style="width: 40%"
 <h2>Conclusion</h2>
 
 <p>
-  Although the Grand Tour is not a perfect solution for high-dimensional data visualization, the examples above highlight the importance of ensuring that the properties of the phenomenon we want to visualize are in fact respected by the visualization method. As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the ones we presented.
+  As powerful as t-SNE and UMAP are, they often fail to offer the correspondences we need, and such correspondences can come, surprisingly, from relatively simple methods like the Grand Tour. The Grand Tour method we presented is particularly useful when direct manipulation from the user is available or desirable.
+  We believe that it might be possible to design methods that highlight the best of both worlds, using non-linear dimensionality reduction to create intermediate, relatively low-dimensional representations of the activation layers, and using the Grand Tour and direct manipulation to compute the final projection.
 </p>
 </d-article>
 
