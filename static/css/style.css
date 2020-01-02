@@ -1,10 +1,15 @@
-a, d-article a{
+.caption a, d-article a{
   border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
 }
 
+.caption a:hover, d-article a:hover{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  color: inherit;
+  text-decoration: none;
+}
 
 d-article h4 {
-    margin-top: 1em;
+  margin-top: 1em;
 }
 
 /*d-article h5 {
@@ -117,8 +122,8 @@ button{
 
 
 .modeOption, .datasetOption, .grandtourButton{
-    display: inline;
-    margin-right: 10px;
+  display: inline;
+  margin-right: 10px;
 }
 
 svg.confusionMatrix{
@@ -226,7 +231,8 @@ d-figure.nngt2.fullscreen{
 
 d-figure.teaser{
   display: block;
-  width: 50%;
+  width: 60%;
+  min-width: 500px;
   height: 280px;
   margin-left: auto; 
   margin-right: auto; 
