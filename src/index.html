@@ -1183,28 +1183,28 @@ style="width: 40%"
 </p>
 </div> <!-- div-data-point-mode -->
 
-<h3>(CARLOS MOVED THIS BUT DOESN'T KNOW WHERE TO PUT IT) From Basis to Instances: Extending Direct Manipulations</h3>
-<p>
-  We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>.
-</p>
-<p> 
-  Unlike the softmax layer, there is one problem with axis handles in hidden layers.
-  Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case. 
-  <!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -->
-  <!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -->
-  Thus we should not have axis handles anymore.
-  Instead, we can regard <em>data points</em> as handles this time. 
-  In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection. 
-  It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well.
-  Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics.
-  We will cover how it works in <a href="#technical-details">technical details</a>.
-</p>
-<p>
-  To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components.
-  To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead.
-  We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes. 
-  In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem). 
-</p>
+<!-- <h3>(CARLOS MOVED THIS BUT DOESN'T KNOW WHERE TO PUT IT) From Basis to Instances: Extending Direct Manipulations</h3> -->
+<!-- <p> -->
+<!--   We tackle the second problem by allowing users to directly manipulate a subset of <em>points</em>. -->
+<!-- </p> -->
+<!-- <p>  -->
+<!--   Unlike the softmax layer, there is one problem with axis handles in hidden layers. -->
+<!--   Even though we preprocessed hidden layer activations (we chose up to 45 principle components through PCA) so that their dimensionality is at a manageable size for the Grand Tour, the axes lines can still make a hairball, and more importantly, these axes in hidden layers are not as meaningful as in the softmax case.  -->
+<!--   <\!-- Unlike the softmax (or pre-softmax) where each axis represents a label class, in hidden layers, one may need some indirect ways (e.g. feature visualization <d-cite key="olah2017feature"></d-cite>) to understand the semantics. -\-> -->
+<!--   <\!-- But even we used some feature visualization techniques, these derived meanings are hard to remember or encode in the Grand Tour.  -\-> -->
+<!--   Thus we should not have axis handles anymore. -->
+<!--   Instead, we can regard <em>data points</em> as handles this time.  -->
+<!--   In the figure above, we can brush a subset of data point, an orange circle at their centroid will show up and we use it as a handle to change the projection.  -->
+<!--   It is worth emphasizing that manipulations on data points are more general, because axis handles can be regarded as special data points as well. -->
+<!--   Moreover, they are applicable in even higher dimensions where axis handles are too many and/or have less semantics. -->
+<!--   We will cover how it works in <a href="#technical-details">technical details</a>. -->
+<!-- </p> -->
+<!-- <p> -->
+<!--   To summarize, by observing the invariance in Grand Tour, we simplified linear transformations in neural networks by removing their rotational components. -->
+<!--   To tackle the hairball effect when the dimensionality is large, we removed axis handles and directly manipulation points instead. -->
+<!--   We want to emphasize again that when axes have a clear semantics and there is only a few of them, like in the softmax layer of a 10-class dataset, we should use the axes.  -->
+<!--   In other cases, we should directly manipulate data points because either the axes may not be as interpretable as the softmax (e.g. intermediate layers), and/or there can be too many dimensions which has a hairball effect (e.g. a softmax layer of a 1000-class classification problem).  -->
+<!-- </p> -->
 
 </div> <!-- div-direct-manipulation -->
 
