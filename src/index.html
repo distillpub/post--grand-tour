@@ -774,14 +774,12 @@ Technical Details
 
 This section presents the technical details necessary to implement the direct manipulation of axis handles and data points, as well as how to implement the projection consistency technique for layer transitions.
 
-<h3>
-Notations
-</h3>
+<h3>Notation</h3>
 
 <p>
-  In this section, our notational convention is that data are represented as row vectors. 
-  They form a matrix in which each row is a record and each column is a different feature/dimension.
-  As a result, when a linear transformation is applied to the data, the transformation matrix is multiplied on the right of the data matrix.
+  In this section, our notational convention is that data points are represented as row vectors.
+  An entire dataset is laid out as a matrix, where each row is a data point, and each column represents a different feature/dimension.
+  As a result, when a linear transformation is applied to the data, the row vectors (and the data matrix overall) are left-multiplied by the transformation matrix.
   This has a side benefit that when applying matrix multiplications in a chain, the formula reads from left to right and aligns with a commutative diagram.
   For example, when a data matrix <d-math>X</d-math> is multiplied by a matrix <d-math>M</d-math> to generate <d-math>Y</d-math>, in formula we write <d-math>XM = Y</d-math>, the letters have the same order in diagram:
 </p>
@@ -792,14 +790,14 @@ Notations
     Y
 </d-math>
 
-Further, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>, we have <d-math>X U \Sigma V^{T} = Y</d-math>, while the diagram
+Furthermore, if the SVD of <d-math>M</d-math> is <d-math>M = U \Sigma V^{T}</d-math>, we have <d-math>X U \Sigma V^{T} = Y</d-math>, and the diagram
 <d-math block>
     X 
     \overset{U}{\mapsto} <!-- XU  -->
     \overset{\Sigma}{\mapsto} <!-- XU\Sigma  -->
     \overset{V^T}{\mapsto} Y
 </d-math>
-is nicely aligned with the formula.
+nicely aligns with the formula.
 
 <h3 class="clickable clickable-active" onclick="toggle(event, '#div-direct-manipulation')">
 Direct Manipulation
@@ -807,13 +805,12 @@ Direct Manipulation
 <div id='div-direct-manipulation' class=''>
 
 <p>
-  Our direct manipulations provide direct control over possible projections of data points.
-  It can be done either on the axes or on a group of data points. 
+  The direct manipulations we presented earlier provide explicit control over the possible projections for the data points.
+  We provide two modes: directly manipulating class axes (the "axis mode"), or directly manipulating a group of data points through their centroid (the "data point mode").
   Based on the dimensionality and axis semantics, as discussed in <a href='#layer-dynamics'>Layer Dynamics</a>, we may prefer one mode than the other.
   
-  The goal of direct manipulations is to change the linear projection according to user's demand, which is provided by for example mouse dragging. 
-  We will see that the axis mode is a special case of data point mode, because we can view an axis handle as a special point on the positive direction of the axis. 
-  But because of its simplicity, we will first introduce axis mode.
+  We will see that the axis mode is a special case of data point mode, because we can view an axis handle as a particular "fictitious" point in the dataset.
+  Because of its simplicity, we will first introduce the axis mode.
 </p>
 
 <h4 class="clickable clickable-active" onclick="toggle(event, '#div-axis-mode')">
@@ -821,18 +818,19 @@ Direct Manipulation
 </h4>
 <div id='div-axis-mode' class=''>
 
-<p>
-  When a user drags an axis handle, he/she wants to move this vector in that direction.
-  Since the projection is done by the Grand Tour, the goal is to find a new Grand Tour projection so that the axis follows the user's direction.
+  <p>
+    The implied semantics of direct manipulation is that when a user drags an UI element (in this case, an axis handle), they are signaling to the system that they wished that the corresponding
+    data point had been projected to the location where the UI element was dropped, rather than where it was dragged from.
+    In our case the overall projection is a rotation (originally determined by the Grand Tour), and an arbitrary user manipulation might not necessarily generate a new projection that is also a rotation. Our goal, then, is to find a new rotation which satisfies the user request and is close to the previous state of the Grand Tour projection, so that the resulting state satisfies the user request.
 
-  In a nutshell, when user drags the <d-math>i^{th}</d-math> axis handle by <d-math>(dx, dy)</d-math>, we add them to the first two entries of the <d-math>i^{th}</d-math> row of the Grand Tour matrix, and do <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of the new matrix
+  In a nutshell, when user drags the <d-math>i^{th}</d-math> axis handle by <d-math>(dx, dy)</d-math>, we add them to the first two entries of the <d-math>i^{th}</d-math> row of the Grand Tour matrix, and then perform <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of the new matrix.
   <d-footnote>
-    Rows have to be reordered such that the <d-math>i^{th}</d-math> row is considered first in the Gram-Schmidt.
-  </d-footnote>.
+    Rows have to be reordered such that the <d-math>i^{th}</d-math> row is considered first in the Gram-Schmidt procedure.
+  </d-footnote>
 </p>
 
 <p>
-  To see why, first, let us formalize the process of the Grand Tour on a standard basis vector <d-math>e_i</d-math>. 
+  Before we see in detail why this works well, let us formalize the process of the Grand Tour on a standard basis vector <d-math>e_i</d-math>. 
   As shown in the diagram below, <d-math>e_i</d-math> goes through an orthogonal Grand Tour matrix <d-math>GT</d-math> to produce a rotated version of itself, <d-math>\tilde{e_i}</d-math>. 
   Then, <d-math>\pi_2</d-math> is a function that keeps only the first two entries of <d-math>\tilde{e_i}</d-math> and gives the 2D coordinate of the handle to be shown in the plot, <d-math>(x_i, y_i)</d-math>.
 </p>
@@ -841,27 +839,27 @@ Direct Manipulation
   e_i \overset{GT}{\mapsto} \tilde{e_i} \overset{\pi_2}{\mapsto} (x_i, y_i)
 </d-math>
 <p>
-  When user drags an axis handle on canvas, he/she induces a delta change <d-math>\Delta = (dx, dy)</d-math>on the xy-plane. 
+  When user drags an axis handle on the screen canvas, they induce a delta change <d-math>\Delta = (dx, dy)</d-math> on the $xy$-plane. 
   The coordinate of the handle becomes:
   <d-math block>(x_i^{(new)}, y_i^{(new)}) := (x_i+dx, y_i+dy)</d-math>
-  Note that <d-math>(x_i, y_i)</d-math> is the first two coordinates of the axis handle in high dimension after the Grand Tour rotation, so a delta change on <d-math>(x_i, y_i)</d-math> induces a delta change <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> on <d-math>\tilde{e_i}</d-math>:
+  Note that $x_i$ and $y_i$ are the first two coordinates of the axis handle in high dimensions after the Grand Tour rotation, so a delta change on <d-math>(x_i, y_i)</d-math> induces a delta change <d-math>\tilde{\Delta} := (dx, dy, 0, 0, \cdots)</d-math> on <d-math>\tilde{e_i}</d-math>:
   <d-math block>\tilde{e_i} \overset{\tilde{\Delta}}{\mapsto} \tilde{e_i} + \tilde{\Delta}</d-math>
 </p>
 <p>
   To find a nearby Grand Tour rotation that respects this change, first note that <d-math>\tilde{e_i}</d-math> is exactly the <d-math>i^{th}</d-math> row of orthogonal Grand Tour matrix <d-math>GT</d-math> 
   <d-footnote>
-    Recall that the convention is that vectors are in row forms and linear transformations are matrices that are multiplied on the right.
-    So <d-math>e_i</d-math> is a row vector whose <d-math>i^{th}</d-math> is 1 and 0s elsewhere, and <d-math>\tilde{e_i} := e_i \cdot GT</d-math> is the <d-math>i^{th}</d-math> row of <d-math>GT</d-math>
+    Recall that the convention is that vectors are in row form and linear transformations are matrices that are multiplied on the right.
+    So <d-math>e_i</d-math> is a row vector whose $i$-th entry is $1$ (and $0$s elsewhere) and <d-math>\tilde{e_i} := e_i \cdot GT</d-math> is the $i$-th row of <d-math>GT</d-math>
   </d-footnote>. 
   Naturally, we want the new matrix to be the original <d-math>GT</d-math> with its <d-math>i^{th}</d-math> row replaced by <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, i.e. we should add <d-math>dx</d-math> and <d-math>dy</d-math> to the <d-math>(i,1)</d-math>-th entry and <d-math>(i,2)</d-math>-th entry of <d-math>GT</d-math> respectively:
-  <d-math block>\tilde{GT} \leftarrow GT</d-math>
-  <d-math block>\tilde{GT}_{i,1} \leftarrow GT_{i,1} + dx</d-math>
-  <d-math block>\tilde{GT}_{i,2} \leftarrow GT_{i,2} + dy</d-math>
-  However, <d-math>\tilde{GT}</d-math> is not orthogonal for arbitrary <d-math>(dx, dy)</d-math>.
-  In order to find an approximation to <d-math>\tilde{GT}</d-math> that is orthogonal, we apply <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of <d-math>\tilde{GT}</d-math>, with the <d-math>i^{th}</d-math> row considered first in the Gram-Schmidt process:
-  <d-math block>GT^{(new)} := GramSchmidt(\tilde{GT})</d-math>
+  <d-math block>\widetilde{GT} \leftarrow GT</d-math>
+  <d-math block>\widetilde{GT}_{i,1} \leftarrow GT_{i,1} + dx</d-math>
+  <d-math block>\widetilde{GT}_{i,2} \leftarrow GT_{i,2} + dy</d-math>
+  However, <d-math>\widetilde{GT}</d-math> is not orthogonal for arbitrary <d-math>(dx, dy)</d-math>.
+  In order to find an approximation to <d-math>\widetilde{GT}</d-math> that is orthogonal, we apply <a href="https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process">Gram-Schmidt orthonormalization</a> on the rows of <d-math>\widetilde{GT}</d-math>, with the <d-math>i^{th}</d-math> row considered first in the Gram-Schmidt process:
+  <d-math block>GT^{(new)} := \textsf{GramSchmidt}(\widetilde{GT})</d-math>
   Note that the <d-math>i^{th}</d-math> row is normalized to a unit vector during the Gram-Schmidt, so the resulting position of the handle is 
-  <d-math>\tilde{e_i}^{(new)} = normalize(\tilde{e_i} + \tilde{\Delta})</d-math>
+  <d-math>\tilde{e_i}^{(new)} = \textsf{normalize}(\tilde{e_i} + \tilde{\Delta})</d-math>
   which may not be exactly the same as <d-math>\tilde{e_i}+\tilde{\Delta}</d-math>, as the following figure shows
   <d-footnote>
     However, for any <d-math>\tilde{\Delta}</d-math>, the norm of the difference is bounded above by <d-math>||\tilde{\Delta}||</d-math>, as the following figure proves.
@@ -887,9 +885,9 @@ Direct Manipulation
   This induces a delta change in the <d-math>i^{th}</d-math> row of the Grand Tour matrix <d-math>GT</d-math>.
   Next, as the first step in Gram-Schmidt, we normalized this row: 
   <d-math block>
-    GT_i^{(new)} := normalize(\tilde{GT}_i) = normalize(\tilde{e_i} + \tilde{\Delta})
+    GT_i^{(new)} := \textsf{normalize}(\widetilde{GT}_i) = \textsf{normalize}(\tilde{e_i} + \tilde{\Delta})
   </d-math>
-  These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := normalize(\tilde{e_i}+\tilde{\Delta})</d-math>.
+  These two steps make the axis handle move from <d-math>\tilde{e_i}</d-math> to <d-math>\tilde{e_i}^{(new)} := \textsf{normalize}(\tilde{e_i}+\tilde{\Delta})</d-math>.
 </p>
 <p>
   Looking at the geometry of this movement, the "add-delta-then-normalize" on <d-math>\tilde{e_i}</d-math> is equivalent to a <em>rotation</em> from <d-math>\tilde{e_i}</d-math> towards <d-math>\tilde{e_i}^{(new)}</d-math>, illustrated in the figure below. 
@@ -912,16 +910,12 @@ Direct Manipulation
 <img src="figs/direct-manipulation-rotation-2d-perp.png" style="width: 40%" class="img-center"/>
 <p>
   First, the angle of rotation can be found by their cosine similarity:
-  <d-math block> \theta = arccos(
-    \frac{
-      \langle \tilde{c}, \tilde{c}^{(new)} \rangle
-    }{
-      ||\tilde{c}|| \cdot ||\tilde{c}^{(new)}||
-    }
+  <d-math block> \theta = \textrm{arccos}(
+    \frac{\langle \tilde{c}, \tilde{c}^{(new)} \rangle}{||\tilde{c}|| \cdot ||\tilde{c}^{(new)}||}
   )</d-math>
   Next, to find the matrix form of the rotation, we need a convenient basis.
-  Let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>.
-  For example, we can let its first row to be <d-math>normalize(\tilde{c})</d-math>, second row to be its orthonormal complement <d-math>normalize(\tilde{c}^{(new)}_{\perp})</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, and the remaining rows complete the whole space:
+  Let <d-math>Q</d-math> be a change of (orthonormal) basis matrix in which the first two rows form the 2-subspace <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>.
+  For example, we can let its first row to be <d-math>\textsf{normalize}(\tilde{c})</d-math>, second row to be its orthonormal complement <d-math>\textsf{normalize}(\tilde{c}^{(new)}_{\perp})</d-math> in <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>, and the remaining rows complete the whole space:
   <d-math block>
   \tilde{c}^{(new)}_{\perp} 
   := \tilde{c} - ||\tilde{c}|| \cdot cos \theta \frac{\tilde{c}^{(new)}}{||\tilde{c}^{(new)}||}
@@ -930,19 +924,19 @@ Direct Manipulation
   <d-math block>
     Q :=
     \begin{bmatrix}
-    \cdots normalize(\tilde{c}) \cdots \\
-    \cdots normalize(\tilde{c}^{(new)}_{\perp}) \cdots \\
+    \cdots \textsf{normalize}(\tilde{c}) \cdots \\
+    \cdots \textsf{normalize}(\tilde{c}^{(new)}_{\perp}) \cdots \\
     P
     \end{bmatrix}
   </d-math>
   where <d-math>P</d-math> completes the remaining space.
 
-  Making use of <d-math>Q</d-math>, we can find the matrix that rotates the plane <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math> by the angle <d-math>\theta</d-math>:
+  Making use of <d-math>Q</d-math>, we can find the matrix that rotates the plane <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math> by the angle <d-math>\theta</d-math>:
   <d-math block>
     \rho = Q^T
     \begin{bmatrix}
-    cos \theta& sin \theta&  0&  0& \cdots\\
-    -sin \theta& cos \theta&  0&  0& \cdots\\
+    \cos \theta& \sin \theta&  0&  0& \cdots\\
+    -\sin \theta& \cos \theta&  0&  0& \cdots\\
     0& 0&  \\ 
     \vdots& \vdots& & I& \\
     \end{bmatrix}
@@ -954,7 +948,7 @@ Direct Manipulation
     GT^{(new)} := GT \cdot \rho
   </d-math>
   Now we should be able to see the connection between axis mode and data point mode.
-  In data point mode, finding <d-math>Q</d-math> can be done by Grand-Schmidt: Let the first basis be <d-math>\tilde{c}</d-math>, find the orthogonal component of <d-math>\tilde{c}^{(new)}</d-math> in <d-math>span(\tilde{c}, \tilde{c}^{(new)})</d-math>, repeatedly take a random vector, find its orthogonal component to the span of the current basis vectors and add it to the basis set. 
+  In data point mode, finding <d-math>Q</d-math> can be done by Grand-Schmidt: Let the first basis be <d-math>\tilde{c}</d-math>, find the orthogonal component of <d-math>\tilde{c}^{(new)}</d-math> in <d-math>\textrm{span}(\tilde{c}, \tilde{c}^{(new)})</d-math>, repeatedly take a random vector, find its orthogonal component to the span of the current basis vectors and add it to the basis set. 
   In axis mode, the <d-math>i^{th}</d-math>-row-first Grand-Schmidt does the rotation and change of basis in one step.
 </p>
 </div> <!-- div-data-point-mode -->
@@ -969,7 +963,7 @@ Direct Manipulation
 <div id='div-align-representation' class=''>
 
 <h4 class="clickable clickable-active" onclick="toggle(event, '#div-relu')">
-  <d-math>ReLU</d-math> Layers
+  ReLU Layers
 </h4>
 <div id='div-relu' class=''>
   When the <d-math>l^{th}</d-math> layer is a ReLU function, the output activation is <d-math>X^{l} = ReLU(X^{l-1})</d-math>. Since ReLU does not change the dimensionality and the function is taken coordinate wise, we can animate the transition by a simple linear interpolation: for a time parameter <d-math>t \in [0,1]</d-math>,
@@ -1016,9 +1010,12 @@ Direct Manipulation
   Max-pooling Layers
 </h4>
 <div id='div-maxpool' class=''>
-  Animating max-pooling layers can be tricky since its not linear <d-footnote>A max-pooling layer is piece-wise linear</d-footnote> or coordinate-wise.
-  We approximate it by average-pooling. 
-  Similar to convolutional layers, we find the matrix form of average-pooling and use its SVD to align the view before and after this layer. 
+  Animating max-pooling layers is nontrivial because max-pooling is neither linear <d-footnote>A max-pooling layer is piece-wise linear</d-footnote> or coordinate-wise.
+  We replace it by average-pooling and scaling by the ratio of the average to the max.
+  We compute the matrix form of average-pooling and use its SVD to align the view before and after this layer. 
+  Functionally, our operations have equivalent results to max-pooling, but this introduces
+  unexpected artifacts. For example, the max-pooling version of the vector $[0.9, 0.9, 0.9, 1.0]$ should "give no credit" to the $0.9$ entries; our implementation, however, will
+  attribute about 25% of the result in the downstream layer to each those coordinates.
 </div> <!-- #div-maxpool -->
 </div> <!-- #div-align-representation -->
 
