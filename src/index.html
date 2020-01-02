@@ -458,7 +458,7 @@
 <p>
   Non-linear embeddings that have non-convex objectives also tend to be sensitive to initial conditions.
   For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30, 31, 32, and 33 (in fact, all the way to 99).
-  Temporal regularization techniques (such as Dynamic t-SNE<d-cite key="rauber2016visualizing"></d-cite>) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
+  Temporal regularization techniques (such as Dynamic t-SNE) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
 </p>
 
 <d-figure id='smallmultiple2' class='smallmultiple' style="">
@@ -623,7 +623,7 @@
   But what if we don't know ahead of time which projection to choose from, because we don't quite know what to look for?
   Principal Component Analysis (PCA) is the quintessential linear dimensionality reduction method,
   choosing to project the data so as to preserve the most variance possible. 
-  However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not help much either.</d-footnote>
+  However, the distribution of data in softmax layers often has similar variance along many axis directions, because each axis concentrates a similar number of examples around the class vector.<d-footnote>We are assuming a class-balanced training dataset. Nevertheless, if the training dataset is not balanced, PCA will prefer dimensions with more examples, which might not be help much either.</d-footnote>
   As a result, even though PCA projections are interpretable and consistent through training epochs, the first two principal components of softmax activations are not substantially better than the third.
   So which of them should we choose?
   <!-- To make matters worse, different principal components are orthogonal to each other, making it hard for the user to keep them all in their head at once. -->
@@ -821,7 +821,7 @@ A digit 1 image should fire up the cell in first column, second row.
       In the same way that we've kept the projection fixed as the training data changed, we would like to "keep the projection fixed", as the data moves through the layers in the neural network. However, this is not straightforward. For example, different layers in a neural network have different dimensions. How do we connect rotations of one layer to rotations of the other?
     </li>
     <li>
-      The class "axis handles" in the softmax layer are convenient, but that's only practical when the dimensionality of the layer is relatively small.
+      The class "axis handles" in the softmax layer convenient, but that's only practical when the dimensionality of the layer is relatively small.
       With hundreds of dimensions, for example, there would be too many axis handles to naturally interact with.
       In addition, hidden layers do not have as clear semantics as the softmax layer, so manipulating them would not be as intuitive.
     </li>
@@ -929,34 +929,33 @@ lt2.overlay.layerPlayButton.on('click')();
 
 <h3>Limitations of the Grand Tour</h3>
 <p>
-  In the very beginning, we have compared several state-of-the-art dimensionality reduction techniques with the Grand Tour, showing that non-linear methods do not have as many desirable properties as the Grand Tour for understanding the behavior of neural networks. 
+  Early on, we compared several state-of-the-art dimensionality reduction techniques with the Grand Tour, showing that non-linear methods do not have as many desirable properties as the Grand Tour for understanding the behavior of neural networks. 
   However, the state-of-the-art non-linear methods come with their own strength. 
-  Whenever geometry is concerned, like the case of understanding multi-way confusions in the softmax layer, linear methods are more interpretable because they preserve certain geometrical structures of data in the projection.  
-  When topology is the main focus, such as when we want to cluster the data or we need dimensionality reduction for downstream geometry-insensitive models, we should prefer non-linear methods such as UMAP or t-SNE for they have more freedom in projecting the data. 
-  As we have seen, linear methods become favorable in our case because of its consistency when data changes: in different training epochs or neural network layers, linear methods reveals the change of data without creating extra artifacts, thanks to their linear behavior. 
-  But the limitations of the Grand Tour also come from its linear restriction: there may not be a good linear projection that satisfy users' need, such as separating the data.
-  For the current state-of-the-art dimensionality reductions, it is more and more possible to combine the best of two worlds. 
-  For example, when visualizing adversarial training with the UMAP, it is possible to fit a UMAP embedding with the original dataset and predict the embeddings of adversarial examples. 
+  Whenever geometry is concerned, like the case of understanding multi-way confusions in the softmax layer, linear methods are more interpretable because they preserve certain geometrical structures of data in the projection. 
+  When topology is the main focus, such as when we want to cluster the data or we need dimensionality reduction for downstream models that are less sensitive to geometry, we might choose non-linear methods such as UMAP or t-SNE for they have more freedom in projecting the data, and will generally make better use of the fewer dimensions available. 
+  <!-- As we have seen, linear methods become favorable in our case because of its consistency when data changes: in different training epochs or neural network layers, linear methods reveals the change of data without creating extra artifacts, thanks to their linear behavior.  -->
+  <!-- But the limitations of the Grand Tour also come from its linear restriction: there may not be a good linear projection that satisfy users' need, such as separating the data. -->
+  <!-- For the current state-of-the-art dimensionality reductions, it is more and more possible to combine the best of two worlds.  -->
+  <!-- For example, when visualizing adversarial training with the UMAP, it is possible to fit a UMAP embedding with the original dataset and predict the embeddings of adversarial examples.  -->
 </p>
 
 <h3>The Power of Animation and Direct Manipulation</h3>
 <p>
-  When comparing linear projections with non-linear dimensionality reductions, we used small multiples that go over different training epochs and dimensionality reduction methods. 
-  Later when we used the Grand Tour alone, however, we used a single view with animations.
-  When comparing small multiples and animations, there is no general conclusion on which one is better than the other in the literature. 
-  They are only studied in specific settings, for example, in dynamic graph drawing <d-cite key="archambault2010animation"></d-cite>.
-  There has been concerns about the incomparable contents <d-cite key="tversky2002animation"></d-cite> between small multiples and animated plots in some of these studies.
-  Despite these concerns, however, the use of animation comes naturally from the direct manipulation in our case.
-  Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections. 
-  Although we could have used small multiples rather than animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused.
+  When comparing linear projections with non-linear dimensionality reductions, we used small multiples to contrast training epochs and dimensionality reduction methods.
+  The Grand Tour, on the other hand, uses a single animated view.
+  When comparing small multiples and animations, there is no general consensus on which one is better than the other in the literature, aside. 
+  from specific settings such as dynamic graph drawing <d-cite key="archambault2010animation"></d-cite>, or concerns about incomparable contents <d-cite key="tversky2002animation"></d-cite> between small multiples and animated plots.
+  Regardless of these concerns, in our scenarios, the use of animation comes naturally from the direct manipulation and the existence of a continuum of rotations for the Grand Tour to operate in.
+  <!-- Direct manipulation and animation give us opportunities to see, one at a time, all possible projections of the data within a single view, whereas with small multiples we can only select a small sample among infinitely possible projections.  -->
+  <!-- Although we could have used small multiples rather than animations for training and layer dynamics, without specific studies supporting that small multiples are significantly better, we choose to corporate all features in a single animated view to keep our visualization minimal and focused. -->
 </p>
-
 
 <h3>Non-sequential Models</h3>
 <p>
-  In our work we have walked through models that are purely sequential. 
-  In modern architectures it is common to have non-sequential parts such as highway <d-cite key="srivastava2015highway"></d-cite> branches or dedicated branches for different tasks <d-cite key="szegedy2015going"></d-cite>. 
-  With our technique, one can visualize neuron activations on each such branch, but more interesting to us in the future is how to visually incorporate multiple branches and interpret much more complex architectures.
+  In our work we have used models that are purely "sequential", in the sense that the layers can be put in numerical ordering, and that the activations for
+  the $n+1$-th layer are a function exclusively of the activations at the $n$-th layer. 
+  In recent DNN architectures, however, it is common to have non-sequential parts such as highway <d-cite key="srivastava2015highway"></d-cite> branches or dedicated branches for different tasks <d-cite key="szegedy2015going"></d-cite>. 
+  With our technique, one can visualize neuron activations on each such branch, but additional research is required to incorporate multiple branches directly.
 </p>
 
 
@@ -966,7 +965,6 @@ lt2.overlay.layerPlayButton.on('click')();
   For the sake of simplicity, in this article we brute-forced the computation of the alignment of such convolutional layers by writing out their explicit matrix representation. 
   However, the singular value decomposition of multi-channel 2D convolutions can be computed efficiently <d-cite key="sedghi2018singular"></d-cite>, which can be then be directly used for alignment, as we described above.
 </p>
-
 
 <script>
 function toggle(event, id){
@@ -992,7 +990,7 @@ Technical Details
 </h2>
 <div id='div-technical-details' class='hidden'>
 
-In this sections, we will introduce the technical details of direct manipulation and layer transition.
+This section presents the technical details necessary to implement the direct manipulation of axis handles and data points, as well as how to implement the projection consistency technique for layer transitions.
 
 <h3>
 Notations
