@@ -23,6 +23,10 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
   this.onLayerSliderInput = function(value){
       renderer.setLayer(value);
+      // if (value == 0 && !this.isViewManipulated && this.renderer.layer0_matrix !== undefined){
+      //   this.renderer.gt.setMatrix(this.renderer.layer0_matrix);
+      // }
+      
       // renderer.render(0);
       renderer.shouldAutoNextLayer = false;
       // renderer.shouldAutoNextEpoch = false;
@@ -294,6 +298,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
       .on('start', ()=>{
         this.brush.hide();
         this.pcaIteration = 0;
+        this.isViewManipulated = true;
       })
       .on('drag', ()=>{
 

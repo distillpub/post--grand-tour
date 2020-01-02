@@ -22,6 +22,7 @@ lt2Figure.addEventListener("ready", function() {
     init_dataset: init_dataset,
     layerIndex: 5,
     init_matrix: EARLY_SEPARATION_MATRIX_LAYER5,
+    layer0_matrix: EARLY_SEPARATION_MATRIX_LAYER0,
     // selectedClasses: new Set([5,7,9]),
 
     framesBetweenEpoch: 25,
@@ -146,12 +147,19 @@ lt2Figure.addEventListener("onscreen", function() {
       lt2.overlay.onSelectLegend(d3.range(10));
     }else{
       lt2.shouldRender = true;
+      lt2.overlay.isViewManipulated = false;
+      
       lt2.play();
       lt2.overlay.play();
-      lt2.overlay.onLayerSliderInput(5);
+      // lt2.overlay.onLayerSliderInput(5);
+      lt2.overlay.onLayerSliderInput(0);
       lt2.overlay.selectedClasses = new Set([5,7,9]);
       lt2.overlay.onSelectLegend(lt2.overlay.selectedClasses);
-      lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER5);
+      // lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER5);
+      
+      lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER0);
+      lt2.overlay.onLayerSliderInput(5);
+
       lt2.overlay.layerPlayButton.on('click')();
     }
     

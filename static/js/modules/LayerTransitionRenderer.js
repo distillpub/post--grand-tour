@@ -496,8 +496,11 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       }
       
     }else if(Math.floor(prevLayer) > Math.floor(layer)
-      && Math.floor(prevLayer) !== this.nlayer-1){
+      && Math.floor(prevLayer) !== this.nlayer-1 
+      ){
       console.log('backward');
+      console.log(Math.floor(prevLayer), '->', Math.floor(layer))
+      
       // let view = dataObj.views[Math.floor(layer+1)];
       // let matrix = this.gt.getMatrix();
       // let submatrix = matrix.slice(0,view.length).map(row=>row.slice(0,view[0].length));
@@ -505,13 +508,24 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       // matrix = utils.embed(submatrix, matrix);
       // this.gt.setMatrix(matrix);
       for(let l=Math.floor(prevLayer); l>Math.floor(layer); l--){
-        let view = dataObj.views[l];
-        let matrix = this.gt.getMatrix();
-        let submatrix = matrix.slice(0,view.length).map(row=>row.slice(0,view[0].length));
-        submatrix = math.multiply(view, submatrix);
-        matrix = utils.embed(submatrix, matrix);
-        this.gt.setMatrix(matrix);
+        if (Math.floor(prevLayer) == this.nlayer-1){
+          continue;
+        }else{
+          let view = dataObj.views[l];
+          let matrix = this.gt.getMatrix();
+          let submatrix = matrix.slice(0,view.length).map(row=>row.slice(0,view[0].length));
+          submatrix = math.multiply(view, submatrix);
+          matrix = utils.embed(submatrix, matrix);
+          this.gt.setMatrix(matrix);
+        }
       }
+    }
+
+    //for lt2.js in the article only
+    if(Math.floor(layer) == 0 
+      && !this.overlay.isViewManipulated 
+      && this.layer0_matrix !== undefined){
+      this.gt.setMatrix(this.layer0_matrix);
     }
 
 
