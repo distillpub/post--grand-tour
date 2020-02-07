@@ -82,7 +82,7 @@
 <distill-header></distill-header>
 <d-front-matter>
 <script id='distill-front-matter' type="text/json">{
-    "title": "Visualizing neural networks with the Grand Tour",
+    "title": "Visualizing Neural Networks with the Grand Tour",
     "description": "We present a way of visualizing activation vectors of neurons in neural network using a technique called the Grand Tour. The random rotation of high dimensional data points shows how trained network confuses different classes during the training process. In addition, our technique allows users to simply change the view point by mouse dragging.",
     "published": "not published",
     "authors": [
@@ -137,15 +137,18 @@
   </div>
 </nav> -->
 
-<div id="teaser-container" style="background-color:rgb(247, 247, 247);">
-  <d-figure class="teaser" style="">
-    <canvas id='teaser' class="" ></canvas>
-  </d-figure>
-  <script src='js/teaser.js'></script>
-</div>
+<d-title>
 
-<div class='base-grid'>
-  <p class='caption' style="grid-column: text;">The Grand Tour<d-cite key="asimov1985grand"></d-cite> in action. This visualization shows the behavior of the final 10-dimensional layer
+
+<!-- <div class='base-grid' id="teaser-container">style="background-color:rgb(247, 247, 247);" -->
+<d-figure class="teaser" style="grid-column: text;">
+  <canvas id='teaser' class=""></canvas>
+</d-figure>
+<script src='js/teaser.js'></script>
+<!-- </div> -->
+
+<!-- <div class='base-grid'> -->
+<figcaption style="grid-column: text;">The Grand Tour<d-cite key="asimov1985grand"></d-cite> in action. This visualization shows the behavior of the final 10-dimensional layer
     of a neural network as it is trained on the MNIST dataset. With this technique, it is possible to see interesting training behavior. For example, the network appears to learn to classify digits 
   <span 
     style="color: #ff7f0e; cursor: pointer;" 
@@ -163,9 +166,10 @@
   and 
   <a onclick="teaser.gt.setMatrix(DIGIT17_MATRIX); teaser.playFromEpoch(19);">21</a> 
   respectively.
-</p>
-</div>
+</figcaption>
+<!-- </div> -->
 
+</d-title>
 
 <script>
   let c = utils.CLEAR_COLOR.map(d=>d*255);
@@ -173,7 +177,7 @@
   .style('background', d3.rgb(...c))
 </script>
 
-<d-title>
+<d-article>
 
 <p>
   The Grand Tour<d-cite key="asimov1985grand"></d-cite> is a classic visualization technique for high-dimensional point clouds that <em>projects</em> a high-dimensional dataset into two dimensions.
@@ -185,11 +189,8 @@
   In this article, we show how to leverage the linearity of the Grand Tour to enable a number of capabilities that are uniquely useful to visualize the behavior of neural networks.
   
   Concretely, we present three use cases of interest: visualizing the training process as the network weights change, visualizing the layer-to-layer behavior as the data goes through the network and visualizing both how adversarial examples<d-cite key="szegedy2013intriguing"></d-cite> are crafted and how they fool a neural network.
- 
 </p>
-</d-title>
 
-<d-article>
 <h2>Introduction</h2>
 
 <p>
@@ -285,7 +286,7 @@
   <svg id='nn2' height=300 style='width: 100%; height: 300px;'></svg>
   <script src='js/nn2.js'></script>
 </d-figure>
-<p class='caption'>Neural network opened. The colored blocks are building-block functions (i.e. neural network layers), the gray-scale heatmaps are either the input image or intermediate activation vectors after some layers.</p>
+<figcaption>Neural network opened. The colored blocks are building-block functions (i.e. neural network layers), the gray-scale heatmaps are either the input image or intermediate activation vectors after some layers.</figcaption>
    
 <p>
   Even though neural networks are capable of incredible feats of classification, deep down, they really are just pipelines of relatively simple functions.
@@ -375,7 +376,7 @@
     'mnist', true, highlight_digits);
 </script>
 </d-figure>
-<p class='caption'>Softmax activations of the MNIST classifier with non-linear dimensionality reduction. Use the buttons on the right to highlight digits 1 and 7 in the plot, or drag rectangles around the charts to select particular point subsets to highlight in the other charts.</p>
+<figcaption>Softmax activations of the MNIST classifier with non-linear dimensionality reduction. Use the buttons on the right to highlight digits 1 and 7 in the plot, or drag rectangles around the charts to select particular point subsets to highlight in the other charts.</figcaption>
 
 <p>
   One reason that non-linear embeddings fail in elucidating this phenomenon is that, for the particular change in the data, the fail the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>. More concretely, the principle states that specific visualization tasks should be modeled as functions that change the data; the visualization sends this change from data to visuals, and
@@ -412,7 +413,7 @@
 [2,5,10,20,30,60,99], ['t-SNE', 'UMAP', 'Linear'], 
 'fashion-mnist', true, highlight_shoes)</script>
 </d-figure>
-<p class='caption'>Three-way confusion in fashion-MNIST. Notice that in contrast to non-linear methods, a carefully-constructed linear projection can offer a better visualization of the classifier behavior.</p>
+<figcaption>Three-way confusion in fashion-MNIST. Notice that in contrast to non-linear methods, a carefully-constructed linear projection can offer a better visualization of the classifier behavior.</figcaption>
 
 <h2>Linear Methods to the Rescue</h2>
 
@@ -434,14 +435,14 @@
   <canvas id='nngt' class='grandtour'></canvas>
   <script src='js/nngt.js'></script>
 </d-figure>
-<p class='caption'>
+<figcaption>
   From
   <a onclick="nngt.gt.setMatrix(DIGIT17_MATRIX)">this linear projection</a>, we can easily identify the learning of 
   <span style="color: #ff7f0e;">digit 1</span> on 
   <a onclick="nngt.setEpochIndex(13)">epoch 14</a> and <br>
   <span style="color: #7f7f7f;">digit 7</span> on 
   <a onclick="nngt.setEpochIndex(19)">epoch 21</a>.
-</p>
+</figcaption>
 
 <p>
   This particular property is illustrated clearly in the Fashion-MNIST example below.
@@ -452,7 +453,7 @@
   <canvas id='nngt-single-epoch-2' class='grandtour'></canvas>
   <script src='js/se2.js'></script>
 </d-figure>
-<p class='caption'>
+<figcaption>
   This <a onclick="
     se2.gt.setMatrix(SSA_MATRIX);
     se2.overlay.onSelectLegend(d3.range(10));
@@ -473,8 +474,7 @@
   <span style="color: #1f77b4;">t-shirts/tops</span>. )
   Both projections are found by direct manipulations.
   <br>
-  
-</p>
+</figcaption>
 
 <p>
   Examples falling between classes indicate that the model has trouble distinguishing the two, such as sandals vs. sneakers, and sneakers vs. ankle boot classes. 
@@ -494,7 +494,7 @@
   <canvas id='nngt-single-epoch-3' class='grandtour'></canvas>
   <script src='js/se3.js'></script>
 </d-figure>
-<p class='caption'>
+<figcaption>
   This <a onclick="
     se3.gt.setMatrix(CD_MATRIX);
     se3.overlay.onSelectLegend(d3.range(10));
@@ -510,7 +510,7 @@
   <span style="color: #1f77b4;">airplanes</span> and
   <span style="color: #bcbd22;">ships</span>.
   Both projections are found by direct manipulations.
-</p>
+</figcaption>
 
 <h2>The Grand Tour</h2>
 
@@ -537,7 +537,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 </ul>
 <d-figure class='tesseract' style="grid-column: text;">
 <canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
-<p class='caption'>Grand tours of a square, a cube and a tesseract</p>
+<figcaption>Grand tours of a square, a cube and a tesseract</figcaption>
 <script src='js/tesseract.js'></script>
 </d-figure>
 
@@ -553,12 +553,12 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   <canvas id='nngt-single-epoch-1' class='grandtour'></canvas>
   <script src='js/se1.js'></script>
 </d-figure>
-<p class='caption'>
+<figcaption>
   The Grand Tour of softmax layer in the last (99<sup>th</sup>) epoch, with 
   <a onclick="utils.setDataset('mnist');">MNIST</a>, 
   <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a> or 
   <a onclick="utils.setDataset('cifar10');">CIFAR-10</a> dataset.
-</p>
+</figcaption>
 
 <p>
   The Grand Tour of the softmax layer lets us qualitatively assess the performance of our model.
@@ -589,7 +589,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   <canvas id='nngt2' class='grandtour'></canvas>
   <script src='js/nngt2.js'></script>
 </d-figure>
-<p class='caption'>
+<figcaption>
   With <a onclick="
     utils.setDataset('cifar10'); 
     nngt2.gt.setMatrix(TT_MATRIX); 
@@ -605,7 +605,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   <a onclick="utils.setDataset('mnist');">MNIST</a>
   or <a onclick="utils.setDataset('fashion-mnist');">fashion-MNIST</a>, 
   where there is less difference between training and testing sets.
-</p>
+</figcaption>
 
 
 
@@ -679,11 +679,11 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
   <canvas id='lt2' class='layertransition'></canvas>
   <script src='js/lt2.js'></script>
 </d-figure>
-<p class='caption'>With layers aligned, it is easy to see the early separation of shoes from <a onclick="
+<figcaption>With layers aligned, it is easy to see the early separation of shoes from <a onclick="
 lt2.onDatasetChange('fashion-mnist');
 lt2Figure.onscreen();
 lt2.overlay.layerPlayButton.on('click')();
-">this view</a>.</p>
+">this view</a>.</figcaption>
 
 <h3>The Grand Tour of Adversarial Dynamics</h3>
 <p>
@@ -698,14 +698,14 @@ lt2.overlay.layerPlayButton.on('click')();
   <canvas id='lta' class='layertransition'></canvas>
   <script src='js/lta.js'></script>
 </d-figure>
-<p class="caption">
+<figcaption>
   From <a onclick="ltaFigure.onscreen()">this view of softmax</a>, we can see how  
   <span style="color: #444444">adversarial examples</span> 
   evolved from <span style="color: #bcbd22">8s</span> 
   into <span style="color: #1f77b4">0s</span>.
   In the corresponding <a onclick="ltaFigure.onscreen(); lta.overlay.onLayerSliderInput(10);">pre-softmax</a> however, these adversarial examples stop around the decision boundary of two classes. 
   Show data as <a onclick="lta.setMode('image')">images</a> to see the actual images generated in each step, or <a onclick="lta.setMode('point')">dots</a> colored by labels.
-</p>
+</figcaption>
 
 <p>
   Through this adversarial training, the network eventually claims, with high confidence, that the inputs given are all 0s.

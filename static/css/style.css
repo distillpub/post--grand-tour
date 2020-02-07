@@ -1,4 +1,11 @@
-.caption a, d-article a{
+d-title h1{
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+}
+
+figcaption{
+  margin-bottom: 2em;
+}
+/*.caption a, d-article a{
   border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
 }
 
@@ -6,7 +13,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.4);
   color: inherit;
   text-decoration: none;
-}
+}*/
 
 d-article h4 {
   margin-top: 1em;
@@ -231,7 +238,7 @@ d-figure.nngt2.fullscreen{
 
 d-figure.teaser{
   display: block;
-  width: 60%;
+  width: 100%;
   min-width: 500px;
   height: 280px;
   margin-left: auto; 
@@ -390,12 +397,23 @@ canvas.layertransition {
 }
 
 
-.caption > span{
+/*.caption > span{
   font-style: normal;
   font-weight: 550;
 }
 
 .caption > span:before{
+  content: "\2b24";
+  position: relative;
+  margin-right: 0.25em;
+}*/
+
+figcaption > span{
+  font-style: normal;
+  font-weight: 550;
+}
+
+figcaption > span:before{
   content: "\2b24";
   position: relative;
   margin-right: 0.25em;
