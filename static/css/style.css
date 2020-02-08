@@ -1,19 +1,25 @@
-d-title h1{
+.play-button{
+  margin: 0;
+}
+
+d-title p{
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+}
+
+figcaption a, d-article a{
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+}
+
+figcaption a:hover, d-article a:hover{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  color: inherit;
+  text-decoration: none;
 }
 
 figcaption{
   margin-bottom: 2em;
 }
-/*.caption a, d-article a{
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
-}
 
-.caption a:hover, d-article a:hover{
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-  color: inherit;
-  text-decoration: none;
-}*/
 
 d-article h4 {
   margin-top: 1em;
@@ -175,7 +181,7 @@ svg text{
     -ms-user-select: none;
         user-select: none;
         font-weight: normal;
-        font-size: 10pt;
+        font-size: 8.5pt;
         fill: #333;
 }
 
@@ -237,6 +243,8 @@ d-figure.nngt2.fullscreen{
 }
 
 d-figure.teaser{
+  grid-column: text;
+
   display: block;
   width: 100%;
   min-width: 500px;
@@ -245,8 +253,9 @@ d-figure.teaser{
   margin-right: auto; 
 }
 d-figure.teaser.fullscreen{
+  grid-column: screen;
   width: 100%;
-  height: calc(100vh - 60px); /* viewport_height - navbar_height (40px)*/
+  height: calc(100vh); /* viewport_height*/
 }
 #teaser{
     width: 100%;     
