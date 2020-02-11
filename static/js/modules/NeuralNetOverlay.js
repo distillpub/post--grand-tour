@@ -1,6 +1,9 @@
 function NeuralNetOverlay(svgid) {
-  this.svg = d3.select(svgid);
 
+  //for functions that do both d3.select(this).xxx and that.method()
+  let that = this; 
+  
+  this.svg = d3.select(svgid);
   let width = this.svg.node().getBoundingClientRect().width;
   let height = this.svg.node().getBoundingClientRect().height;
   this.svg.attr('width', width);
@@ -13,7 +16,15 @@ function NeuralNetOverlay(svgid) {
   this.shouldAutoReplay = true;
   this.cache = {};
 
-  let that = this;
+  window.addEventListener('resize', ()=>{
+    let width = this.svg.node().getBoundingClientRect().width;
+    let height = this.svg.node().getBoundingClientRect().height;
+    this.svg.attr('width', width);
+    this.drawStructure(this.net, this.exampleRightBound);
+    this.repositionSlider();
+  });
+
+
   this.slider = d3.select(this.svg.node().parentNode)
     .insert('input', ':first-child')
     .attr('type', 'range')
@@ -143,291 +154,304 @@ function NeuralNetOverlay(svgid) {
 
   this.updateImage = function(imageIndex) {
     this.imageIndex = imageIndex;
-    for (let i=0; i<this.net.length; i++) {
-      let struct = this.net[i];
-      if (struct.type == 'data') {
-        if (struct.name == 'argmax') {
-          if (this.pred && this.labels) {
-            let text = this.svg.select('#text_'+struct.name);
-            text.text('pred: '+utils.getLabelNames()[
-              this.pred[imageIndex][this.epochIndex]]);
-            text.append('tspan')
-              .attr('x', text.attr('x'))
-              .attr('dy', '1.2em')
-              .text('(truth: '+utils.getLabelNames()[this.labels[imageIndex]]+')');
-          }
-        } else {
-          // TODO
-          this.svg.select('#image_'+struct.name)
-          .attr('x', d=>d.x - imageIndex * d.width)
-          .attr('y', d=>d.y - (struct.name=='input' ? 0:this.epochIndex * d.height))
-          .attr('width', d=>d.width * 45);
+    this.drawStructure(this.net, this.exampleRightBound);
+  };
 
-          // this.svg.select('#image_'+struct.name)
-          //   .attr('xlink:href', url);
+
+  let drawLegend = ()=>{
+    let legendData = [
+      {'text':'linear', 'color': getColor('linear')},
+      {'text':'component-wise', 'color': getColor('ReLU')},
+      {'text':'other', 'color': getColor('maxpool')},
+    ];
+
+    let sx = d3.scaleLinear()
+      .domain([0, 1, 2])
+      .range([
+        +this.svg.attr('width')-100, 
+        +this.svg.attr('width')-70, 
+        +this.svg.attr('width')-10
+      ]);
+    let sy = d3.scaleLinear()
+      .domain([0, legendData.length])
+      .range([10, 10+this.svg.attr('height')/4]);
+    
+    this.svg.selectAll('.legendRect')
+    .data(legendData)
+    .enter()
+    .append('rect')
+    .attr('class', 'legendRect')
+
+    this.svg.selectAll('.legendRect')
+    .attr('x', sx(1))
+    .attr('y', (d,i)=>sy(i))
+    .attr('width', sx(2)-sx(1))
+    .attr('height', (sy(1)-sy(0))*0.75)
+    .attr('fill', d=>d.color);
+
+    this.svg.selectAll('.legendText')
+    .data(legendData)
+    .enter()
+    .append('text')
+    .attr('class', 'legendText');
+
+    this.svg.selectAll('.legendText')
+    .attr('x', sx(1)-5)
+    .attr('y', (d,i)=>sy(i+0.75/2))
+    .text(d=>d.text)
+    .attr('text-anchor', 'end')
+    .attr('alignment-baseline', 'central');
+
+    this.svg.selectAll('.legendText,.legendRect')
+    .on('mouseover', (d)=>{
+      let legendType = d.text;
+      let layerType = layerText => {
+        if (legendType == 'linear'){
+          return !layerText.includes('linear') 
+          && !layerText.includes('conv');
+        }else if(legendType == 'component-wise'){
+          return !layerText.includes('ReLU') 
+        }else if(legendType == 'other'){
+          return !layerText.includes('softmax')
+          && !layerText.includes('argmax')
+          && !layerText.includes('maxpool')
+        }else{
+          return false;
         }
+      };
+
+      this.svg.selectAll('.layerRect')
+      .filter(layerType)
+      .attr('opacity', 0);
+
+      this.svg.selectAll('.layerText')
+      .filter(layerType)
+      .attr('opacity', 0.5);
+
+    })
+    .on('mouseout', ()=>{
+      this.svg.selectAll('.layerRect')
+      .attr('opacity', 1);
+      this.svg.selectAll('.layerText')
+      .attr('opacity', 1);
+      // .attr('fill', text=>getColor(text));
+    });
+  };//end of drawLegend
+
+
+
+  let drawActivations = (net)=>{
+    let w = this.svg.attr('width');
+    let data = net.filter(d=>d.type=='data' && d.name !== 'argmax');
+
+    this.svg.selectAll('.activation')
+    .data(data)
+    .enter()
+    .append('image')
+    .attr('class', 'activation');
+    
+    this.svg.selectAll('.clip')
+    .data(data)
+    .enter()
+    .append('clipPath')
+    .attr('class', 'clip')
+    .attr('id', d=>'clip_'+d.name);
+
+    this.svg.selectAll('.clip')
+    .each(function(d){
+      d3.select(this)
+      .selectAll('rect')
+      .data([d])
+      .enter()
+      .append('rect');
+
+      d3.select(this)
+      .selectAll('rect')
+      .attr('x', d=>d.x)
+      .attr('y', d=>d.y-d.height/2)
+      .attr('width', d=>d.width)
+      .attr('height', d=>d.height);
+    })
+    
+
+    this.svg.selectAll('.activation')
+    .attr('x', d=>d.x - this.imageIndex * d.width)
+    .attr('y', d=>d.y-d.height/2 - (d.name=='input'?0:this.epochIndex * d.height))
+    .attr('width', d=>d.width * 45)
+    // .attr('height', d=>d.height)
+    .attr('xlink:href', d=>this.getImageUrl(utils.getDataset(), d.name))
+    .attr('clip-path', d =>`url(#clip_${d.name})`);
+
+    this.svg.selectAll('.activation')
+    .each(d=>{
+      if(d.name == 'softmax'
+        || (utils.getDataset() == 'mnist' && d.name == 'fc2')
+        || (utils.getDataset() == 'fashion-mnist' && d.name == 'fc2')
+        || (utils.getDataset() == 'cifar10' && d.name == 'fc3') ){
+
+        let sx = d3.scaleLinear().domain([0,2]).range([d.x, d.x+d.width]);
+        let sy = d3.scaleLinear().domain([0,5]).range([d.y-d.height/2, d.y+d.height/2]);
+
+        this.svg.selectAll('.'+d.name+'-dim-text')
+        .data(utils.getLabelNames())
+        .enter()
+        .append('text')
+        .attr('class', d.name+'-dim-text');
+
+        classIndices = this.svg.selectAll('.'+d.name+'-dim-text')
+        .data(utils.getLabelNames())
+        .attr('x', (d,i)=>sx(i%2+0.5))
+        .attr('y', (d,i)=>sy(Math.floor(i/2)+0.5))
+        .style('font-size', 8)
+        .style('text-anchor', 'middle')
+        .style('alignment-baseline', 'middle')
+        .text(d=>d);
+
+      }
+    })
+
+    this.svg.selectAll('#prediction')
+    .data([net[net.length-1],])
+    .enter()
+    .append('text')
+    .attr('id', 'prediction')
+    .attr('text-anchor', 'start')
+    .attr('alignment-baseline', 'middle');
+
+    if(this.pred !== undefined){
+      this.svg.select('#prediction')
+      .attr('x', +this.svg.select('#pipeline').attr('x2') + 3)
+      .attr('y', d=>d.y)
+      .text('pred: ' + utils.getLabelNames()[this.pred[this.imageIndex][this.epochIndex]])
+      .append('tspan')
+      .attr('x', this.svg.select('#prediction').attr('x'))
+      .attr('dy', '1.2em')
+      .text('(truth: '+utils.getLabelNames()[this.labels[this.imageIndex]]+')');
+    }
+
+  };
+
+
+  let getColor = function(text) {
+    let baseColors = {
+      'conv': '#a6cee3',
+      'linear': '#a6cee3',
+      'ReLU': '#ffffb3',
+      'maxpool': '#b2df8a',
+      'softmax': '#b2df8a',
+      'argmax': '#b2df8a',
+
+      'dropout': '#80b1d3',
+      'flatten': '#fff',
+      'default': '#f55',
+    };
+
+    for (let k in baseColors){
+      if(text.includes(k)){
+        return baseColors[k];
       }
     }
+    return baseColors['default'];
+  };
+
+
+  let drawLayers = (net)=>{
+    let data = net.filter(d=>d.type=='function');
+
+    let g = this.svg.selectAll('.layer')
+    .data(data)
+    .enter()
+    .append('g')
+    .attr('class', 'layer');
+    g = this.svg.selectAll('.layer');
+
+    g.each(function(d){
+      let rect = d3.select(this).selectAll('.layerRect')
+      .data(d.blocks)
+      .enter()
+      .append('rect')
+      .attr('class', 'layerRect');
+      rect = d3.select(this).selectAll('.layerRect');
+
+      let text = d3.select(this).selectAll('.layerText')
+      .data(d.blocks)
+      .enter()
+      .append('text')
+      .attr('class', 'layerText');
+      text = d3.select(this).selectAll('.layerText');
+
+      rect
+      .attr('x', (_,i)=>d.x + d.width * i)
+      .attr('y', d.y - d.height/2)
+      .attr('width', d.width)
+      .attr('height', d.height)
+      .attr('fill', t=>getColor(t));
+
+      text
+      .attr('x', (_,i)=>d.x + d.width * i + d.width/2)
+      .attr('y', d.y)
+      .attr('transform', (_,i)=>`rotate(-90 ${d.x+d.width/2 + d.width*i} ${d.y})`)
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'middle')
+      .text(text=>text);
+    });
+    
   };
 
 
   this.drawStructure = function(net, start) {
+    let marginLeft = 10;
+    let marginRight = 40;
     let sx = d3.scaleLinear()
-        .domain([0, 1]).range([start, +this.svg.attr('width')]);
+        .domain([0, 1]).range([+start+marginLeft, +this.svg.attr('width')-marginRight]);
     let sy = d3.scaleLinear()
         .domain([0, 1]).range([0, +this.svg.attr('height')]);
-    let r = 5;
+    let width_total = sx.range()[1] - sx.range()[0];
 
+    let data_activation = net.filter(d=>d.type == 'data');
+    let data_layer = net.filter(d=>d.type == 'function');
+
+    let gap = Math.max(+this.svg.attr('width') / 40, 10);
+    let width_layer = 16;
+    let layer_count = data_layer.reduce((a,b)=>a+b.blocks.length, 0);
+
+    let width_activation = 1/data_activation.length 
+       * (width_total - (net.length-1) * gap - width_layer * layer_count);
+
+    let x = sx(0);
+    net.forEach((d,i)=>{
+      d.index = i;
+      if(d.type=='data'){
+        d.width = width_activation;
+        d.height = width_activation / d.size[0] * d.size[1];
+        d.x = x;
+        d.y = sy(0.5);
+        x += gap + d.width;
+      }else{
+        d.width = width_layer;
+        d.height = 100;
+        d.x = x;
+        d.y = sy(0.5);
+        x += gap + d.width * d.blocks.length;
+      }
+    });
+   
+    //draw a horizontal line
     this.svg.selectAll('#pipeline')
       .data([0])
       .enter()
       .append('line')
       .attr('id', 'pipeline');
-
     this.svg.select('#pipeline')
-      .attr('x1', sx(0.07))
-      .attr('x2', sx(0.83))
+      .attr('x1', sx(0)+width_activation/2)
+      .attr('x2', sx(1.0)-width_activation)
       .attr('y1', sy(0.5))
       .attr('y2', sy(0.5))
       .attr('stroke', '#999')
       .attr('stroke-width', 2);
-    
 
-    let getColor = function(text) {
-      let baseColors = {
-        'conv': '#a6cee3',
-        'linear': '#a6cee3',
-        'ReLU': '#ffffb3',
-        'maxpool': '#b2df8a',
-        'softmax': '#b2df8a',
-        'argmax': '#b2df8a',
-
-        'dropout': '#80b1d3',
-        'flatten': '#fff',
-        'default': '#f55',
-      };
-      if (text.includes('conv')) {
-        return baseColors['conv'];
-      } else if (text.includes('ReLU')) {
-        return baseColors['ReLU'];
-      } else if (text.includes('dropout')) {
-        return baseColors['dropout'];
-      } else if (text.includes('linear')) {
-        return baseColors['linear'];
-      } else if (text.includes('maxpool')) {
-        return baseColors['maxpool'];
-      } else if (text.includes('flatten')) {
-        return baseColors['flatten'];
-      } else if (text.includes('softmax')) {
-        return baseColors['softmax'];
-      } else if (text.includes('argmax')) {
-        return baseColors['argmax'];
-      } else {
-        return baseColors['default'];
-      }
-    };
-    
-
-    let drawImage = (struct, x, assignedWidth, imageIndex) => {
-      let width = assignedWidth*0.6;
-      let height = width/struct.size[0] * struct.size[1];
-      x = x+assignedWidth*0.2;
-      let y = sy(0.5)-height/2;
-      let data = [{width, height, x, y}];
-
-      if (struct.name == 'argmax') {
-        this.svg.selectAll('#text_'+struct.name)
-          .data([0])
-          .enter()
-          .append('text')
-          // .attr('font-size', 12)
-          .attr('id', 'text_'+struct.name);
-
-        let text = this.svg.select('#text_'+struct.name);
-
-        text.attr('x', x)
-          .attr('y', sy(0.5))
-          .attr('text-anchor', 'start')
-          .attr('alignment-baseline', 'middle');
-
-        this.svg.select('#pipeline')
-          .attr('x2', x-5);
-      } else {
-        this.svg.selectAll('#image_'+struct.name)
-          .data(data)
-          .enter()
-          .append('image')
-          .attr('id', 'image_'+struct.name);
-        this.svg.selectAll('#clip_'+struct.name)
-          .data(data)
-          .enter()
-          .append('clipPath')
-          .attr('id', 'clip_'+struct.name);
-
-        let img = this.svg.select('#image_'+struct.name);
-        let clipPath = this.svg.select('#clip_'+struct.name);
-        let url = this.getImageUrl(utils.getDataset(), struct.name);
-
-        clipPath.append('rect')
-        .attr('x', d=>d.x)
-        .attr('y', d=>d.y)
-        .attr('width', d=>d.width)
-        .attr('height', d=>d.height);
-
-        img.attr('x', d=>d.x - imageIndex * d.width)
-          .attr('y', d=>d.y)
-          .attr('width', d=>d.width * 45)
-          .attr('xlink:href', url)
-          .attr('clip-path', d=>`url(#clip_${struct.name})`);
-
-        if(struct.name == 'softmax'
-          || (utils.getDataset() == 'mnist' && struct.name == 'fc2')
-          || (utils.getDataset() == 'fashion-mnist' && struct.name == 'fc2')
-          || (utils.getDataset() == 'cifar10' && struct.name == 'fc3')
-          ){
-          let sx = d3.scaleLinear().domain([0,2]).range([x, x+width]);
-          let sy = d3.scaleLinear().domain([0,5]).range([y, y+width/2*5]);
-
-          this.svg.selectAll('.'+struct.name+'-dim-text')
-          .data(utils.getLabelNames())
-          .enter()
-          .append('text')
-          .attr('class', struct.name+'-dim-text');
-
-          classIndices = this.svg.selectAll('.'+struct.name+'-dim-text')
-          .data(utils.getLabelNames())
-          .attr('x', (d,i)=>sx(i%2+0.5))
-          .attr('y', (d,i)=>sy(Math.floor(i/2)+0.5))
-          .style('font-size', 8)
-          .style('text-anchor', 'middle')
-          .style('alignment-baseline', 'middle')
-          .text(d=>d);
-
-        }
-      }
-    };
-
-
-    let drawLayer = (text, x, width)=>{
-      let y = sy(0.5)-100/2;
-      let height = 100;
-
-      this.svg.append('rect')
-        .data([text])
-        .attr('class', 'layerRect')
-        .attr('x', x)
-        .attr('y', y)
-        .attr('width', width)
-        .attr('height', height)
-        .attr('fill', text=>getColor(text));
-
-      this.svg.append('text')
-        .data([text])
-        .attr('class', 'layerText')
-        .attr('x', x+width/2)
-        .attr('y', y+height/2)
-        .attr('transform', 'rotate(-90 '+(x+width/2)+' '+(y+height/2)+')')
-        .attr('text-anchor', 'middle')
-        .attr('alignment-baseline', 'middle')
-        // .attr('font-size', 12)
-        .text(text=>text);
-    };
-
-
-    let startx = sx(0.00);
-    let imageWidth = sx(1)/net.length*1.35;
-    let blockWidth = 16;
-    for (let i=0; i<net.length; i++) {
-      let struct = net[i];
-      if (struct.type == 'data') {
-        drawImage(struct, startx, imageWidth, 0);
-        startx += imageWidth;
-      } else if (struct.type == 'function') {
-        for (let j=0; j<struct.blocks.length; j++) {
-          let block = struct.blocks[j];
-          drawLayer(block, startx, blockWidth);
-          startx += blockWidth;
-        }
-      }
-    }
-
-    let drawLegend = ()=>{
-      let legendData = [
-        {'text':'linear', 'color': getColor('linear')},
-        {'text':'component-wise', 'color': getColor('ReLU')},
-        {'text':'other', 'color': getColor('maxpool')},
-      ];
-
-      let sx = d3.scaleLinear()
-        .domain([0, 1, 2])
-        .range([
-          +this.svg.attr('width')-100, 
-          +this.svg.attr('width')-70, 
-          +this.svg.attr('width')-10
-        ]);
-      let sy = d3.scaleLinear()
-        .domain([0, legendData.length])
-        .range([10, 10+this.svg.attr('height')/4]);
-      
-      this.svg.selectAll('.legendRect')
-      .data(legendData)
-      .enter()
-      .append('rect')
-      .attr('class', 'legendRect')
-      .attr('x', sx(1))
-      .attr('y', (d,i)=>sy(i))
-      .attr('width', sx(2)-sx(1))
-      .attr('height', (sy(1)-sy(0))*0.75)
-      .attr('fill', d=>d.color);
-
-      this.svg.selectAll('.legendText')
-      .data(legendData)
-      .enter()
-      .append('text')
-      .attr('class', 'legendText')
-      .attr('x', sx(1)-5)
-      .attr('y', (d,i)=>sy(i+0.75/2))
-      .text(d=>d.text)
-      .attr('text-anchor', 'end')
-      .attr('alignment-baseline', 'central');
-
-      this.svg.selectAll('.legendText,.legendRect')
-      .on('mouseover', (d)=>{
-        let legendType = d.text;
-        let layerType = layerText => {
-          if (legendType == 'linear'){
-            return !layerText.includes('linear') 
-            && !layerText.includes('conv');
-          }else if(legendType == 'component-wise'){
-            return !layerText.includes('ReLU') 
-          }else if(legendType == 'other'){
-            return !layerText.includes('softmax')
-            && !layerText.includes('argmax')
-            && !layerText.includes('maxpool')
-          }else{
-            return false;
-          }
-        };
-
-        this.svg.selectAll('.layerRect')
-        .filter(layerType)
-        .attr('opacity', 0);
-
-        this.svg.selectAll('.layerText')
-        .filter(layerType)
-        .attr('opacity', 0.5);
-
-      })
-      .on('mouseout', ()=>{
-        this.svg.selectAll('.layerRect')
-        .attr('opacity', 1);
-        this.svg.selectAll('.layerText')
-        .attr('opacity', 1);
-        // .attr('fill', text=>getColor(text));
-      });
-
-
-    }
+    drawActivations(net);
+    drawLayers(net);
     drawLegend();
   };
 
@@ -462,16 +486,18 @@ function NeuralNetOverlay(svgid) {
 
   this.drawEpochIndicator = (i)=>{
     if (this.epochIndicator === undefined || this.epochIndicator === null) {
+      //init
       this.epochIndicator = this.svg.append('text')
         .attr('id', 'epochIndicator')
         .attr('x', width/2)
         .attr('y', height-40)
         .attr('text-anchor', 'middle')
-        .text('epoch: '+i+'/99');
-    } else {
-      this.epochIndicator
-        .text('epoch: '+i+'/99');
     }
+
+    this.epochIndicator
+    .attr('x', parseFloat(this.slider.style('left')) + parseFloat(this.slider.style('width')) / 2)
+    .text('epoch: '+i+'/99');
+
   };
 
 
@@ -481,18 +507,28 @@ function NeuralNetOverlay(svgid) {
 
     this.net = utils.getNet(utils.getDataset());
     this.loadPred();
-    let right = this.drawExamples();
-    this.drawStructure(this.net, right);
+    this.exampleRightBound = this.drawExamples();
+    this.drawStructure(this.net, this.exampleRightBound);
+    this.repositionSlider();
     
     if (this.intervalHandle !== undefined) {
       clearInterval(this.intervalHandle);
       delete this.intervalHandle;
     }
+  };
 
-    
-    
+  this.repositionSlider = function(){
+    this.slider
+    .style('left', `${+this.exampleRightBound+64}px`)
+    .style('width', `${+this.svg.attr('width')-this.exampleRightBound-64-32}px`);
+
+    this.playButton
+    .style('left', `${parseFloat(this.slider.style('left')) - 30}px`);
+
+    this.drawEpochIndicator(this.epochIndex);
 
   };
+
 
   this.render = function(){
     if (this.shouldAutoNextEpoch) {
