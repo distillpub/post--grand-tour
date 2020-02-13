@@ -19,6 +19,10 @@ teaserFigure.addEventListener("ready", function() {
   allViews.push(teaser);
   
   teaser.overlay.fullScreenButton.style('top', '18px');
+  teaser.overlay.epochSlider.style('top', 'calc(100% - 28px)');
+  teaser.overlay.playButton.style('top', ' calc(100% - 34px)');
+  teaser.overlay.grandtourButton.style('top', ' calc(100% - 34px)');
+
   // teaser.overlay.fullScreenButton.remove();
   teaser.overlay.modeOption.remove();
   teaser.overlay.datasetOption.remove();

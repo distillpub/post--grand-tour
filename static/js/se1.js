@@ -27,6 +27,8 @@ seFigure1.addEventListener("ready", function() {
     se1 = utils.loadDataToRenderer(urls, se1);
     se1.overlay.initLegend(
       utils.baseColors.slice(0,10), utils.getLabelNames());
+    se1.overlay.repositionAll();
+
     if(utils.getDataset() == 'cifar10'){
       se1.setColorFactor(0.0);
     }else{
@@ -37,6 +39,7 @@ seFigure1.addEventListener("ready", function() {
     .property('selected', d=>{
       return d.value == utils.getDataset();
     });
+
   });
   
   window.addEventListener('resize', ()=>{

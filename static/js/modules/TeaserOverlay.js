@@ -253,12 +253,6 @@ function TeaserOverlay(renderer, kwargs) {
     this.svg.attr('width', width);
     this.svg.attr('height', height);
 
-    this.legend_sx = d3.scaleLinear()
-      .domain([0, 1])
-      .range([width-120, width-20]);
-    this.lengend_sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([height/2-120, height/2+120]);
 
     // let aspect = width/height;
     // let ymax = renderer.dataObj.dmax;
@@ -270,15 +264,15 @@ function TeaserOverlay(renderer, kwargs) {
     //   .domain([-ymax, ymax])
     //   .range([height, 0]);
       
-
+    this.initLegendScale();
     this.updateArchorRadius(renderer.mode);
     this.repositionAll();
   };
 
 
   this.repositionAll = function() {
-    let width = this.svg.attr('width');
-    let height = this.svg.attr('height');
+    let width = +this.svg.attr('width');
+    let height = +this.svg.attr('height');
 
     let sliderLeft = parseFloat(this.epochSlider.style('left'));
     let sliderWidth = parseFloat(this.epochSlider.style('width'));
@@ -294,15 +288,14 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('y', height-20);
     }
 
-    this.legendRect
-      .attr('x', this.legend_sx(0))
-      .attr('y', (c, i)=>this.lengend_sy(i/10))
-      .attr('width', (this.lengend_sy(1)-this.lengend_sy(0))/10 )
-      .attr('height', (this.lengend_sy(1)-this.lengend_sy(0))/10);
+    this.legendMark
+      .attr('cx', this.legend_sx(0.0))
+      .attr('cy', (c, i)=>this.legend_sy((i+0.5)/10))
+      .attr('r', (this.legend_sy(1)-this.legend_sy(0))/40 );
 
     this.legendText
-      .attr('x', this.legend_sx(0.3))
-      .attr('y', (l, i)=>this.lengend_sy((i+0.5)/10));
+      .attr('x', +this.legend_sx(0.0)+(this.legend_sy(1)-this.legend_sy(0))/40*3)
+      .attr('y', (l, i)=>this.legend_sy((i+0.5)/10));
   };
 
 
@@ -410,21 +403,25 @@ function TeaserOverlay(renderer, kwargs) {
     // .attr('opacity', 0.1);
   };
 
-
-  this.initLegend = function(colors, labels) {
+  this.initLegendScale = function(){
+    let width = +this.svg.attr('width');
+    let legendLeft = width - utils.legendLeft[this.renderer.fixed_dataset || utils.getDataset()];
     this.legend_sx = d3.scaleLinear()
       .domain([0, 1])
-      .range([this.svg.attr('width')-120, this.svg.attr('width')-20]);
-
-    this.lengend_sy = d3.scaleLinear()
+      .range([legendLeft, width]);
+    this.legend_sy = d3.scaleLinear()
       .domain([0, 1])
-      .range([20, this.svg.attr('height')-50]);
+      .range([20, 230]);
+  };
 
-    this.svg.selectAll('.legendRect')
+  this.initLegend = function(colors, labels) {
+      
+    this.initLegendScale();
+    this.svg.selectAll('.legendMark')
       .data(colors)
       .enter()
-      .append('rect')
-      .attr('class', 'legendRect')
+      .append('circle')
+      .attr('class', 'legendMark')
       .attr('fill', (c, i)=>'rgb('+c+')')
       .on('mouseover', (_, i)=>{
         let classes = new Set(this.selectedClasses);
@@ -445,7 +442,7 @@ function TeaserOverlay(renderer, kwargs) {
           this.selectedClasses = new Set();
         }
       });
-    this.legendRect = this.svg.selectAll('.legendRect');
+    this.legendMark = this.svg.selectAll('.legendMark');
     this.svg.selectAll('.legendText')
       .data(labels)
       .enter()
@@ -491,7 +488,7 @@ function TeaserOverlay(renderer, kwargs) {
         renderer.dataObj.alphas[i] = 0;
       }
     }
-    this.svg.selectAll('rect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, j)=>{
         if (!labelClasses.has(j)) {
           return 0.1;
@@ -519,7 +516,7 @@ function TeaserOverlay(renderer, kwargs) {
       }
     }
 
-    this.svg.selectAll('rect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, i)=>{
         if (labelClasses.size == 0) {
           return 1.0;

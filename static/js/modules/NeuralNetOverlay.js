@@ -312,7 +312,7 @@ function NeuralNetOverlay(svgid) {
         .style('font-size', 8)
         .style('text-anchor', 'middle')
         .style('alignment-baseline', 'middle')
-        .text(d=>d);
+        .text(d=>(+this.svg.attr('width') > 1000) ? d:'');
 
       }
     })
@@ -418,12 +418,20 @@ function NeuralNetOverlay(svgid) {
     let data_activation = net.filter(d=>d.type == 'data');
     let data_layer = net.filter(d=>d.type == 'function');
 
-    let gap = Math.max(+this.svg.attr('width') / 40, 10);
-    let width_layer = 16;
+    // let gap = Math.max(+this.svg.attr('width') / 40, 10);
+    // let width_layer = 18;
+    // let layer_count = data_layer.reduce((a,b)=>a+b.blocks.length, 0);
+    // let width_activation = 1/data_activation.length 
+       // * (width_total - (net.length-1) * gap - width_layer * layer_count);
+    
     let layer_count = data_layer.reduce((a,b)=>a+b.blocks.length, 0);
-
-    let width_activation = 1/data_activation.length 
-       * (width_total - (net.length-1) * gap - width_layer * layer_count);
+    let activation_count = data_activation.length;
+    let gap_count = net.length-1;
+    let step_size = width_total / (layer_count*0.5 + activation_count*2 + gap_count*0.5);
+    
+    let gap = step_size * 0.5;
+    let width_layer = step_size * 0.5;
+    let width_activation = step_size * 2;
 
     let x = sx(0);
     net.forEach((d,i)=>{

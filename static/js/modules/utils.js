@@ -17,6 +17,12 @@ utils.dataset = 'mnist';
 utils.datasetListener = [];
 utils.pointAlpha = 255 * 0.1;
 
+utils.legendLeft = {
+  'mnist':60,
+  'fashion-mnist':80,
+  'cifar10':80,
+  'mnist-adversarial':80
+};
 
 utils.mixScale = function(s0,s1,progress, func){
   let range0 = s0.range();
