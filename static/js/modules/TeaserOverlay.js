@@ -212,7 +212,7 @@ function TeaserOverlay(renderer, kwargs) {
   this.datasetOption.append('label')
     .text('Dataset: ');
   this.datasetSelection = this.datasetOption.append('select')
-    .attr('id', 'datasetSelection')
+    .attr('class', 'datasetSelection')
     .on('change', function() {
       let dataset = d3.select(this).property('value');
       utils.setDataset(dataset)

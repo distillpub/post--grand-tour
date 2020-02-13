@@ -230,6 +230,9 @@ d-figure{
 }
 
 
+d-figure.nn2{
+  grid-column: page;
+}
 
 d-figure.fullscreen{
   grid-column: screen;
@@ -244,7 +247,6 @@ d-figure.nngt2.fullscreen{
 
 d-figure.teaser{
   grid-column: text;
-
   display: block;
   width: 100%;
   min-width: 500px;
@@ -260,6 +262,9 @@ d-figure.teaser.fullscreen{
 #teaser{
     width: 100%;     
     height: 100%;
+}
+figcaption.teaser{
+  grid-column: text;
 }
 
 
@@ -358,15 +363,15 @@ canvas.smallmultiple, canvas.smallmultiple0{
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%; 
     background: #4CAF50;
     cursor: pointer;
 }
 .slider::-moz-range-thumb {
-    width: 10px;
-    height: 10px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;

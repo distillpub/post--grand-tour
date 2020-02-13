@@ -69,6 +69,7 @@
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="css/style.css">
+<link rel="stylesheet" media="screen and (max-width: 1024px)" href="css/small-screen.css">
 
 <style>
 .nav{
@@ -153,7 +154,7 @@
 <!-- </div> -->
 
 <!-- <div class='base-grid'> -->
-<figcaption style="grid-column: text; margin-bottom: 0;">The Grand Tour<d-cite key="asimov1985grand"></d-cite> in action. This visualization shows the behavior of the final 10-dimensional layer
+<figcaption class='teaser' style="margin-bottom: 0;">The Grand Tour<d-cite key="asimov1985grand"></d-cite> in action. This visualization shows the behavior of the final 10-dimensional layer
     of a neural network as it is trained on the MNIST dataset. With this technique, it is possible to see interesting training behavior. For example, the network appears to learn to classify digits 
   <span 
     style="color: #ff7f0e; cursor: pointer;" 
@@ -287,7 +288,7 @@
   </d-footnote> layer.
 </p>
 
-<d-figure class='nn2' style="grid-column: page; ">
+<d-figure class='nn2'> <!-- style="grid-column: page;" -->
   <svg id='nn2' height=300 style='width: 100%; height: 300px;'></svg>
   <script src='js/nn2.js'></script>
 </d-figure>
@@ -540,7 +541,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 <li>On a cube, the Grand Tour rotates it in 3D, and its 2D projection let us see every facet of the cube. </li>
 <li>On a 4D cube (a <em>tesseract</em>), the rotation happens in 4D and the 2D view shows every possible projection.</li>
 </ul>
-<d-figure class='tesseract' style="grid-column: text;">
+<d-figure class='tesseract' style="">
 <canvas id='tesseract' style='width: 100%; height: 300px;'></canvas>
 <figcaption>Grand tours of a square, a cube and a tesseract</figcaption>
 <script src='js/tesseract.js'></script>

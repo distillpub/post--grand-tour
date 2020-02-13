@@ -1,0 +1,13 @@
+d-figure.nn2{
+  grid-column: screen;
+}
+
+d-figure{
+  grid-column: page;
+}
+d-figure.teaser{
+  grid-column: page;
+}
+figcaption.teaser{
+  grid-column: page;
+}

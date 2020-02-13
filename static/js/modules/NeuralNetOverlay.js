@@ -16,6 +16,8 @@ function NeuralNetOverlay(svgid) {
   this.shouldAutoReplay = true;
   this.cache = {};
 
+  this.isFirst = true;
+
   window.addEventListener('resize', ()=>{
     let width = this.svg.node().getBoundingClientRect().width;
     let height = this.svg.node().getBoundingClientRect().height;
@@ -275,12 +277,17 @@ function NeuralNetOverlay(svgid) {
     
 
     this.svg.selectAll('.activation')
-    .attr('x', d=>d.x - this.imageIndex * d.width)
+    .attr('x', d=>d.x-this.imageIndex * d.width)
     .attr('y', d=>d.y-d.height/2 - (d.name=='input'?0:this.epochIndex * d.height))
     .attr('width', d=>d.width * 45)
     // .attr('height', d=>d.height)
-    .attr('xlink:href', d=>this.getImageUrl(utils.getDataset(), d.name))
     .attr('clip-path', d =>`url(#clip_${d.name})`);
+
+    if(this.isFirst){
+      this.svg.selectAll('.activation')
+      .attr('xlink:href', d=>this.getImageUrl(utils.getDataset(), d.name))
+      this.isFirst = false;
+    }
 
     this.svg.selectAll('.activation')
     .each(d=>{
@@ -502,6 +509,7 @@ function NeuralNetOverlay(svgid) {
 
 
   this.init = function() {
+    this.isFirst = true;
     this.svg.html('');
     this.epochIndicator = null;
 
