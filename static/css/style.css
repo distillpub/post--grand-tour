@@ -316,16 +316,16 @@ canvas.smallmultiple0{
 
 .smallmultiple-fullscreenButton{
     position: absolute;
-    top: -5px;
-    left: calc(100% - 32px);
+    top: 0;
+    left: 1px;
     font-size: 20px;
     opacity: 0.7;
 }
 
 .smallmultiple-clearBrushButton{
     position: absolute;
-    top: -5px;
-    left: calc(100% - 32px - 32px);
+    top: 0;
+    left: 30px;
     font-size: 20px;
     opacity: 0.7;
 }

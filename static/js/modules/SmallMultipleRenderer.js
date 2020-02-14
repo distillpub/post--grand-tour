@@ -29,7 +29,7 @@ function SmallMultipleRenderer(gl, program, kwargs) {
   this.paddingTop = 25;//between subplots
 
   this.left = 1;
-  this.top = 20;
+  this.top = 4;
   this.paddingBottom = 40;
 
   this.updateBoundaries = function(width){
