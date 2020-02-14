@@ -1,16 +1,22 @@
 function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
   this.selectedClasses = new Set();
   this.isFullScreen = false;
+  this.dataset = dataset;
+  this.renderer = renderer;
+ 
 
   this.init = function() {
     let canvas = renderer.gl.canvas;
     let marginTop = 30;
     let canvasWidth = canvas.clientWidth;
     let canvasHeight = canvas.clientHeight;
-    let canvasWidthPercentage = 0.8;
-    let canvasMarginPercentage = (1-canvasWidthPercentage)/2;
-    let width = canvasWidth / canvasWidthPercentage;
-    let height = canvasHeight + marginTop;
+    // let canvasWidthPercentage = 0.8;
+    // let canvasMarginPercentage = (1-canvasWidthPercentage)/2;
+    // let width = canvasWidth / canvasWidthPercentage;
+    // let height = canvasHeight + marginTop;
+    let width = canvasWidth;
+    let height = canvasHeight;
+
 
     // d3.select('d-figure.'+renderer.gl.canvas.classList[0])
     // .select('svg').remove();
@@ -85,6 +91,7 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
           this.isFullScreen = !this.isFullScreen;
           d3.select(renderer.overlay.svg.node().parentElement)
             .classed('fullscreen', this.isFullScreen);
+          
           renderer.resize();
           this.resize();
           this.clearAllBrushes();
@@ -95,23 +102,15 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
         .text('fullscreen')
     }
 
-
     this.sx = d3.scaleLinear()
-      .domain([0, 1])
-      .range([canvasMarginPercentage*width, (1-canvasMarginPercentage)*width]);
+      .domain([0, renderer.ncol])
+      .range([renderer.left, renderer.right]);
     this.sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([marginTop, marginTop + canvasHeight]);
+      .domain([0, renderer.nrow])
+      .range([renderer.top, renderer.bottom]);
+  
 
-    this.ax = d3.axisBottom(this.sx)
-      .tickValues(d3.range(renderer.ncol+1).map((i) => i/renderer.ncol))
-      .tickSize(-canvasHeight);
 
-    this.ay = d3.axisLeft(this.sy)
-      .tickValues(d3.range(renderer.nrow+1).map((i) => i/renderer.nrow))
-      .tickSize(-canvasWidth);
-
-    
     let brushesData = [];
 
     for (let j=0; j<renderer.epochs.length; j++) {
@@ -121,10 +120,17 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
         
         let bsx = d3.scaleLinear()
             .domain([-1, 1])
-            .range([this.sx(j/renderer.ncol), this.sx((j+1)/renderer.ncol)]);
+            .range([
+              this.sx(j), 
+              this.sx(j)+renderer.sideLength
+            ]);
         let bsy = d3.scaleLinear()
-            .domain([-1, 1])
-            .range([this.sy((i+1)/renderer.nrow), this.sy((i)/renderer.nrow)]);
+            .domain([1,-1])
+            .range([
+              this.sy(i)+renderer.paddingTop, 
+              this.sy(i)+renderer.paddingTop+renderer.sideLength
+            ]);
+
         let brush = d3.brush()
             .extent([[bsx(-1), bsy(1)], [bsx(1), bsy(-1)]])
             .on('brush', (d)=>{
@@ -177,39 +183,28 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
 
     this.svg.selectAll('.brush')
       .each(function(d) {
+        d3.select(this)
+        .selectAll('.brushFrame')
+        .data([0])
+        .enter()
+        .append('rect')
+        .attr('class', 'brushFrame');
+
+        d3.select(this)
+        .selectAll('.brushFrame')
+        .attr('x', d.bsx(-1))
+        .attr('y', d.bsy(1))
+        .attr('width', d.bsx(1)-d.bsx(-1))
+        .attr('height', d.bsy(-1)-d.bsy(1))
+        .attr('rx', 5)
+        // .attr('stroke', '#eee')
+        // .attr('stroke-width', 0.5)
+        .attr('fill', '#aaa')
+        .style('opacity', 0.1);
+
         d3.select(this).call(d.brush);
       });
 
-
-    this.svg.selectAll('.axisBottom')
-      .data([0])
-      .enter()
-      .append('g')
-      .attr('class', 'axisBottom');
-    this.axisBottom = this.svg.selectAll('.axisBottom');
-    this.axisBottom
-      .attr('transform', 'translate(0,'+this.sy(1)+')')
-      .call(this.ax);
-
-
-    this.svg.selectAll('.axisLeft')
-      .data([0])
-      .enter()
-      .append('g')
-      .attr('class', 'axisLeft');
-    this.axisLeft = this.svg.selectAll('.axisLeft');
-    this.axisLeft
-      .attr('transform', 'translate('+this.sx(0)+',0)')
-      .call(this.ay);
-
-    this.svg.selectAll('.tick>line, .domain')
-      .attr('stroke-width', 7)
-      .attr('stroke', 'white');
-    this.axisBottom.selectAll('.tick>line')
-      .attr('stroke-width', 1.5);
-
-
-    this.svg.selectAll('.axisLeft text, .axisBottom text').remove();
 
 
     this.svg.selectAll('text.method')
@@ -225,9 +220,10 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
 
     this.methodText = this.svg.selectAll('text.method');
     this.methodText
-      .attr('x', this.sx(0)-0)
-      .attr('y', (_, i)=>this.sy((i+0.5)/renderer.nrow))
-      .attr('text-anchor', 'end')
+      .attr('x', this.sx(renderer.ncol/2))
+      .attr('y', (_, i)=>(this.sy(i)+renderer.paddingTop-4))
+      .attr('text-anchor', 'middle')
+      .attr('alignment-baseline', 'bottom')
       .text((d)=>d);
 
 
@@ -244,19 +240,18 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
 
     this.epochText = this.svg.selectAll('text.epoch');
     this.epochText
-      .attr('x', (d, i)=>this.sx((i+0.5)/renderer.ncol))
-      .attr('y', this.sy(0)-5)
+      .attr('x', (d, i)=>this.sx(i+0.5))
+      .attr('y', this.sy(renderer.nrow)+5)
       // .attr('x', this.sx(0)-0)
       // .attr('y', (_, i)=>this.sy((i+0.5)/renderer.nrow))
       .attr('text-anchor', 'middle')
-      .attr('alignment-baseline', 'middle')
+      .attr('alignment-baseline', 'hanging')
       .text((d)=>'epoch '+d);
 
     this.svg.selectAll('rect.vertical_divider')
       .data(d3.range);
 
 
-    this.canvasMarginPercentage = canvasMarginPercentage;
     this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, dataset));
   };
 
@@ -276,20 +271,114 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
   };
 
 
-  this.initLegend = function(colors=utils.baseColors.slice(0, 10), labels=utils.getLabelNames()) {
+  this.getDataset = function(){
+    return this.dataset;
+  };
+
+
+
+  this.onMouseover = function(d,i){
+    if(responsiveLegend){
+      let classes = new Set(this.selectedClasses);
+      if (!classes.has(i)) {
+        classes.add(i);
+      }
+      this.onSelectLegend(classes);
+    }
+  };
+  this.onMouseout = function(d,i){
+    if(responsiveLegend){
+      this.updateAlphas();
+      let labelClasses = new Set(this.selectedClasses);
+      this.legendMark
+        .attr('opacity', (d, i)=>{
+          if (labelClasses.size == 0) {
+            return 1.0;
+          } else {
+            return labelClasses.has(i) ? 1.0:0.1;
+          }
+        });
+      renderer.render();
+    }
+  };
+  this.onClick = function(d,i){
+    if(responsiveLegend){
+      if (this.selectedClasses.has(i)) {
+        this.selectedClasses.delete(i);
+      } else {
+        this.selectedClasses.add(i);
+      }
+      this.onSelectLegend(this.selectedClasses);
+      if (this.selectedClasses.size == renderer.dataObj.ndim) {
+        this.selectedClasses = new Set();
+      }
+    }
+  };
+
+  this.initLegend = function(
+    colors = utils.baseColors.slice(0, 10), 
+    labels = utils.getLabelNames()
+  ) {
+    let width = +this.svg.attr('width');
+    let marginTop = renderer.top + renderer.paddingTop;
+    let padding = 8;
+
+    let legendLeft = width - utils.smLegendLeft[this.getDataset()];
+    let legendRight = width - utils.smLegendRight[this.getDataset()];
     this.legend_sx = d3.scaleLinear()
       .domain([0, 1])
-      .range([this.sx(1)+5, this.sx(1+this.canvasMarginPercentage)]);
+      .range([legendLeft, legendRight]);
 
     this.legend_sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([this.sy(0)+5, Math.min(this.sy(1), this.sy(0)+400)]);
+      .domain([
+        -1, 
+        0, 
+        utils.getLabelNames().length, 
+        utils.getLabelNames().length+1 ])
+      .range([
+        marginTop,
+        marginTop+padding, 
+        marginTop+padding+utils.legendHeight[this.getDataset()], 
+        marginTop+padding+utils.legendHeight[this.getDataset()]+padding ]);
 
-    this.svg.selectAll('.legendRect')
+
+    if(this.legendBox === undefined){
+       this.legendBox = this.svg.selectAll('.legendBox')
+        .data([0])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendBox')
+        .attr('fill', 'none')
+        .attr('stroke', '#c1c1c1')
+        .attr('stroke-width', 1);
+    }
+    if (this.legendTitle == undefined && utils.legendTitle[this.getDataset()] !== undefined){
+       this.legendTitleBg = this.svg.selectAll('.legendTitleBg')
+        .data([0, ])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendTitleBg')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)));
+
+      this.legendTitle = this.svg.selectAll('.legendTitle')
+        .data([utils.legendTitle[this.getDataset()], ])
+        .enter()
+        .append('text')
+        .attr('class', 'legendTitle')
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .text(d=>d);
+    }
+    this.legendMark = this.svg.selectAll('.legendMark');
+
+
+    
+
+    this.svg.selectAll('.legendMark')
       .data(colors)
       .enter()
-      .append('rect')
-      .attr('class', 'legendRect')
+      .append('circle')
+      .attr('class', 'legendMark')
       .attr('fill', (c, i)=>d3.rgb(...c))
       .style('cursor', ()=>{
         if(responsiveLegend){
@@ -298,70 +387,74 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
           return 'auto';
         }
       })
-      .on('mouseover', (_, i)=>{
-        if(responsiveLegend){
-          let classes = new Set(this.selectedClasses);
-          if (!classes.has(i)) {
-            classes.add(i);
-          }
-          this.onSelectLegend(classes);
-        }
+      .on('mouseover', (d, i)=>{
+        this.onMouseover(d,i);
       })
-      .on('mouseout', (_, i)=>{
-        if(responsiveLegend){
-          this.updateAlphas();
-          let labelClasses = new Set(this.selectedClasses);
-          this.legendRect
-            .attr('opacity', (d, i)=>{
-              if (labelClasses.size == 0) {
-                return 1.0;
-              } else {
-                return labelClasses.has(i) ? 1.0:0.1;
-              }
-            });
-          renderer.render();
-        }
+      .on('mouseout', (d, i)=>{
+        this.onMouseout(d,i)
       })
-      .on('click', (_, i)=>{
-        if(responsiveLegend){
-          if (this.selectedClasses.has(i)) {
-            this.selectedClasses.delete(i);
-          } else {
-            this.selectedClasses.add(i);
-          }
-          this.onSelectLegend(this.selectedClasses);
-          if (this.selectedClasses.size == renderer.dataObj.ndim) {
-            this.selectedClasses = new Set();
-          }
-        }
+      .on('click', (d, i)=>{
+        this.onClick(d,i);
       });
-    this.legendRect = this.svg.selectAll('.legendRect');
+    this.legendMark = this.svg.selectAll('.legendMark');
 
     this.svg.selectAll('.legendText')
       .data(labels)
       .enter()
       .append('text')
-      .attr('class', 'legendText');
+      .attr('class', 'legendText')
+      .attr('alignment-baseline', 'middle');
 
-    this.legendText = this.svg.selectAll('.legendText')
-      .attr('alignment-baseline', 'middle')
-      .attr('text-anchor', 'middle')
+    this.legendText = this.svg.selectAll('.legendText');
+    this.legendText
       .text((l)=>l)
-      .style('pointer-events', 'none');
+      .on('mouseover', (d, i)=>{
+        this.onMouseover(d,i);
+      })
+      .on('mouseout', (d, i)=>{
+        this.onMouseout(d,i)
+      })
+      .on('click', (d, i)=>{
+        this.onClick(d,i);
+      });
 
+      
     this.repositionLegends = ()=>{
       let width = this.svg.attr('width');
       let height = this.svg.attr('height');
-      this.legendRect
-        .attr('x', this.legend_sx(0))
-        .attr('y', (c, i)=>this.legend_sy(i/10))
-        .attr('width', (this.legend_sy(1)-this.legend_sy(0))/10 )
-        .attr('height', (this.legend_sy(1)-this.legend_sy(0))/10 );
+      let r = (this.legend_sy(1)-this.legend_sy(0))/4;
+
+      this.legendMark
+        .attr('cx', this.legend_sx(0.0)+2.5*r)
+        .attr('cy', (c, i)=>this.legend_sy(i+0.5))
+        .attr('r', r);
 
       this.legendText
-        .attr('x', this.legend_sx(0) +
-              (this.legend_sy(1)-this.legend_sy(0))/10/2 )
-        .attr('y', (l, i)=>this.legend_sy((i+0.5)/10));
+        .attr('x', +this.legend_sx(0.0)+2.5*r+2.5*r)
+        .attr('y', (l, i)=>this.legend_sy(i+0.5));
+
+      this.legendBox
+        .attr('x', this.legend_sx.range()[0])
+        .attr('y', this.legend_sy(-1))
+        .attr('width', this.legend_sx.range()[1]-this.legend_sx.range()[0])
+        .attr('height', this.legend_sy(utils.getLabelNames().length+1)-this.legend_sy(-1))
+        .attr('rx', r);
+
+      if (this.legendTitle !== undefined){
+        this.legendTitle
+          .attr('x',  this.legend_sx(0.5))
+          .attr('y',  this.legend_sy(-1))
+          .text(utils.legendTitle[this.getDataset()] || '');
+
+        let rectData = this.legendTitle.node().getBBox();
+        let padding = 2;
+        this.legendTitleBg
+          .attr('x', rectData.x-padding)
+          .attr('y', rectData.y-padding)
+          .attr('width', rectData.width+2*padding)
+          .attr('height', rectData.height+2*padding)
+          .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
+      }
     };
     this.repositionLegends();
   };
@@ -381,7 +474,7 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
       }
     }
     // this.updateAlphas();
-    this.legendRect
+    this.legendMark
       .attr('opacity', (d, j)=>{
         if (!labelClasses.has(j)) {
           return 0.1;

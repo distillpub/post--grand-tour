@@ -21,16 +21,17 @@ class LossHistoryRenderer{
     }
 
     resize(){
-        let marginLeft = 50;
-        let marginBottom = 50;
-        let margin = 30;
+        let marginLeft = 40;
+        let marginBottom = 40;
+        let marginRight = 5;
+        let marginTop = 5;
         this.sx = d3.scaleLinear()
         .domain([0,100])
-        .range([marginLeft, this.width-margin]);
+        .range([marginLeft, this.width-marginRight]);
 
         this.sy = d3.scaleLog()
         .domain([this.dataExtent[0], this.dataExtent[1]*1.2])
-        .range([this.height-marginBottom, margin]);
+        .range([this.height-marginBottom, marginTop]);
     }
     
 
@@ -66,7 +67,8 @@ class LossHistoryRenderer{
         .attr('y', this.sy.range()[1])
         .attr('width', Math.abs(this.sx.range()[1] - this.sx.range()[0]))
         .attr('height', Math.abs(this.sy.range()[1] - this.sy.range()[0])+2)
-        .attr('fill', '#eee');
+        .attr('fill', 'white');
+        // .attr('fill', '#eee');
 
 
         let ax = d3.axisBottom(this.sx).tickValues([0,14,21,50,75,99]);
@@ -140,8 +142,8 @@ class LossHistoryRenderer{
         .enter()
         .append('text')
         .attr('class', 'y-label');
-        let ylabel_x = this.sx(0)-25;
-        let ylabel_y = (this.sy.range()[0]+this.sy.range()[1])/2;
+        let ylabel_x = this.sx(0)-20;
+        let ylabel_y = (this.sy.range()[0]+this.sy.range()[1])/2 + 18;
         ylabel = this.svg.selectAll('.y-label')
         .attr('x', ylabel_x)
         .attr('y', ylabel_y)
@@ -163,8 +165,8 @@ class LossHistoryRenderer{
         .append('path')
         .attr('class', 'lineplot');
         paths = this.svg.selectAll('path.lineplot')
-        .attr('stroke', (d,i)=>this.sc(i))
         .attr('fill', 'none')
+        .attr('stroke', (d,i)=>this.sc(i))
         .attr('stroke-width', 1.5)
         // .attr('stroke-linecap', 'round')
         // .attr('stroke-dasharray', '4,1.5')

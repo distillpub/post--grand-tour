@@ -12,9 +12,9 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     });
     this.nrow = kwargs.methods.length;
     this.ncol = kwargs.epochs.length;
+
   };
   this.setKwargs(kwargs);
-
 
   this.gl = gl;
   this.program = program;
@@ -23,6 +23,33 @@ function SmallMultipleRenderer(gl, program, kwargs) {
   this.mode = 'point';
   this.colorFactor = utils.COLOR_FACTOR;
   this.isFullScreen = false;
+
+  this.legendPadding = 2;
+  this.paddingLeft = 1;
+  this.paddingTop = 25;//between subplots
+
+  this.left = 1;
+  this.top = 20;
+  this.paddingBottom = 40;
+
+  this.updateBoundaries = function(width){
+    this.width = width;
+    this.legendLeft = utils.smLegendLeft[this.dataset];
+    this.legendRight = utils.smLegendRight[this.dataset];  
+    this.right = this.width - this.legendLeft - this.legendPadding;
+    
+    this.sideLength = (this.right-this.left) / this.ncol - this.paddingLeft;
+
+    this.height = this.top 
+    + this.sideLength * this.nrow 
+    + this.paddingTop * this.nrow
+    + this.paddingBottom;
+
+    this.bottom = this.height - this.paddingBottom;
+
+  };
+
+  
 
   this.initData = function(buffer, url) {
     if (url.includes('labels.bin')) {
@@ -76,9 +103,12 @@ function SmallMultipleRenderer(gl, program, kwargs) {
   };
 
   this.resizeCanvas = function() {
-    let width = parseFloat(d3.select(this.gl.canvas).attr('width'));
-    let height = width / this.ncol * this.nrow;
-    gl.canvas.height = height;
+    // let width = parseFloat(d3.select(this.gl.canvas).attr('width')) / window.devicePixelRatio;
+    let width = this.gl.canvas.clientWidth;
+    this.updateBoundaries(width);
+
+    gl.canvas.width = this.width;// * window.devicePixelRatio;
+    gl.canvas.height = this.height;// * window.devicePixelRatio;
     utils.resizeCanvas(gl.canvas);
   };
 
@@ -168,9 +198,21 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     let colorLoc = this.colorLoc;
     let positionLoc = this.positionLoc;
 
-    let width = gl.canvas.width;
-    let height = gl.canvas.height;
-    let sideLength = Math.min(width / this.ncol, height / this.nrow);
+    let width = this.width;
+    let height = this.height;
+    let legendLeft = this.legendLeft;
+    let legendRight = this.legendRight;
+    let legendPadding = this.legendPadding;
+    let paddingLeft = this.paddingLeft;
+    let paddingTop = this.paddingTop;
+    let paddingBottom = this.paddingBottom;
+    let left = this.left;
+    let right = this.right;
+    let top = this.top;
+    let bottom = this.bottom;
+    let sideLength = this.sideLength;
+
+
     let colors = labels.map((d)=>utils.baseColors[d]);
     colors = colors.map((c, i)=>[c[0], c[1], c[2], dataObj.alphas[i]]);
     if (this.mode == 'image') {
@@ -182,7 +224,7 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
     dataObj.points = {};
-      for (let i=0; i<this.nrow; i++) {
+    for (let i=0; i<this.nrow; i++) {
       let dataTensor = dataObj[this.methods[i]];
       dataObj.points[this.methods[i]] = {};
       // let dmax;
@@ -214,10 +256,12 @@ function SmallMultipleRenderer(gl, program, kwargs) {
         dataObj.points[this.methods[i]][this.epochs[j]] = points;
 
         let dpr = window.devicePixelRatio;
-        let margin = 5;
         gl.viewport( 
-          j*(sideLength)+margin*dpr, (this.nrow-(i+1))*sideLength+margin*dpr, 
-          sideLength-2*margin*dpr, sideLength-2*margin*dpr
+          (left+j*(sideLength+paddingLeft))*dpr, 
+          // this.paddingBottom,
+          (this.paddingBottom+(this.nrow-i-1)*(sideLength+paddingTop))*dpr, 
+          sideLength*dpr, 
+          sideLength*dpr
         );
 
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);

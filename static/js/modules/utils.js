@@ -8,8 +8,13 @@ let utils = {};
 utils.no_cors_host = 'data-no-cors/';
 // utils.cors_host = ''; 
 
-utils.CLEAR_COLOR = [.97, .97, .97];
-utils.CLEAR_COLOR_SMALL_MULTIPLE = [.95, .95, .95];
+// utils.CLEAR_COLOR = [.97, .97, .97];
+// utils.CLEAR_COLOR = [250/255,250/255,250/255];
+// utils.CLEAR_COLOR = [254/255,254/255,254/255];
+// utils.CLEAR_COLOR_SMALL_MULTIPLE = [.95, .95, .95];
+
+utils.CLEAR_COLOR = [1,1,1];
+utils.CLEAR_COLOR_SMALL_MULTIPLE = [1,1,1];
 utils.MIN_EPOCH = 0;
 utils.MAX_EPOCH = 99;
 utils.COLOR_FACTOR = 0.9;
@@ -17,12 +22,49 @@ utils.dataset = 'mnist';
 utils.datasetListener = [];
 utils.pointAlpha = 255 * 0.1;
 
+//legend of teaser, grand tour plots
 utils.legendLeft = {
-  'mnist':60,
-  'fashion-mnist':80,
-  'cifar10':80,
-  'mnist-adversarial':80
+  'mnist':55,
+  'fashion-mnist':95,
+  'cifar10':95,
+  'mnist-adversarial': 95
 };
+utils.legendRight = {
+  'mnist':2,
+  'fashion-mnist':2,
+  'cifar10':2,
+  'mnist-adversarial': 2
+};
+
+//legend of small multiple
+utils.smLegendLeft = {
+  'mnist':45,
+  'fashion-mnist':85,
+  'cifar10':85,
+  'mnist-adversarial': 85
+};
+utils.smLegendRight = {
+  'mnist':2,
+  'fashion-mnist':2,
+  'cifar10':2,
+  'mnist-adversarial': 2
+};
+
+utils.legendTitle = {
+  'mnist': 'digit',
+  'fashion-mnist': undefined,
+  'cifar10': undefined,
+  'mnist-adversarial': undefined
+};
+
+utils.legendHeight = {
+  'mnist': 150,
+  'fashion-mnist': 150,
+  'cifar10': 150,
+  'mnist-adversarial': 165,
+}
+
+
 
 utils.mixScale = function(s0,s1,progress, func){
   let range0 = s0.range();
@@ -257,7 +299,7 @@ utils.getLabelNames = function(adversarial=false, dataset=undefined) {
   }
   let res;
   if (dataset == 'mnist') {
-    res = d3.range(10).map((i)=>'digit '+i); 
+    res = d3.range(10).map((i)=>''+i); 
   } else if (dataset == 'fashion-mnist') {
     res = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
             'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'];

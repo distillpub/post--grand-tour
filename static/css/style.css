@@ -1,6 +1,4 @@
-.play-button{
-  margin: 0;
-}
+
 
 d-title p{
   border-bottom: solid 1px rgba(0, 0, 0, 0.1);
@@ -120,17 +118,26 @@ d-math{
 }
 /*--------------------------------------*/
 
-a, i, .legendRect, .legendText, button, select, option{
+a, i, .legendMark, .legendText, button, select, option{
     cursor: pointer;
 }
 
-button{
+.legendTitle{
+  font-weight: bold;
+}
+
+
+button.annotation{
   background: #eee;
-  border: none;
-  height: 33px;
-  font-size: 14px;
-  text-decoration: none;
-  border-radius: 4px;
+  /*border: none;*/
+  font-size: 9px;
+  /*text-decoration: none;*/
+  border-radius: 3px;
+  height: 24px;
+  width: 85px;
+  /*left: calc(100% - 86px);*/
+  padding: 0;
+  border: 1px solid #ccc;
 }
 
 
@@ -185,11 +192,11 @@ svg text{
         fill: #333;
 }
 
-svg.confusionMatrix text{
-    font-weight: 200;
-    /*font-size: 12px;*/
-}
+/*svg text.epoch, */
+svg text.method{
+  font-weight: bold;
 
+}
 
 :root {
   --axis-color: #555;
@@ -210,9 +217,11 @@ svg.confusionMatrix text{
 
 .x-grid line,
 .y-grid line{
-  stroke-width: 0.8;
-  stroke: #fff;
+  stroke-width: 0.5;
+  stroke: #ccc;
+  opacity: 0.7;
 }
+
 .x-grid path.domain,
 .y-grid path.domain,
 .x-axis path.domain,
@@ -221,7 +230,9 @@ svg.confusionMatrix text{
   display: none;
 }
 
-
+.x-label, .y-label{
+  font-weight: bold;
+}
 
 d-figure{
   position: relative;
@@ -249,7 +260,7 @@ d-figure.teaser{
   grid-column: text;
   display: block;
   width: 100%;
-  min-width: 500px;
+  /*min-width: 500px;*/
   height: 280px;
   margin-left: auto; 
   margin-right: auto; 
@@ -284,16 +295,19 @@ canvas.grandtour.fullscreen{
 
 
 
-d-figure.smallmultiple, d-figure.smallmultiple0{
+/*d-figure.smallmultiple, 
+d-figure.smallmultiple0{
     grid-column: page;
+}*/
+
+canvas.smallmultiple, 
+canvas.smallmultiple0{
+    /*margin-top: 30px;*/
+    /*margin-left: 10%;*/
+    /*margin-right: 10%;*/
+    width: 100%; 
 }
 
-canvas.smallmultiple, canvas.smallmultiple0{
-    margin-top: 30px;
-    margin-left: 10%;
-    margin-right: 10%;
-    width: 80%; 
-}
 
 .smallmultiple.fullscreen, .smallmultiple0.fullscreen{
     grid-column: screen;
@@ -325,7 +339,7 @@ canvas.smallmultiple, canvas.smallmultiple0{
 .play-button{
     position: absolute;
     top: calc(100% - 40px);
-    left: calc(15% - 30px);
+    left: 50px;
     font-size: 20px;
     opacity: 0.7;
 }
@@ -333,7 +347,7 @@ canvas.smallmultiple, canvas.smallmultiple0{
 .teaser-fullscreenButton{
     position: absolute;
     top: 48px;
-    left: 13px; /*77%;*/
+    left: 2px; /*77%;*/
     font-size: 20px;
     opacity: 0.3;
 }
@@ -341,11 +355,18 @@ canvas.smallmultiple, canvas.smallmultiple0{
 .teaser-grandtourButton{
     position: absolute;
     top: calc(100% - 40px);
-    left: 13px; /*77%;*/
+    left: 2px; /*77%;*/
     font-size: 20px;
     opacity: 0.7;
 }
 
+/*button whose <d-figure> parent is in fullscreen*/
+.fullscreen .teaser-fullscreenButton{
+    left: 10px;
+}
+.fullscreen .teaser-grandtourButton{
+    left: 10px;
+}
 
 
 .slider {
@@ -380,8 +401,8 @@ canvas.smallmultiple, canvas.smallmultiple0{
 
 .epochSlider {
   top: calc(100% - 34px);
-  left: 15%;
-  width: 60%;
+  left: 80px;
+  width: calc(100% - 80px - 65px)
 }
 
 .layerSlider {

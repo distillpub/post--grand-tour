@@ -63,19 +63,20 @@ function annotate3(renderer){
   let buttons = overlay.annotationGroup.selectAll('button')
   .data(data)
   .enter()
-  .append('button');
-  buttons = overlay.annotationGroup.selectAll('button')
-  .style('height', '33px');
+  .append('button')
+  .attr('class', 'annotation btn btn-default');
+
+  buttons = overlay.annotationGroup.selectAll('button');
 
   let buttonHeight = parseFloat(buttons.style('height'));
-  let sy = d3.scaleLinear().domain([0,2]).range([0,buttonHeight*data.length*1.1]);
+  let sy = d3.scaleLinear().domain([0,2]).range([0,(buttonHeight*1.3)*data.length]);
   
   buttons.data(data)
   .style('position', 'absolute')
-  .style('top', (d,i)=>`calc(40% + ${sy(i)}px`)
-  .style('left', (d,i)=>'calc(100% + 10px)')
-  .style('width', '120px')
-  .style('background', d=> d.isOn?'#2196F3':'#eee')
+  .style('top', (d,i)=>`${constants.buttonOffsetY['default'] + sy(i)}px`)
+  .style('background', d=> constants.buttonColors[d.isOn?'on':'off'])
+  .style('width', (d,i)=>`${2+utils.legendLeft['fashion-mnist']-utils.legendRight['fashion-mnist']}px`)
+  .style('left', (d,i)=>`calc(100% - ${utils.legendLeft['fashion-mnist']}px)`)
   .text(d=>d.text)
   .on('click', function(d){
     onButtonClick3.bind(this)(d, buttons);

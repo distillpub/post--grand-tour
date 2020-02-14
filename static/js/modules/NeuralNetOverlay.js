@@ -176,7 +176,7 @@ function NeuralNetOverlay(svgid) {
       ]);
     let sy = d3.scaleLinear()
       .domain([0, legendData.length])
-      .range([10, 10+this.svg.attr('height')/4]);
+      .range([10, 10+legendData.length*20]);
     
     this.svg.selectAll('.legendRect')
     .data(legendData)
@@ -536,7 +536,7 @@ function NeuralNetOverlay(svgid) {
   this.repositionSlider = function(){
     this.slider
     .style('left', `${+this.exampleRightBound+64}px`)
-    .style('width', `${+this.svg.attr('width')-this.exampleRightBound-64-32}px`);
+    .style('width', `${+this.svg.attr('width')-this.exampleRightBound-130}px`);
 
     this.playButton
     .style('left', `${parseFloat(this.slider.style('left')) - 30}px`);

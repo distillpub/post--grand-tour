@@ -377,9 +377,12 @@
 <d-figure id='smallmultiple1' class='smallmultiple' style="">
   <canvas id='sm1' class='smallmultiple' width='100' height='200'></canvas>
   <script>
+  // let sm1 = createSmallMultiple('#smallmultiple1', 
+  //   [13,14,15, 20,21,22], ['t-SNE', 'Dynamic t-SNE', 'UMAP'], 
+  //   'mnist', true, highlight_digits);
   let sm1 = createSmallMultiple('#smallmultiple1', 
     [13,14,15, 20,21,22], ['t-SNE', 'Dynamic t-SNE', 'UMAP'], 
-    'mnist', true, highlight_digits);
+    'mnist', true);
 </script>
 </d-figure>
 <figcaption>Softmax activations of the MNIST classifier with non-linear dimensionality reduction. Use the buttons on the right to highlight digits 1 and 7 in the plot, or drag rectangles around the charts to select particular point subsets to highlight in the other charts.</figcaption>
@@ -395,13 +398,13 @@
 
 <p>
   Non-linear embeddings that have non-convex objectives also tend to be sensitive to initial conditions.
-  For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30, 31, 32, and 33 (in fact, all the way to 99).
+  For example, in MNIST, although the neural network starts to stabilize on epoch 30, t-SNE and UMAP still generate quite different projections between epochs 30, 31 and 32 (in fact, all the way to 99).
   Temporal regularization techniques (such as Dynamic t-SNE) mitigate these consistency issues, but still suffer from other interpretability issues<d-cite key="wattenberg2016use"></d-cite>. 
 </p>
 
 <d-figure id='smallmultiple2' class='smallmultiple' style="">
   <canvas id='sm2' class='smallmultiple' width='100' height='200'></canvas>
-  <script>let sm2 = createSmallMultiple('#smallmultiple2', [1,5,10,15, 20,30,31,32,33], ['t-SNE', 'Dynamic t-SNE', 'UMAP', 'Linear'], 'mnist', true, ()=>{})</script>
+  <script>let sm2 = createSmallMultiple('#smallmultiple2', [1,5,10,15,20,30,31,32], ['t-SNE', 'Dynamic t-SNE', 'UMAP', 'Linear'], 'mnist', true, ()=>{})</script>
 </d-figure>
 
 <p>
@@ -415,9 +418,13 @@
 <d-figure id='smallmultiple3' class='smallmultiple' style="">
   <canvas id='sm3' class='smallmultiple' width='100' height='200'></canvas>
   <script>
-  let sm3 = createSmallMultiple('#smallmultiple3', 
-[2,5,10,20,30,60,99], ['t-SNE', 'UMAP', 'Linear'], 
-'fashion-mnist', true, highlight_shoes)</script>
+  sm3 = createSmallMultiple('#smallmultiple3', 
+    [2,5,10,20,50,99], ['t-SNE', 'UMAP', 'Linear'], 
+    'fashion-mnist', true, 
+    highlight_shoes_button, 
+    highlight_shoes,
+  );
+  </script>
 </d-figure>
 <figcaption>Three-way confusion in fashion-MNIST. Notice that in contrast to non-linear methods, a carefully-constructed linear projection can offer a better visualization of the classifier behavior.</figcaption>
 
@@ -445,7 +452,7 @@
   From
   <a onclick="nngt.gt.setMatrix(DIGIT17_MATRIX)">this linear projection</a>, we can easily identify the learning of 
   <span style="color: #ff7f0e;">digit 1</span> on 
-  <a onclick="nngt.setEpochIndex(13)">epoch 14</a> and <br>
+  <a onclick="nngt.setEpochIndex(13)">epoch 14</a> and 
   <span style="color: #7f7f7f;">digit 7</span> on 
   <a onclick="nngt.setEpochIndex(19)">epoch 21</a>.
 </figcaption>

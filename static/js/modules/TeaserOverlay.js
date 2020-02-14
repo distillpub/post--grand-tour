@@ -12,6 +12,10 @@ function TeaserOverlay(renderer, kwargs) {
   let that = this;
   let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
 
+  this.getDataset = function(){
+    return this.renderer.fixed_dataset || utils.getDataset();
+  };
+
   this.zoomSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
@@ -228,7 +232,7 @@ function TeaserOverlay(renderer, kwargs) {
     .attr('value', d=>d.value)
     .property('selected', d=>{
       //show default selection
-        return d.value == utils.getDataset();
+        return d.value == this.getDataset();
     });
 
   function clamp(min, max, v) {
@@ -288,19 +292,47 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('y', height-20);
     }
 
+    let r = (this.legend_sy(1)-this.legend_sy(0))/4;
     this.legendMark
-      .attr('cx', this.legend_sx(0.0))
-      .attr('cy', (c, i)=>this.legend_sy((i+0.5)/10))
-      .attr('r', (this.legend_sy(1)-this.legend_sy(0))/40 );
+      .attr('cx', this.legend_sx(0.0)+2.5*r)
+      .attr('cy', (c, i)=>this.legend_sy(i+0.5))
+      .attr('r', r);
 
     this.legendText
-      .attr('x', +this.legend_sx(0.0)+(this.legend_sy(1)-this.legend_sy(0))/40*3)
-      .attr('y', (l, i)=>this.legend_sy((i+0.5)/10));
+      .attr('x', +this.legend_sx(0.0)+2.5*r+2.5*r)
+      .attr('y', (l, i)=>this.legend_sy(i+0.5));
+
+    this.legendBox
+      .attr('x', this.legend_sx.range()[0])
+      .attr('y', this.legend_sy(-1))
+      .attr('width', this.legend_sx.range()[1]-this.legend_sx.range()[0])
+      .attr('height', this.legend_sy(utils.getLabelNames().length+1)-this.legend_sy(-1))
+      .attr('rx', r);
+
+    if (this.legendTitle !== undefined){
+      this.legendTitle
+        .attr('x',  this.legend_sx(0.5))
+        .attr('y',  this.legend_sy(-1))
+        .text(utils.legendTitle[this.getDataset()] || '');
+
+      let rectData = this.legendTitle.node().getBBox();
+      let padding = 2;
+      this.legendTitleBg
+        .attr('x', rectData.x-padding)
+        .attr('y', rectData.y-padding)
+        .attr('width', rectData.width+2*padding)
+        .attr('height', rectData.height+2*padding)
+        .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
+
+
+    }
   };
 
 
+
+
   this.init = function() {
-    this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, this.renderer.fixed_dataset || undefined));
+    this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, this.getDataset()));
     this.resize();
     this.initAxisHandle();
     if (this.annotate !== undefined){
@@ -405,18 +437,55 @@ function TeaserOverlay(renderer, kwargs) {
 
   this.initLegendScale = function(){
     let width = +this.svg.attr('width');
-    let legendLeft = width - utils.legendLeft[this.renderer.fixed_dataset || utils.getDataset()];
+    let marginTop = 20;
+    let padding = 8;
+
+    let legendLeft = width - utils.legendLeft[this.getDataset()];
+    let legendRight = width - utils.legendRight[this.getDataset()];
+    
     this.legend_sx = d3.scaleLinear()
       .domain([0, 1])
-      .range([legendLeft, width]);
+      .range([legendLeft, legendRight]);
     this.legend_sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([20, 230]);
+      .domain([-1, 0, utils.getLabelNames().length, utils.getLabelNames().length+1])
+      .range([marginTop-padding, marginTop, marginTop+170, marginTop+170+padding]);
   };
 
   this.initLegend = function(colors, labels) {
       
     this.initLegendScale();
+
+    if(this.legendBox === undefined){
+       this.legendBox = this.svg.selectAll('.legendBox')
+        .data([0])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendBox')
+        .attr('fill', 'none')
+        .attr('stroke', '#c1c1c1')
+        .attr('stroke-width', 1);
+    }
+    if (this.legendTitle == undefined && utils.legendTitle[this.getDataset()] !== undefined){
+       this.legendTitleBg = this.svg.selectAll('.legendTitleBg')
+        .data([0, ])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendTitleBg')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)));
+
+      this.legendTitle = this.svg.selectAll('.legendTitle')
+        .data([utils.legendTitle[this.getDataset()], ])
+        .enter()
+        .append('text')
+        .attr('class', 'legendTitle')
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .text(d=>d);
+    }
+
+   
+
+
     this.svg.selectAll('.legendMark')
       .data(colors)
       .enter()
