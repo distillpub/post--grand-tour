@@ -51,7 +51,7 @@ utils.smLegendRight = {
 };
 
 utils.legendTitle = {
-  'mnist': 'digit',
+  'mnist': 'Digit',
   'fashion-mnist': undefined,
   'cifar10': undefined,
   'mnist-adversarial': undefined
@@ -304,8 +304,8 @@ utils.getLabelNames = function(adversarial=false, dataset=undefined) {
     res = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
             'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'];
   } else if (dataset == 'cifar10') {
-    res = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-            'dog', 'frog', 'horse', 'ship', 'truck'];
+    res = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer',
+            'Dog', 'Frog', 'Horse', 'Ship', 'Truck'];
   } else {
     throw new Error('Unrecognized dataset ' + dataset);
   }

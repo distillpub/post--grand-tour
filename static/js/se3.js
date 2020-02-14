@@ -5,13 +5,13 @@ function onButtonClick3(d, buttons, shouldTurnOffOthers=true){
       // turn off other buttons
       buttons.filter(e=>e!=d)
       .each(d=>d.isOn=false)
-      .style('background', '#eee');
+      .style('background', constants.buttonColors['off']);
     }
 
-    d3.select(this).style('background', '#2196F3');
+    d3.select(this).style('background', constants.buttonColors['on']);
     d.action.turnOn();
   }else{
-    d3.select(this).style('background', '#eee');
+    d3.select(this).style('background', constants.buttonColors['off']);
     d.action.turnOff();
   }
 }
