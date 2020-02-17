@@ -5,12 +5,12 @@ function onButtonClick2(d, buttons, shouldTurnOffOthers=true){
       // turn off other buttons
       buttons.filter(e=>e!=d)
       .each(d=>d.isOn=false)
-      .style('background', constants.buttonColors['off']);
+      .style('background', utils.buttonColors['off']);
     }
-    d3.select(this).style('background', constants.buttonColors['on']);
+    d3.select(this).style('background', utils.buttonColors['on']);
     d.action.turnOn();
   }else{
-    d3.select(this).style('background', constants.buttonColors['off']);
+    d3.select(this).style('background', utils.buttonColors['off']);
     d.action.turnOff();
   }
 }
@@ -71,8 +71,8 @@ function annotate2(renderer){
   
   buttons.data(data)
   .style('position', 'absolute')
-  .style('top', (d,i)=>`${constants.buttonOffsetY['default'] + sy(i)}px`)
-  .style('background', d=> constants.buttonColors[d.isOn?'on':'off'])
+  .style('top', (d,i)=>`${utils.buttonOffsetY['default'] + sy(i)}px`)
+  .style('background', d=> utils.buttonColors[d.isOn?'on':'off'])
   .style('width', (d,i)=>`${2+utils.legendLeft['fashion-mnist']-utils.legendRight['fashion-mnist']}px`)
   .style('left', (d,i)=>`calc(100% - ${utils.legendLeft['fashion-mnist']}px)`)
   .text(d=>d.text)

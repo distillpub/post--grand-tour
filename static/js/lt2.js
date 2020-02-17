@@ -11,6 +11,7 @@ lt2Figure.addEventListener("ready", function() {
 
   let init_dataset = 'fashion-mnist';
   let urls = utils.getLayerTransitionURL(init_dataset, 'test');
+  const S=4, L=6; //small, large landmarkSizes
 
   let kwargs = {
     shouldPlayGrandTour: false, 
@@ -38,25 +39,24 @@ lt2Figure.addEventListener("ready", function() {
     npoint: 500,
     pointSize: 6.0,
     normalizeView: true,
+
+    overlayKwargs: {
+      landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
+    }
   };
   lt2 = new LayerTransitionRenderer(gl, programs[0], kwargs);
-  lt2.datasetName = init_dataset;
-  const S=4, L=6; //small, large landmarkSizes
-  lt2.overlay = new LayerTransitionOverlay(lt2, {
-      landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
-  });
+  
   lt2 = utils.loadDataToRenderer(urls, lt2, ()=>{
     if(lt2Figure._onscreen){
       lt2Figure.onscreen();
     }
   });
-  lt2.datasetName = init_dataset;
 
   allViews.push(lt2);
 
   window.addEventListener('resize', ()=>{
-      // sm0.resize();
-      // sm0.overlay.resize();
+      lt2.resize();
+      lt2.overlay.resize();
   });
 
 
@@ -73,7 +73,6 @@ lt2Figure.addEventListener("ready", function() {
       this.layerIndexPrev = layer;
       lt2.overlay.onLayerSliderInput(layer);
     }
-
     lt2.dataObj.norms = undefined;
     lt2.colorRect = undefined;
     lt2.dataObj.dataTensor = [];
@@ -106,8 +105,8 @@ lt2Figure.addEventListener("ready", function() {
         ];
         lt2.overlay.landmarkSizes = [L,S,S,L,S,S,L,S,L,S,L,L];
       }
-      lt2.overlay.redrawLayerSlider();
-      lt2.datasetName = dataset;
+      // lt2.overlay.redrawLayerSlider();
+      lt2.overlay.repositionAll();
       lt2.shouldRecalculateColorRect = true;
     });
 

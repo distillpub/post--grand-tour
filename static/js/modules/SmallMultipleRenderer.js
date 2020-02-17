@@ -223,42 +223,38 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     gl.clearColor( ...utils.CLEAR_COLOR_SMALL_MULTIPLE, 1.0 );
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
-    dataObj.points = {};
-    for (let i=0; i<this.nrow; i++) {
-      let dataTensor = dataObj[this.methods[i]];
-      dataObj.points[this.methods[i]] = {};
-      // let dmax;
-      let isDmaxConsistent = false;
-      // if (this.methods[i].includes('manual') 
-      //     || this.methods[i].includes('random')
-      //     || this.methods[i].includes('pca')) {
-      //   // dmax = 1.25 * math.max(math.abs(dataTensor[dataTensor.length-1]));
-      //   // isDmaxConsistent = true;
-      //   isDmaxConsistent = false;
-      // } else {
-      //   isDmaxConsistent = false;
-      // }
+    if(dataObj.points === undefined){ //compute the location of points once
+      dataObj.points = {};
+      dataObj.min = {};
+      dataObj.max = {};
+      for (let i=0; i<this.nrow; i++) {
+        dataObj.points[this.methods[i]] = {};
+        dataObj.min[this.methods[i]] = {};
+        dataObj.max[this.methods[i]] = {};
+        let dataTensor = dataObj[this.methods[i]];
+        for (let j=0; j<this.ncol; j++) {
+          let points = dataTensor[this.epochs[j]];
 
-      for (let j=0; j<this.ncol; j++) {
-
-        let points = dataTensor[this.epochs[j]];
-        if (!isDmaxConsistent) {
-          let min = math.min(points, 0);
-          let max = math.max(points, 0);
+          dataObj.min[this.methods[i]][this.epochs[j]] = math.min(points, 0);
+          dataObj.max[this.methods[i]][this.epochs[j]] = math.max(points, 0);
+          let min = dataObj.min[this.methods[i]][this.epochs[j]];
+          let max = dataObj.max[this.methods[i]][this.epochs[j]];
           points = points.map((row)=>row.map((d, j)=>{
             d = (d-min[j])/(max[j]-min[j])*2-1;
             d /= 1.20;
             return d;
           }));
-        } else {
-          points = points.map((row)=>row.map((d)=>d/dmax));
+          dataObj.points[this.methods[i]][this.epochs[j]] = points;
         }
-        dataObj.points[this.methods[i]][this.epochs[j]] = points;
-
+      }
+    }
+    
+    for (let i=0; i<this.nrow; i++) {
+      for (let j=0; j<this.ncol; j++) {
+        let points = dataObj.points[this.methods[i]][this.epochs[j]];
         let dpr = window.devicePixelRatio;
         gl.viewport( 
           (left+j*(sideLength+paddingLeft))*dpr, 
-          // this.paddingBottom,
           (this.paddingBottom+(this.nrow-i-1)*(sideLength+paddingTop))*dpr, 
           sideLength*dpr, 
           sideLength*dpr

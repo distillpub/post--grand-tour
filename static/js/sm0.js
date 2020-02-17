@@ -77,14 +77,14 @@ function onHighlightButtonClick(d, buttons, overlay, shouldTurnOffOthers=false){
         // turn off other buttons
         buttons.filter(e=>e!=d)
         .each(d=>d.isOn=false)
-        .style('background', constants.buttonColors['off']);
+        .style('background', utils.buttonColors['off']);
       }
       // turn on this one
-      d3.select(this).style('background', constants.buttonColors['on']);
+      d3.select(this).style('background', utils.buttonColors['on']);
       d.action[0](d.action[1]);
 
     }else{
-      d3.select(this).style('background', constants.buttonColors['off']);
+      d3.select(this).style('background', utils.buttonColors['off']);
       overlay.clearBrushButton.on('click')();
     }
 }
@@ -170,7 +170,7 @@ function highlight_shoes_button(renderer){
   .style('top', (d,i)=>`calc(215px + ${sy(i)}px`)
   .style('left', (d,i)=>`calc(100% - ${utils.smLegendLeft['fashion-mnist']}px)`)
   .style('width', (d,i)=>`${2+utils.smLegendLeft['fashion-mnist']-utils.smLegendRight['fashion-mnist']}px`)
-  .style('background', d=> constants.buttonColors[d.isOn?'on':'off'])
+  .style('background', d=> utils.buttonColors[d.isOn?'on':'off'])
   .text(d=>d.text)
   .on('click', function(d){
     onHighlightButtonClick.bind(this)(d, buttons, overlay, shouldTurnOffOthers=true);

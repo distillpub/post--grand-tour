@@ -399,16 +399,17 @@ canvas.smallmultiple0{
 }
 
 
-.epochSlider {
-  top: calc(100% - 34px);
+.epochSlider, .layerSlider {
   left: 80px;
-  width: calc(100% - 80px - 65px)
+  width: calc(100% - 80px - 80px)
+}
+
+.epochSlider{
+  top: calc(100% - 34px);
 }
 
 .layerSlider {
   top: calc(100% - 70px);
-  left: 15%;
-  width: 60%;
 }
 
 .zoomSlider {

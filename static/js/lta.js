@@ -10,6 +10,7 @@ ltaFigure.addEventListener("ready", function() {
   );
 
   let urls = utils.getAdversarialURL();
+  const S=4, L=6; //small, large landmarkSizes
 
   lta = new LayerTransitionRenderer(gl, programs[0], {
     epochIndicatorPrefix: 'adversarial training: ', 
@@ -35,16 +36,14 @@ ltaFigure.addEventListener("ready", function() {
     shouldPlayGrandTour: false, 
     shouldAutoNextEpoch: true,
     shouldAutoNextLayer: false,
+    overlayKwargs: {
+      landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
+      hasAdversarial: true,
+    }
   });
 
   allViews.push(lta);
 
-  const S=4, L=6; //small, large
-  lta.overlay = new LayerTransitionOverlay(lta, {
-      landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
-      hasAdversarial: true,
-    });
-  
   lta = utils.loadDataToRenderer(urls, lta, ()=>{
     if(ltaFigure._onscreen){
       ltaFigure.onscreen();
@@ -54,8 +53,8 @@ ltaFigure.addEventListener("ready", function() {
 
 
   window.addEventListener('resize', ()=>{
-      // sm0.resize();
-      // sm0.overlay.resize();
+      lta.resize();
+      lta.overlay.resize();
   });
 
 
@@ -78,6 +77,7 @@ ltaFigure.addEventListener("onscreen", function() {
     lta.shouldRender = true;
     lta.play();
     lta.overlay.play();
+    lta.overlay.repositionAll();
 
     lta.overlay.onLayerSliderInput(11);
     lta.overlay.selectedClasses = new Set([0,8,10]);

@@ -54,7 +54,7 @@ utils.legendTitle = {
   'mnist': 'Digit',
   'fashion-mnist': undefined,
   'cifar10': undefined,
-  'mnist-adversarial': undefined
+  'mnist-adversarial': 'Digit',
 };
 
 utils.legendHeight = {
@@ -62,8 +62,16 @@ utils.legendHeight = {
   'fashion-mnist': 150,
   'cifar10': 150,
   'mnist-adversarial': 165,
+};
+utils.buttonColors = {
+  'on': '#B3C5F4',
+  'off': '#f3f3f3',
 }
 
+utils.buttonOffsetY = {
+  'default': 245,
+  'adversarial': 265,
+};
 
 
 utils.mixScale = function(s0,s1,progress, func){

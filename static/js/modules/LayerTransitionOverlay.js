@@ -21,6 +21,9 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
   this.layerSliderOffsetY = 30;
 
+  this.getDataset = function(){
+    return this.renderer.dataset + (this.hasAdversarial?'-adversarial':'');
+  };
   this.onLayerSliderInput = function(value){
       renderer.setLayer(value);
       // if (value == 0 && !this.isViewManipulated && this.renderer.layer0_matrix !== undefined){
@@ -41,9 +44,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .attr('min', 0)
     .attr('max', renderer.nlayer-1)
     .attr('value', renderer.nlayer-1)
-    .attr('step', 0.005)
-    .style('top', 'calc(100% - 71px)')
-    .style('width', '70%');
+    .attr('step', 0.005);
   this.layerSlider 
     .on('input', ()=>{
       let value = +this.layerSlider.property('value');
@@ -64,7 +65,6 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .attr('max', renderer.nepoch-1)
     .attr('value', renderer.nepoch-1)
     .attr('step', 1)
-    .style('width', '70%')
     .on('input', function() {
       let value = +d3.select(this).property('value');
       renderer.setEpoch(value);
@@ -647,7 +647,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
         this.renderer.isClassSelected[i] = false;
       }
     }
-    this.svg.selectAll('.legendRect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, j)=>{
         if (!classes.has(j)) {
           return 0.1;
@@ -658,88 +658,117 @@ function LayerTransitionOverlay(renderer, kwargs) {
     this.renderer.render(0);
   };
 
-  this.initLegend = function(colors, labels){
-    //legend
-    if(this.legend_sx === undefined){ //if first on init
-      this.legend_sx = d3.scaleLinear()
-        .domain([0, 1])
-        .range([width-130, width-10]);
+  this.initLegendScale = function(){
+    let width = +this.svg.attr('width');
+    let marginTop = 20;
+    let padding = 8;
 
-      this.legend_sy = d3.scaleLinear()
-        .domain([0, 1])
-        .range([100, height-180]);
+    let legendLeft = width - utils.legendLeft[this.getDataset()];
+    let legendRight = width - utils.legendRight[this.getDataset()];
+    
+    this.legend_sx = d3.scaleLinear()
+      .domain([0, 1])
+      .range([legendLeft, legendRight]);
 
-      let onMouseOver = (_, i)=>{
-        let classes = new Set(this.selectedClasses);
-        if (!classes.has(i)) {
-          classes.add(i);
-        }
-        this.onSelectLegend(classes);
-      };
+    let nlabel = utils.getLabelNames(renderer.hasAdversarial).length;
+    this.legend_sy = d3.scaleLinear()
+      .domain([-1, 0, nlabel, nlabel+1])
+      .range([marginTop-padding, marginTop, marginTop+17*nlabel, marginTop+17*nlabel+padding]);
+  };
 
-      let onMouseOut = ()=>{
-        this.restoreSelectedClasses();
-      };
+  this.initLegend = function(colors, labels) {
+      
+    this.initLegendScale();
 
-      let onClick = (_, i)=>{
-        if (this.selectedClasses.has(i)) {
-          this.selectedClasses.delete(i);
-        } else {
-          this.selectedClasses.add(i);
-        }
-        this.onSelectLegend(this.selectedClasses);
-        if (this.selectedClasses.size == renderer.dataObj.ndim) {
-          this.selectedClasses = new Set();
-        }
-      };
-
-      let classNames = utils.getLabelNames(this.hasAdversarial, renderer.init_dataset || utils.getDataset());
-      let classCount = classNames.length;
-      colors = colors || utils.baseColors.slice(0, classCount);
-      labels = labels || classNames;
-
-      this.legendText = this.svg.selectAll('.legendText')
-        .data(labels)
-        .enter()
-        .append('text')
-        .attr('class', 'legendText')
-        .attr('alignment-baseline', 'middle')
-        .attr('fill', '#333')
-        .attr('x', this.legend_sx(0.3))
-        .attr('y', (l, i)=>this.legend_sy((i+0.5)/classCount))
-        .text((l)=>l)
-        .on('mouseover', onMouseOver)
-        .on('mouseout', onMouseOut)
-        .on('click', onClick);
-
-      this.legendRect = this.svg.selectAll('.legendRect')
-        .data(colors)
+    if(this.legendBox === undefined){
+       this.legendBox = this.svg.selectAll('.legendBox')
+        .data([0])
         .enter()
         .append('rect')
-        .attr('class', 'legendRect')
-        .attr('fill', (c, i)=>'rgb('+c+')')
-        .attr('x', this.legend_sx(0))
-        .attr('y', (c, i)=>this.legend_sy(i/classCount))
-        .attr('width', (this.legend_sy(1)-this.legend_sy(0))/classCount )
-        .attr('height', (this.legend_sy(1)-this.legend_sy(0))/classCount)
-        .on('mouseover', onMouseOver)
-        .on('mouseout', onMouseOut)
-        .on('click', onClick);
-    }else{//if called on dataset change
-      labels = labels || utils.getLabelNames(this.hasAdversarial, utils.getDataset());
-      this.legendText
-        .data(labels)
+        .attr('class', 'legendBox')
+        .attr('fill', 'none')
+        .attr('stroke', '#c1c1c1')
+        .attr('stroke-width', 1);
+    }
+
+    if (this.legendTitle === undefined 
+      && utils.legendTitle[this.getDataset()] !== undefined){
+       this.legendTitleBg = this.svg.selectAll('.legendTitleBg')
+        .data([0, ])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendTitleBg')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)));
+
+      this.legendTitle = this.svg.selectAll('.legendTitle')
+        .data([utils.legendTitle[this.getDataset()], ])
+        .enter()
+        .append('text')
+        .attr('class', 'legendTitle')
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
         .text(d=>d);
     }
+      
+
+    let onMouseOver = (_, i)=>{
+      let classes = new Set(this.selectedClasses);
+      if (!classes.has(i)) {
+        classes.add(i);
+      }
+      this.onSelectLegend(classes);
+    };
+    let onMouseOut = ()=>{
+      this.restoreSelectedClasses();
+    };
+    let onClick = (_, i)=>{
+      if (this.selectedClasses.has(i)) {
+        this.selectedClasses.delete(i);
+      } else {
+        this.selectedClasses.add(i);
+      }
+      this.onSelectLegend(this.selectedClasses);
+      if (this.selectedClasses.size == renderer.dataObj.ndim) {
+        this.selectedClasses = new Set();
+      }
+    };
+
+    let classNames = utils.getLabelNames(this.hasAdversarial, renderer.init_dataset || utils.getDataset());
+    let classCount = classNames.length;
+    colors = colors || utils.baseColors.slice(0, classCount);
+    labels = labels || classNames;
+
+    this.legendText = this.svg.selectAll('.legendText')
+      .data(labels)
+      .enter()
+      .append('text')
+      .attr('class', 'legendText')
+      .attr('alignment-baseline', 'middle')
+      .attr('fill', '#333')
+      .text((l)=>l)
+      .on('mouseover', onMouseOver)
+      .on('mouseout', onMouseOut)
+      .on('click', onClick);
+    this.legendText = this.svg.selectAll('.legendText');
+
+    this.legendMark = this.svg.selectAll('.legendMark')
+      .data(colors)
+      .enter()
+      .append('circle')
+      .attr('class', 'legendMark')
+      .attr('fill', (c, i)=>'rgb('+c+')')
+      .on('mouseover', onMouseOver)
+      .on('mouseout', onMouseOut)
+      .on('click', onClick);
+    this.legendMark = this.svg.selectAll('.legendMark');
+
+    labels = labels || utils.getLabelNames(this.hasAdversarial, utils.getDataset());
+    this.legendText
+      .data(labels)
+      .text(d=>d);
     
 
   };
-
-  this.initLegend();
-
-
-  
-
 
 
   this.controlOptionGroup = d3.select('d-figure.'+renderer.gl.canvas.id)
@@ -800,39 +829,10 @@ function LayerTransitionOverlay(renderer, kwargs) {
     });
 
 
-
   this.init = function(){
-    this.layerSliderSx = d3.scaleLinear()
-      .domain([0,this.renderer.nlayer-1])
-      //TODO: get this range from slider.style.left, and *.width
-      .range([this.svg.attr('width') * 0.15 + 10, 
-        this.svg.attr('width') * 0.85 - 10]);
-
-    this.layerIndicator
-    .attr('x', this.layerSliderSx(math.mean(this.layerSliderSx.domain())) )
-    .attr('y', height-this.layerSliderOffsetY - 40);
-
-    this.epochIndicator
-    .attr('x', this.layerSliderSx(math.mean(this.layerSliderSx.domain())) )
-    .attr('y', height-30);
-
- 
-    this.svg.selectAll('.layerSliderLandmark') 
-    .data(this.landmarkSizes || d3.range(this.renderer.nlayer))
-    .enter()
-    .append('circle')
-    .attr('class', 'layerSliderLandmark');
-
-    this.svg.selectAll('.layerSliderLandmark') 
-    .attr('cx', (d,i)=>this.layerSliderSx(i))
-    .attr('cy', height-this.layerSliderOffsetY - 30)
-    .attr('r', d=>d)
-    .attr('fill', '#d3d3d3');
-
+    this.initLegend();
+    this.repositionAll();
   };
-
-
-
 
   
 
@@ -852,7 +852,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
       }
     }
 
-    this.svg.selectAll('.legendRect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, i)=>{
         if (classes.size == 0) {
           return 1.0;
@@ -898,31 +898,121 @@ function LayerTransitionOverlay(renderer, kwargs) {
     }
   };
 
-  this.redrawLayerSlider = function(){
+  // this.redrawLayerSlider = function(){
 
-    this.layerSliderSx = d3.scaleLinear()
-    .domain([0,this.renderer.nlayer-1])
-    //TODO: get this range from slider.style.left, and *.width
-    .range([this.svg.attr('width') * 0.15 + 10, 
-      this.svg.attr('width') * 0.85 - 10]);
+  //   this.layerMarkerSx = d3.scaleLinear()
+  //   .domain([0,this.renderer.nlayer-1])
+  //   //TODO: get this range from slider.style.left, and *.width
+  //   .range([this.svg.attr('width') * 0.15 + 10, 
+  //     this.svg.attr('width') * 0.85 - 10]);
+
+  //   this.layerSlider
+  //   .attr('max', renderer.nlayer-1)
+
+  //   this.svg.selectAll('.layerSliderLandmark') 
+  //   .data(this.landmarkSizes || d3.range(this.renderer.nlayer))
+  //   .exit().remove();
+
+  //   this.svg.selectAll('.layerSliderLandmark') 
+  //   .data(this.landmarkSizes || d3.range(this.renderer.nlayer))
+  //   .enter()
+  //   .append('circle')
+  //   .attr('class', 'layerSliderLandmark');
+
+  //   this.svg.selectAll('.layerSliderLandmark') 
+  //   .attr('cx', (d,i)=>this.layerMarkerSx(i))
+  //   .attr('cy', height-this.layerSliderOffsetY - 30)
+  //   .attr('r', d=>d)
+  //   .attr('fill', '#d3d3d3');
+  // };
+
+
+  this.repositionAll = function(){
+    let width = +this.svg.attr('width');
+    let height = +this.svg.attr('height');
+
+    let sliderLeft = parseFloat(this.epochSlider.style('left'));
+    let sliderWidth = parseFloat(this.epochSlider.style('width'));
+    let sliderMiddle = sliderLeft+sliderWidth/2;
+    
+
+    let r = (this.legend_sy(1)-this.legend_sy(0))/4;
+    this.legendMark
+      .attr('cx', this.legend_sx(0.0)+2.5*r)
+      .attr('cy', (c, i)=>this.legend_sy(i+0.5))
+      .attr('r', r);
+
+    this.legendText
+      .attr('x', +this.legend_sx(0.0)+2.5*r+2.5*r)
+      .attr('y', (l, i)=>this.legend_sy(i+0.5));
+
+    this.legendBox
+      .attr('x', this.legend_sx.range()[0])
+      .attr('y', this.legend_sy(-1))
+      .attr('width', this.legend_sx.range()[1]-this.legend_sx.range()[0])
+      .attr('height', this.legend_sy.range()[3]-this.legend_sy(-1))
+      .attr('rx', r);
+
+    if (this.legendTitle !== undefined){
+      this.legendTitle
+        .attr('x',  this.legend_sx(0.5))
+        .attr('y',  this.legend_sy(-1))
+        .text(utils.legendTitle[this.getDataset()] || '');
+
+      let rectData = this.legendTitle.node().getBBox();
+      let padding = 2;
+      this.legendTitleBg
+        .attr('x', rectData.x-padding)
+        .attr('y', rectData.y-padding)
+        .attr('width', rectData.width+2*padding)
+        .attr('height', rectData.height+2*padding)
+        .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
+    }
 
     this.layerSlider
     .attr('max', renderer.nlayer-1)
 
+    this.layerIndicator
+      .attr('x', sliderMiddle )
+      .attr('y', height-this.layerSliderOffsetY - 40);
+
+    this.epochIndicator
+      .attr('x', sliderMiddle )
+      .attr('y', height-30);
+
+
+    this.layerMarkerSx = d3.scaleLinear()
+      .domain([0,this.renderer.nlayer-1])
+      .range([sliderLeft+8, sliderLeft+sliderWidth-8]);
+ 
     this.svg.selectAll('.layerSliderLandmark') 
-    .data(this.landmarkSizes || d3.range(this.renderer.nlayer))
-    .exit().remove();
+      .data(this.landmarkSizes)
+      .exit()
+      .remove();
 
     this.svg.selectAll('.layerSliderLandmark') 
-    .data(this.landmarkSizes || d3.range(this.renderer.nlayer))
-    .enter()
-    .append('circle')
-    .attr('class', 'layerSliderLandmark');
+      .data(this.landmarkSizes)
+      .enter()
+      .append('circle')
+      .attr('class', 'layerSliderLandmark');
 
     this.svg.selectAll('.layerSliderLandmark') 
-    .attr('cx', (d,i)=>this.layerSliderSx(i))
-    .attr('cy', height-this.layerSliderOffsetY - 30)
-    .attr('r', d=>d)
-    .attr('fill', '#d3d3d3');
+      .attr('cx', (d,i)=>this.layerMarkerSx(i))
+      .attr('cy', height-this.layerSliderOffsetY - 30)
+      .attr('r', d=>d)
+      .attr('fill', '#d3d3d3');
   };
+
+
+  this.resize = function(){
+    width = canvas.clientWidth;
+    height = canvas.clientHeight;
+    this.svg.attr('width', width);
+    this.svg.attr('height', height);
+    this.initLegendScale();
+    this.repositionAll();
+  };
+
+
+
 }

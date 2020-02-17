@@ -44,6 +44,11 @@ function LayerTransitionRenderer(gl, program, kwargs) {
   this.isPointBrushed = new Array(this.npoint).fill(true);
   this.isClassSelected = new Array(this.npoint).fill(true);
 
+  console.log(this.init_dataset || utils.getDataset());
+  this.dataset = this.init_dataset || utils.getDataset();
+
+  this.overlay = new LayerTransitionOverlay(this, this.overlayKwargs);
+
 
   this.frame2layer = function(frame){
     frame = frame % (this.framesBetweenLayer * (this.nlayer-1));
@@ -249,14 +254,13 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         gl, utils.getAdversarialTextureURL()
       );
     }else{
-      let dataset;
       if(this.firstInit === undefined){
-        dataset = this.init_dataset || utils.getDataset();
+        this.dataset = this.init_dataset || utils.getDataset();
         this.firstInit = false;
       }else{
-        dataset = utils.getDataset();
+        this.dataset = utils.getDataset();
       }
-      texture = utils.loadTexture(gl, utils.getLayerTransitionTextureURL(dataset));
+      texture = utils.loadTexture(gl, utils.getLayerTransitionTextureURL(this.dataset));
     }
     
     this.samplerLoc = gl.getUniformLocation(program, 'uSampler');
@@ -277,11 +281,8 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     
   };
 
-
   
   this.shouldRender = true;
-  // this.t = 1e4;
-
 
   this.epochFrame = this.epoch2frame(this.epochIndex);
   this.layerFrame = this.layer2frame(this.layerIndex);
@@ -331,12 +332,6 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     let e0 = Math.max(Math.floor(e), 0);
     let e1 = Math.max(Math.ceil(e), 0);
     let pe = e - e0;
-
-
-    // if(this.normalizeView && this.dataObj.norms){
-    //   this.dataObj.dmax = this.dataObj.norms[l0]*(1-pl) + this.dataObj.norms[l1]*pl;
-    //   this.dataObj.dmax = this.dataObj.dmax || 1;
-    // }
 
     //overlay display
     this.overlay.layerSlider.property('value', l);
@@ -801,5 +796,27 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     }
     this.layerIndexPrev = this.layerIndex;
     return;
+  };//end render
+
+  this.setFullScreen = function(shouldSet) {
+    this.isFullScreen = shouldSet;
+    let canvas = this.gl.canvas;
+    let canvasSelection = d3.select('#'+canvas.id)
+      .classed('fullscreen', shouldSet);
+
+    d3.select(canvas.parentNode)
+      .classed('fullscreen', shouldSet);
+
+    utils.resizeCanvas(canvas);
+    this.overlay.resize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
   };
+
+  this.resize = function(){
+    utils.resizeCanvas(this.gl.canvas);
+    this.render();
+    this.overlay.resize();
+  };
+
+
 }

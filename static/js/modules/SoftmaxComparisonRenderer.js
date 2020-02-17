@@ -35,6 +35,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
   this.isFullScreen = false;
   this.scaleFactor = 1.0;
 
+  this.firstInit = true;
   
   
 
@@ -195,6 +196,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
     if(this.firstInit == true){
       // if initialized
       this.dataset = this.init_dataset || utils.getDataset();
+      this.firstInit = false;
     }else{
       // if second init when dataset changed
       this.dataset = utils.getDataset();

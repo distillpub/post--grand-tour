@@ -11,6 +11,10 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
   let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
   let that = this;
 
+  this.getDataset = function(){
+    return this.renderer.dataset;
+  };
+
   this.zoomSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
@@ -264,21 +268,15 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     this.svg.attr('width', width);
     this.svg.attr('height', height);
 
-    this.legend_sx = d3.scaleLinear()
-      .domain([0, 1])
-      .range([width-120, width-20]);
-    this.lengend_sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([height/2-120, height/2+120]);
-
+    this.initLegendScale();
     this.updateArchorRadius(renderer.mode);
     this.repositionAll();
   };
 
 
   this.repositionAll = function() {
-    let width = this.svg.attr('width');
-    let height = this.svg.attr('height');
+    let width = +this.svg.attr('width');
+    let height = +this.svg.attr('height');
 
     let sliderLeft = parseFloat(this.epochSlider.style('left'));
     let sliderWidth = parseFloat(this.epochSlider.style('width'));
@@ -294,15 +292,38 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
         .attr('y', height-20);
     }
 
-    this.legendRect
-      .attr('x', this.legend_sx(0))
-      .attr('y', (c, i)=>this.lengend_sy(i/10))
-      .attr('width', (this.lengend_sy(1)-this.lengend_sy(0))/10 )
-      .attr('height', (this.lengend_sy(1)-this.lengend_sy(0))/10);
+    let r = (this.legend_sy(1)-this.legend_sy(0))/4;
+    this.legendMark
+      .attr('cx', this.legend_sx(0.0)+2.5*r)
+      .attr('cy', (c, i)=>this.legend_sy(i+0.5))
+      .attr('r', r);
 
     this.legendText
-      .attr('x', this.legend_sx(0.3))
-      .attr('y', (l, i)=>this.lengend_sy((i+0.5)/10));
+      .attr('x', +this.legend_sx(0.0)+2.5*r+2.5*r)
+      .attr('y', (l, i)=>this.legend_sy(i+0.5));
+
+    this.legendBox
+      .attr('x', this.legend_sx.range()[0])
+      .attr('y', this.legend_sy(-1))
+      .attr('width', this.legend_sx.range()[1]-this.legend_sx.range()[0])
+      .attr('height', this.legend_sy(utils.getLabelNames().length+1)-this.legend_sy(-1))
+      .attr('rx', r);
+
+    if (this.legendTitle !== undefined){
+      this.legendTitle
+        .attr('x',  this.legend_sx(0.5))
+        .attr('y',  this.legend_sy(-1))
+        .text(utils.legendTitle[this.getDataset()] || '');
+
+      let rectData = this.legendTitle.node().getBBox();
+      let padding = 2;
+      this.legendTitleBg
+        .attr('x', rectData.x-padding)
+        .attr('y', rectData.y-padding)
+        .attr('width', rectData.width+2*padding)
+        .attr('height', rectData.height+2*padding)
+        .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
+    }
 
 
     this.trainingText
@@ -442,21 +463,59 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     // .attr('opacity', 0.1);
   };
 
+  this.initLegendScale = function(){
+    let width = +this.svg.attr('width');
+    let marginTop = 20;
+    let padding = 8;
 
-  this.initLegend = function(colors, labels) {
+    let legendLeft = width - utils.legendLeft[this.getDataset()];
+    let legendRight = width - utils.legendRight[this.getDataset()];
+    
     this.legend_sx = d3.scaleLinear()
       .domain([0, 1])
-      .range([this.svg.attr('width')-120, this.svg.attr('width')-20]);
+      .range([legendLeft, legendRight]);
+    this.legend_sy = d3.scaleLinear()
+      .domain([-1, 0, utils.getLabelNames().length, utils.getLabelNames().length+1])
+      .range([marginTop-padding, marginTop, marginTop+170, marginTop+170+padding]);
+  };
 
-    this.lengend_sy = d3.scaleLinear()
-      .domain([0, 1])
-      .range([20, this.svg.attr('height')-50]);
+  this.initLegend = function(colors, labels) {
+    this.initLegendScale();
 
-    this.svg.selectAll('.legendRect')
+    if(this.legendBox === undefined){
+       this.legendBox = this.svg.selectAll('.legendBox')
+        .data([0])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendBox')
+        .attr('fill', 'none')
+        .attr('stroke', '#c1c1c1')
+        .attr('stroke-width', 1);
+    }
+
+    if (this.legendTitle === undefined && utils.legendTitle[this.getDataset()] !== undefined){
+       this.legendTitleBg = this.svg.selectAll('.legendTitleBg')
+        .data([0, ])
+        .enter()
+        .append('rect')
+        .attr('class', 'legendTitleBg')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)));
+
+      this.legendTitle = this.svg.selectAll('.legendTitle')
+        .data([utils.legendTitle[this.getDataset()], ])
+        .enter()
+        .append('text')
+        .attr('class', 'legendTitle')
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .text(d=>d);
+    }
+
+    this.svg.selectAll('.legendMark')
       .data(colors)
       .enter()
-      .append('rect')
-      .attr('class', 'legendRect')
+      .append('circle')
+      .attr('class', 'legendMark')
       .attr('fill', (c, i)=>'rgb('+c+')')
       .on('mouseover', (_, i)=>{
         let classes = new Set(this.selectedClasses);
@@ -477,7 +536,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
           this.selectedClasses = new Set();
         }
       });
-    this.legendRect = this.svg.selectAll('.legendRect');
+    this.legendMark = this.svg.selectAll('.legendMark');
     this.svg.selectAll('.legendText')
       .data(labels)
       .enter()
@@ -526,7 +585,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
       }
       
     }
-    this.svg.selectAll('rect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, j)=>{
         if (!labelClasses.has(j)) {
           return 0.1;
@@ -558,7 +617,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     }
     
 
-    this.svg.selectAll('rect')
+    this.svg.selectAll('.legendMark')
       .attr('opacity', (d, i)=>{
         if (labelClasses.size == 0) {
           return 1.0;

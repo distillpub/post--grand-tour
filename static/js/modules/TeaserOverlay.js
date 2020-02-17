@@ -257,17 +257,6 @@ function TeaserOverlay(renderer, kwargs) {
     this.svg.attr('width', width);
     this.svg.attr('height', height);
 
-
-    // let aspect = width/height;
-    // let ymax = renderer.dataObj.dmax;
-    // let xmax = ymax * aspect;
-    // renderer.sx = d3.scaleLinear()
-    //   .domain([-xmax, xmax])
-    //   .range([0, width]);
-    // renderer.sy = d3.scaleLinear()
-    //   .domain([-ymax, ymax])
-    //   .range([height, 0]);
-      
     this.initLegendScale();
     this.updateArchorRadius(renderer.mode);
     this.repositionAll();
@@ -323,8 +312,6 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('width', rectData.width+2*padding)
         .attr('height', rectData.height+2*padding)
         .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
-
-
     }
   };
 
@@ -465,7 +452,9 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('stroke', '#c1c1c1')
         .attr('stroke-width', 1);
     }
-    if (this.legendTitle == undefined && utils.legendTitle[this.getDataset()] !== undefined){
+
+    if (this.legendTitle === undefined 
+      && utils.legendTitle[this.getDataset()] !== undefined){
        this.legendTitleBg = this.svg.selectAll('.legendTitleBg')
         .data([0, ])
         .enter()

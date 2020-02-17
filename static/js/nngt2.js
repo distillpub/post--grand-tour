@@ -39,6 +39,8 @@ nngt2Figure.addEventListener("ready", function() {
     urls = urls.concat(utils.getTeaserDataURL(dataset, 'train'));
     nngt2 = utils.loadDataToRenderer(urls, nngt2);
     nngt2.overlay.initLegend(utils.baseColors.slice(0,10), utils.getLabelNames(false, dataset));
+    nngt2.overlay.repositionAll();
+    
     if(dataset == 'cifar10'){
       nngt2.setColorFactor(0.0);
     }else{
