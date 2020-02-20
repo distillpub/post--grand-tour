@@ -332,9 +332,18 @@ function TeaserRenderer(gl, program, kwargs) {
 
 
     utils.updateScale_center(points, gl.canvas,
-      this.sx_center, this.sy_center, this.sz_center, this.scaleFactor);
+      this.sx_center, this.sy_center, this.sz_center, 
+      this.scaleFactor,
+      utils.legendLeft[this.overlay.getDataset()]+15,
+      65
+    );
+    
     utils.updateScale_span(points, gl.canvas,
-      this.sx_span, this.sy_span, this.sz_span, this.scaleFactor);
+      this.sx_span, this.sy_span, this.sz_span, 
+      this.scaleFactor,
+      utils.legendLeft[this.overlay.getDataset()]+15,
+      65
+    );
 
     let transition;
     if (this.scaleTransitionDelta > 0){

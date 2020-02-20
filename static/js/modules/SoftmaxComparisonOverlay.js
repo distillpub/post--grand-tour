@@ -165,15 +165,11 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     });
 
   this.trainingText = this.svg.append('text')
-    .attr('x', (width-50)/2 + this.xOffsetLeft)
-    .attr('y', 30)
     .style('text-anchor', 'middle')
     .style('alignment-baseline', 'middle')
     .text('Training');
 
   this.testingText = this.svg.append('text')
-    .attr('x', (width-50)/2 + this.xOffsetRight)
-    .attr('y', 30)
     .style('text-anchor', 'middle')
     .style('alignment-baseline', 'middle')
     .text('Testing');
@@ -284,7 +280,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     
     this.epochIndicator
       .attr('x', sliderMiddle)
-      .attr('y', height-40);
+      .attr('y', height-35);
 
     if(renderer.epochs.length <= 1){
       this.epochIndicator
@@ -325,11 +321,12 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
         .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
     }
 
-
     this.trainingText
-      .attr('x', (width-50)/2 + this.xOffsetLeft);
+      .attr('x', renderer.sx(0) + this.xOffsetLeft)
+      .attr('y', 20);
     this.testingText
-      .attr('x', (width-50)/2 + this.xOffsetRight);
+      .attr('x', renderer.sx(0) + this.xOffsetRight)
+      .attr('y', 20);
 
   };
 

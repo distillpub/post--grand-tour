@@ -161,13 +161,12 @@ function highlight_shoes_button(renderer){
 
   buttons = overlay.annotationGroup.selectAll('button.annotation');
 
-
   let buttonHeight = parseFloat(buttons.style('height'));
   let sy = d3.scaleLinear().domain([0,2]).range([0, (buttonHeight*1.3)*data.length]);
   
   buttons.data(data)
   .style('position', 'absolute')
-  .style('top', (d,i)=>`calc(215px + ${sy(i)}px`)
+  .style('top', (d,i)=>`calc(225px + ${sy(i)}px`)
   .style('left', (d,i)=>`calc(100% - ${utils.smLegendLeft['fashion-mnist']}px)`)
   .style('width', (d,i)=>`${2+utils.smLegendLeft['fashion-mnist']-utils.smLegendRight['fashion-mnist']}px`)
   .style('background', d=> utils.buttonColors[d.isOn?'on':'off'])

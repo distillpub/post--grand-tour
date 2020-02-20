@@ -70,6 +70,7 @@ nngt2Figure.addEventListener("onscreen", function() {
     nngt2.shouldRender = true;
     nngt2.play();
     nngt2.setEpochIndex(99);
+    nngt2.overlay.repositionAll();
   }
   for(let view of allViews){
     if(view !== nngt2 && view.pause){

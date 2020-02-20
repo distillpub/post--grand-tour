@@ -57,21 +57,19 @@ utils.legendTitle = {
   'mnist-adversarial': 'Digit',
 };
 
-utils.legendHeight = {
-  'mnist': 150,
-  'fashion-mnist': 150,
-  'cifar10': 150,
-  'mnist-adversarial': 165,
+//for softmax grandtour
+utils.buttonOffsetY = {
+  'default': 245,
+  'adversarial': 265,
 };
+
+//for small multiples & softmax grandtour
 utils.buttonColors = {
   'on': '#B3C5F4',
   'off': '#f3f3f3',
 }
 
-utils.buttonOffsetY = {
-  'default': 245,
-  'adversarial': 265,
-};
+
 
 
 utils.mixScale = function(s0,s1,progress, func){
@@ -96,26 +94,46 @@ utils.data2canvas = function(points, sx, sy, sz){
   return points;
 };
 
+
 utils.updateScale_span = function(points, canvas, sx, sy, sz, 
   scaleFactor=1.0,
-  marginTop = 30, marginBottom = 40, marginRight = 50){
+  marginRight=undefined,
+  marginBottom=undefined, 
+  marginLeft=undefined,
+  marginTop=undefined){
+
+  if (marginTop === undefined){
+    marginTop = 22;
+  }
+  if (marginBottom === undefined){
+    marginBottom = 65;
+  }
+  if (marginLeft === undefined){
+    marginLeft = 32;
+  }
+  if (marginRight === undefined){
+    marginRight = d3.max(Object.values(utils.legendLeft)) + 15;
+  }
 
   let vmin = math.min(points, 0);
   let vmax = math.max(points, 0);
   let xDataRange = vmax[0]-vmin[0];
   let yDataRange = vmax[1]-vmin[1];
-
+  
   let yMiddle = ((canvas.clientHeight-marginBottom) + marginTop ) /2;
-  let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
+  let yRadius0 = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
+
+  let xMiddle = ((canvas.clientWidth-marginRight) + marginLeft)/2;
+  let xRadius0 = ((canvas.clientWidth-marginRight) - marginLeft)/2;
+
+  let xRadius = Math.min(xRadius0, yRadius0 / yDataRange * xDataRange);
+  let yRadius = Math.min(yRadius0, xRadius0 / xDataRange * yDataRange);
+
+  xRadius *= scaleFactor;
   yRadius *= scaleFactor;
+
   sy.domain([vmin[1], vmax[1]])
   .range([yMiddle+yRadius, yMiddle-yRadius]);
-
-  let xMiddle = (canvas.clientWidth-marginRight)/2;
-  // let xRadius = 0.5*Math.abs(sy.range()[0]-sy.range()[1]) 
-                // / yDataRange * xDataRange;
-  let xRadius = yRadius / yDataRange * xDataRange;
-  // xRadius *= scaleFactor;
 
   sx.domain([vmin[0], vmax[0]])
   .range([xMiddle-xRadius, xMiddle+xRadius]);
@@ -125,9 +143,27 @@ utils.updateScale_span = function(points, canvas, sx, sy, sz,
 
 };
 
+
 utils.updateScale_center = function(points, canvas, sx, sy, sz, 
   scaleFactor=1.0,
-  marginTop = 30, marginBottom = 40, marginRight = 50,){
+  marginRight=undefined,
+  marginBottom=undefined, 
+  marginLeft=undefined,
+  marginTop=undefined
+  ){
+
+  if (marginTop === undefined){
+    marginTop = 22;
+  }
+  if (marginBottom === undefined){
+    marginBottom = 65;
+  }
+  if (marginLeft === undefined){
+    marginLeft = 32;
+  }
+  if (marginRight === undefined){
+    marginRight = d3.max(Object.values(utils.legendLeft)) + 15;
+  }
 
   let vmax = math.max(math.abs(points), 0);
   let vmin = numeric.neg(vmax);
@@ -136,16 +172,22 @@ utils.updateScale_center = function(points, canvas, sx, sy, sz,
   let yDataRange = 2*vmax[1];
 
   let yMiddle = ((canvas.clientHeight-marginBottom) + marginTop ) /2;
-  let yRadius = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
-  yRadius *= scaleFactor;
-  sy.domain([vmin[1], vmax[1]])
-  .range([yMiddle+yRadius, yMiddle-yRadius]);
+  let yRadius0 = ((canvas.clientHeight-marginBottom) - marginTop ) /2;
 
-  let xMiddle = (canvas.clientWidth-marginRight)/2;
-  let xRadius = yRadius / yDataRange * xDataRange;
+  let xMiddle = ((canvas.clientWidth-marginRight) + marginLeft)/2;
+  let xRadius0 = ((canvas.clientWidth-marginRight) - marginLeft)/2;
+
+  let xRadius = Math.min(xRadius0, yRadius0 / yDataRange * xDataRange);
+  let yRadius = Math.min(yRadius0, xRadius0 / xDataRange * yDataRange);
+
+  xRadius *= scaleFactor;
+  yRadius *= scaleFactor;
 
   sx.domain([vmin[0], vmax[0]])
   .range([xMiddle-xRadius, xMiddle+xRadius]);
+
+  sy.domain([vmin[1], vmax[1]])
+  .range([yMiddle+yRadius, yMiddle-yRadius]);
 
   sz.domain([vmin[2], vmax[2]])
   .range([0,1]);

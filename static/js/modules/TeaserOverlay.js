@@ -273,7 +273,7 @@ function TeaserOverlay(renderer, kwargs) {
     
     this.epochIndicator
       .attr('x', sliderMiddle)
-      .attr('y', height-40);
+      .attr('y', height-35);
 
     if(renderer.epochs.length <= 1){
       this.epochIndicator

@@ -329,18 +329,18 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
       .domain([0, 1])
       .range([legendLeft, legendRight]);
 
+    let nlabel = utils.getLabelNames().length;
     this.legend_sy = d3.scaleLinear()
       .domain([
         -1, 
         0, 
-        utils.getLabelNames().length, 
-        utils.getLabelNames().length+1 ])
+        nlabel, 
+        nlabel+1 ])
       .range([
         marginTop,
         marginTop+padding, 
-        marginTop+padding+utils.legendHeight[this.getDataset()], 
-        marginTop+padding+utils.legendHeight[this.getDataset()]+padding ]);
-
+        marginTop+padding+nlabel*17, 
+        marginTop+padding+nlabel*17+padding ]);
 
     if(this.legendBox === undefined){
        this.legendBox = this.svg.selectAll('.legendBox')

@@ -4,16 +4,9 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
   utils.walkObject(kwargs, (k) => {
     this[k] = kwargs[k];
   });
-
-  
-
   let dpr = window.devicePixelRatio;
-  // this.xOffsetLeft0 = 0;
-  // this.xOffsetRight0 = 0;
-  this.xOffsetLeft0 = -400*2/dpr;
-  this.xOffsetRight0 = 300*2/dpr;
-  this.xOffsetLeft = this.xOffsetLeft0;
-  this.xOffsetRight = this.xOffsetRight0;
+  this.xOffsetLeft = -100;
+  this.xOffsetRight = 0;
 
   this.sx_center = d3.scaleLinear();
   this.sy_center = d3.scaleLinear();
@@ -23,7 +16,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
   this.sz = this.sz_center;
   this.canvasWidth0 = gl.canvas.clientWidth;
 
-  this.overlay = new SoftmaxComparisonOverlay(this, [this.xOffsetLeft/dpr,this.xOffsetRight/dpr]);
+  this.overlay = new SoftmaxComparisonOverlay(this, [this.xOffsetLeft,this.xOffsetRight]);
 
   this.framesPerTransition = 30;
   this.framesPerEpoch = 60;
@@ -92,6 +85,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
       this.isPlaying = true;
       this.overlay.init();
       this.play();
+      this.overlay.repositionAll();
     }
 
     if(this.isDataReady && (this.animId==null || this.shouldRender==false)){
@@ -127,13 +121,6 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
     gl.uniform1f(this.canvasWidthLoc, canvas.clientWidth);
     gl.uniform1f(this.canvasHeightLoc, canvas.clientHeight);
 
-    //TODO FIXME
-    this.xOffsetLeft = canvas.clientWidth / this.canvasWidth0 * (this.xOffsetLeft0);
-    this.xOffsetRight = canvas.clientWidth / this.canvasWidth0 * (this.xOffsetRight0);
-    this.overlay.xOffsetLeft = this.xOffsetLeft/dpr;
-    this.overlay.xOffsetRight = this.xOffsetRight/dpr;
-
-    // gl.viewport(0, 0, canvas.width, canvas.height);
   };
 
 
@@ -371,8 +358,23 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
           (this.s%this.framesPerEpoch)/this.framesPerTransition);
       }
 
+      //update based on the right grand tour plot
+      let marginRight = utils.legendLeft[this.overlay.getDataset()]+15
+      let marginLeft = 32 + (this.gl.canvas.clientWidth-marginRight-32)/2;
+      
       utils.updateScale_center(points, gl.canvas,
-      this.sx_center, this.sy_center, this.sz_center, this.scaleFactor);
+        this.sx_center, this.sy_center, this.sz_center, 
+        this.scaleFactor,
+        marginRight,
+        65,//margin bottom
+        marginLeft,
+        38,//margin top
+      );
+      this.xOffsetLeft = -(this.gl.canvas.clientWidth-marginRight-marginLeft);
+
+      this.overlay.xOffsetLeft = this.xOffsetLeft;
+      this.overlay.xOffsetRight = this.xOffsetRight;
+
       this.sx = this.sx_center;
       this.sy = this.sy_center;
       this.sz = this.sz_center;
@@ -412,7 +414,7 @@ function SoftmaxComparisonRenderer(gl, program, kwargs) {
       let positionLoc = this.positionLoc;
 
       gl.viewport(
-        xOffset, yOffset, 
+        xOffset * dpr, yOffset * dpr, 
         gl.canvas.width, gl.canvas.height 
       );
 
