@@ -38,8 +38,6 @@ lt2Figure.addEventListener("ready", function() {
     nepoch: 50,
     npoint: 500,
     pointSize: 6.0,
-    normalizeView: true,
-
     overlayKwargs: {
       landmarkSizes: [L,S,S,L,S,S,L,S,L,S,L,L],
     }

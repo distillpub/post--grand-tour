@@ -21,7 +21,7 @@ function TeaserRenderer(gl, program, kwargs) {
   if (!this.hasOwnProperty('shouldAutoNextEpoch')){
     this.shouldAutoNextEpoch = true;
   }
-
+  this.pointSize0 = this.pointSize || 6.0;
 
   this.overlay = new TeaserOverlay(this, this.overlayKwargs);
 
@@ -254,6 +254,11 @@ function TeaserRenderer(gl, program, kwargs) {
     this.gl.uniform1f(this.colorFactorLoc, f);
   };
 
+  this.setPointSize = function(s) {
+    this.pointSize = s;
+    gl.uniform1f(this.pointSizeLoc, s * window.devicePixelRatio);
+  };
+
 
   this.pause = function() {
     if(this.animId){
@@ -360,7 +365,10 @@ function TeaserRenderer(gl, program, kwargs) {
     points = utils.data2canvas(points, this.sx, this.sy, this.sz);
 
     if (this.mode == 'image') {
-      points = utils.point2rect(points, dataObj.npoint, 14);
+      points = utils.point2rect(points, 
+        dataObj.npoint, 
+        14*math.sqrt(this.scaleFactor)
+      );
     }
 
     dataObj.points = points;
@@ -409,7 +417,8 @@ function TeaserRenderer(gl, program, kwargs) {
     let c1;
     if (this.mode === 'point') {
       gl.uniform1i(this.isDrawingAxisLoc, 0);
-      gl.uniform1f(this.pointSizeLoc, 6.0 * window.devicePixelRatio);
+      this.setPointSize(this.pointSize0 * Math.sqrt(this.scaleFactor));
+
       gl.drawArrays(gl.POINTS, 0, dataObj.npoint);
       c1 = colors.map((c, i)=>[c[0], c[1], c[2], dataObj.alphas[i]]);
     } else {

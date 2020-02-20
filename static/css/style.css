@@ -143,7 +143,10 @@ button.annotation{
 
 .modeOption, .datasetOption, .grandtourButton{
   display: inline;
-  margin-right: 10px;
+  margin-right: 1em;
+}
+label{
+  margin-right: 0.3em;
 }
 
 svg.confusionMatrix{
@@ -404,25 +407,31 @@ canvas.smallmultiple0{
   width: calc(100% - 80px - 80px)
 }
 
+.layerTransition {
+  left: 80px;
+  width: calc(100% - 80px - 50px)
+}
+
 .epochSlider{
   top: calc(100% - 34px);
 }
 
 .layerSlider {
-  top: calc(100% - 70px);
+  top: calc(100% - 69px);
 }
 
 .zoomSlider {
-    top: 20px; 
-    left: 83%; 
-    width: 15%;
+  top: 10px; 
+  left: calc(100% - 80px);
+  width: 80px;
 }
+
 
 
 
 canvas.layertransition {
     width: 100%;
-    height: 500px;
+    height: 400px;
 }
 
 .layerSliderLandmark {

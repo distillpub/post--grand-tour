@@ -98,6 +98,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     })
     .on('click', function(){
       renderer.setFullScreen(!renderer.isFullScreen);
+      renderer.render(0);
       that.resize();
 
       if(renderer.isFullScreen){
@@ -266,6 +267,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
 
     this.initLegendScale();
     this.updateArchorRadius(renderer.mode);
+
     this.repositionAll();
   };
 
@@ -485,7 +487,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
         .enter()
         .append('rect')
         .attr('class', 'legendBox')
-        .attr('fill', 'none')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)))
         .attr('stroke', '#c1c1c1')
         .attr('stroke-width', 1);
     }

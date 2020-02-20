@@ -448,7 +448,7 @@ function TeaserOverlay(renderer, kwargs) {
         .enter()
         .append('rect')
         .attr('class', 'legendBox')
-        .attr('fill', 'none')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)))
         .attr('stroke', '#c1c1c1')
         .attr('stroke-width', 1);
     }

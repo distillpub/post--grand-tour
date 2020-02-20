@@ -5,7 +5,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
   this.hasAdversarial = false;
   this.epochIndicatorPrefix = 'epoch: ';
-  this.imageSize = 1/20;
+  this.imageSize = 1/10;
 
   this.framesForEpochTransition = 10; //total #frames for transition only
   this.framesBetweenEpoch = 60; //total #frames between epoch transition (trans+pause)
@@ -20,12 +20,16 @@ function LayerTransitionRenderer(gl, program, kwargs) {
   utils.walkObject(kwargs, (k) => {
     this[k] = kwargs[k];
   });
+  this.pointSize0 = this.pointSize || 6.0;
   if(this.layerIndex === undefined){
     this.layerIndex = this.nlayer-2; //the layer before softmax
   }
 
+  this.marginLeft = 2;
+  this.marginBottom = 80;
+  this.marginTop = 2;
 
-  this.scaleFactor = 0.8;
+  this.scaleFactor = 0.9;
 
   this.dataObj = {};
   this.epochIndex = this.nepoch-1;
@@ -49,7 +53,6 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
   this.overlay = new LayerTransitionOverlay(this, this.overlayKwargs);
 
-
   this.frame2layer = function(frame){
     frame = frame % (this.framesBetweenLayer * (this.nlayer-1));
     let layerIndex = math.floor(frame / this.framesBetweenLayer);
@@ -58,7 +61,6 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     let layer = layerIndex + layerProgress;
     return layer;
   }
-
 
   this.frame2epoch = function(frame){
     frame = frame % (this.framesBetweenEpoch * (this.nepoch-1));
@@ -469,17 +471,15 @@ function LayerTransitionRenderer(gl, program, kwargs) {
 
     this.ndim = ndim;
     gt.setNdim(ndim);
+
     //internal view change in grand tour
     if (Math.floor(prevLayer) < Math.floor(layer) 
       && Math.floor(layer) !== this.nlayer-1 ){
-      
-      // let view = dataObj.views[Math.floor(layer)];
-      // view = math.transpose(view);
-      // let matrix = this.gt.getMatrix();
-      // matrix = math.multiply(view, matrix);
-      // this.gt.setMatrix(matrix);
+  
       for(let l=Math.floor(prevLayer)+1; l<=Math.floor(layer); l++){
-        console.log('forward');
+        console.log('forward', 
+          Math.floor(prevLayer),'->', Math.floor(layer));
+
         let view = dataObj.views[l];
         view = math.transpose(view);
         ndim = view.length;
@@ -493,15 +493,9 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     }else if(Math.floor(prevLayer) > Math.floor(layer)
       && Math.floor(prevLayer) !== this.nlayer-1 
       ){
-      console.log('backward');
-      console.log(Math.floor(prevLayer), '->', Math.floor(layer))
+      console.log('backward', 
+        Math.floor(layer),'<-', Math.floor(prevLayer));
       
-      // let view = dataObj.views[Math.floor(layer+1)];
-      // let matrix = this.gt.getMatrix();
-      // let submatrix = matrix.slice(0,view.length).map(row=>row.slice(0,view[0].length));
-      // submatrix = math.multiply(view, submatrix);
-      // matrix = utils.embed(submatrix, matrix);
-      // this.gt.setMatrix(matrix);
       for(let l=Math.floor(prevLayer); l>Math.floor(layer); l--){
         if (Math.floor(prevLayer) == this.nlayer-1){
           continue;
@@ -542,9 +536,6 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       points = gt.project(data0, dt);
     }
 
-    
-
-
     // interpolation between epochs
     let points_e0, points_e1;
     if(Math.floor(epoch) != Math.ceil(epoch)){
@@ -562,39 +553,33 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         points = utils.mix(points_e0, points_e1, epoch-Math.floor(epoch));
       }   
     }
-
     this.points = points;
 
 
-    if(this.normalizeView){
+    //noramlize points to webgl coordinate
+    dataObj.mean = math.mean(
+      points.map(row => {
+        return [row[0], row[1]];
+      }),
+    0);
 
-      dataObj.mean = math.mean(
-        points.map(row => {
-          return [row[0], row[1]];
-        }),
-      0);
+    dataObj.dmax = math.max(
+      points.map(row => {
+        return [
+          Math.abs(row[0]-dataObj.mean[0]), 
+          Math.abs(row[1]-dataObj.mean[1]), 
+        ];
+      })
+    );
 
-      dataObj.dmax = math.max(
-        points.map(row => {
-          return [
-            Math.abs(row[0]-dataObj.mean[0]), 
-            Math.abs(row[1]-dataObj.mean[1]), 
-          ];
-        })
-      );
+    points = points.map((row)=>{
+    row[0] -= dataObj.mean[0];
+    row[1] -= dataObj.mean[1];
+      return numeric.div(row, dataObj.dmax/(this.scaleFactor));
+    });
 
-      points = points.map((row)=>{
-      row[0] -= dataObj.mean[0];
-      row[1] -= dataObj.mean[1];
-        return numeric.div(row, dataObj.dmax/(this.scaleFactor));
-      });
-      this.pointsNormalized = points;
+    this.pointsNormalized = points; //used for brush
 
-    }
-
-    
-
-    
   
 
     let bgColors = labels.map((d)=>utils.bgColors[d]);
@@ -607,24 +592,25 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       this.shouldRecalculateColorRect = false;
     }
 
-
-    // dataObj.colors = colors;
-
     let colorBuffer = this.colorBuffer;
     let positionBuffer = this.positionBuffer;
     let colorLoc = this.colorLoc;
     let positionLoc = this.positionLoc;
 
-    //// square viewport
-    // gl.viewport(
-    //   (gl.canvas.width-gl.canvas.height)/2, 0, 
-    //   gl.canvas.height, gl.canvas.height 
-    // );
-
-    ////full canvas viewport
+    
+    this.marginRight = utils.legendLeft[this.overlay.getDataset()];
+    let width =  gl.canvas.clientWidth
+      - this.marginLeft 
+      - this.marginRight;
+    let height = gl.canvas.clientHeight
+      - this.marginBottom 
+      - this.marginTop;
+    let dpr = window.devicePixelRatio;
     gl.viewport(
-      0, 0, 
-      gl.canvas.width, gl.canvas.height 
+      this.marginLeft*dpr, 
+      this.marginBottom*dpr, 
+      width*dpr, 
+      height*dpr
     );
 
     
@@ -682,7 +668,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
         this.bgColorRect[6*pointIndexPairs[Math.floor(i/6)][1]]
       );
       points = utils.point2rect(points, this.npoint, 
-        this.imageSize * Math.pow(this.scaleFactor, 0.4), 
+        this.imageSize * Math.pow(this.scaleFactor, 0.5), 
         true
       );
     }
@@ -748,7 +734,7 @@ function LayerTransitionRenderer(gl, program, kwargs) {
     //draw bg
     gl.uniform1i(this.isDrawingAxisLoc, 0);
     if (this.mode === 'point') {
-      gl.uniform1f(this.pointSizeLoc, this.pointSize * window.devicePixelRatio);
+      this.setPointSize(this.pointSize0 * Math.sqrt(this.scaleFactor));
       gl.drawArrays(gl.POINTS, 0, this.npoint);
     } else if (this.mode === 'image') {
       gl.drawArrays(gl.TRIANGLES, 0, 6*this.npoint);

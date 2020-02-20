@@ -15,7 +15,7 @@ ltaFigure.addEventListener("ready", function() {
   lta = new LayerTransitionRenderer(gl, programs[0], {
     epochIndicatorPrefix: 'adversarial training: ', 
     hasAdversarial: true,
-    imageSize: 0.08,
+    imageSize: 0.1,
     nlayer: urls.length/2,
     layerNames: [
     'Conv', 'MaxPool', 'ReLU',
@@ -26,7 +26,6 @@ ltaFigure.addEventListener("ready", function() {
     nepoch: 50,
     npoint: 500,
     pointSize: 6.0,
-    normalizeView: true,
     framesBetweenEpoch: 20,
     framesForEpochTransition: 18,
     mode: 'point',

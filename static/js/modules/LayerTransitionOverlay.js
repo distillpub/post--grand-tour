@@ -40,7 +40,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.layerSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider layerSlider')
+    .attr('class', 'slider layerSlider layerTransition')
     .attr('min', 0)
     .attr('max', renderer.nlayer-1)
     .attr('value', renderer.nlayer-1)
@@ -60,7 +60,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.epochSlider = figure
     .insert('input', ':first-child')
     .attr('type', 'range')
-    .attr('class', 'slider epochSlider')
+    .attr('class', 'slider epochSlider layerTransition')
     .attr('min', 0)
     .attr('max', renderer.nepoch-1)
     .attr('value', renderer.nepoch-1)
@@ -94,8 +94,8 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .insert('input', ':first-child')
     .attr('type', 'range')
     .attr('class', 'slider zoomSlider')
-    .attr('min', 0.2)
-    .attr('max', 5.0)
+    .attr('min', 0.1)
+    .attr('max', 2.0)
     .attr('value', this.renderer.scaleFactor)
     .attr('step', 0.01)
     .on('input', function() {
@@ -268,14 +268,20 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
 
 
-  //canvas scales, brush  
-  this.sx = d3.scaleLinear()
-    .domain([-width/height, width/height])
-    .range([0, width]);
-  this.sy = d3.scaleLinear()
-    .domain([1,-1])
-    .range([0, height]);
-
+  //canvas scales, brush 
+  //
+  //
+  this.updateScale = function(){
+    let width = canvas.clientWidth;
+    let height = canvas.clientHeight; 
+    this.sx = d3.scaleLinear()
+      .domain([-width/height, width/height])
+      .range([renderer.marginLeft, width-renderer.marginRight]);
+    this.sy = d3.scaleLinear()
+      .domain([1,-1])
+      .range([renderer.marginTop, height-renderer.marginBottom]);
+   };
+  this.updateScale();
 
   this.brush = d3.brush();
   this.svg.append('g')
@@ -299,6 +305,8 @@ function LayerTransitionOverlay(renderer, kwargs) {
         this.brush.hide();
         this.pcaIteration = 0;
         this.isViewManipulated = true;
+        this.updateScale();
+
       })
       .on('drag', ()=>{
 
@@ -312,17 +320,6 @@ function LayerTransitionOverlay(renderer, kwargs) {
         if(dx==0 && dy==0){
           return;
         }
-
-        // if(renderer.layerIndex < renderer.nlayer-1){
-        //   let prod = numeric.prod(
-        //     renderer.dataObj.viewDeterminants.slice(0, Math.floor(renderer.layerIndex-1))
-        //   );
-        //   // let prod = renderer.dataObj.viewDeterminants[Math.floor(renderer.layerIndex)];
-        //   if (prod < 0){
-        //     dx = -dx;
-        //     dy = -dy;
-        //   }
-        // }
 
         let dmax = this.renderer.dataObj.dmax;
 
@@ -589,7 +586,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.brush
     .on('start', ()=>{
       this.brush.show();
-        // this.controller.onBrushStart();
+      this.updateScale();
     })
     .on('brush', ()=>{
       if(d3.event.selection){
@@ -621,15 +618,11 @@ function LayerTransitionOverlay(renderer, kwargs) {
     })
     .on('end', ()=>{
       this.brush.fade();
-      if(d3.event.selection){
-        
-      }else{ //brush cleared
-        // this.shouldShowCentroid = false;
-
-        let isPointBrushed = this.renderer.pointsNormalized.map(d=>{
-          return true;
-        });
-        this.renderer.isPointBrushed = isPointBrushed;
+      if(d3.event.selection && numeric.sum(lt2.isPointSelected)>0 ){
+        // normal case: do nothing
+      }else{
+        let n = this.renderer.npoint;
+        this.renderer.isPointBrushed = Array(n).fill(true);
       }
     });
 
@@ -686,7 +679,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
         .enter()
         .append('rect')
         .attr('class', 'legendBox')
-        .attr('fill', 'none')
+        .attr('fill', d3.rgb(...utils.CLEAR_COLOR.map(d=>d*255)))
         .attr('stroke', '#c1c1c1')
         .attr('stroke-width', 1);
     }
