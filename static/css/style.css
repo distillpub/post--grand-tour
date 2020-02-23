@@ -350,7 +350,7 @@ canvas.smallmultiple0{
 
 .teaser-fullscreenButton{
     position: absolute;
-    top: 48px;
+    /*top: 48px;*/
     left: 2px; /*77%;*/
     font-size: 20px;
     opacity: 0.3;
@@ -454,6 +454,11 @@ canvas.layertransition {
   position: relative;
   margin-right: 0.25em;
 }*/
+
+
+.form-group {
+  font-size: 0.87rem;
+}
 
 figcaption > span{
   font-style: normal;

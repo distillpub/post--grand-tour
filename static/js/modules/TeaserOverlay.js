@@ -16,18 +16,6 @@ function TeaserOverlay(renderer, kwargs) {
     return this.renderer.fixed_dataset || utils.getDataset();
   };
 
-  // this.zoomSlider = figure
-  //   .insert('input', ':first-child')
-  //   .attr('type', 'range')
-  //   .attr('class', 'slider zoomSlider')
-  //   .attr('min', 0.5)
-  //   .attr('max', 2.5)
-  //   .attr('value', 1.0)
-  //   .attr('step', 0.01)
-  //   .on('input', function() {
-  //     let value = +d3.select(this).property('value');
-  //     renderer.setScaleFactor(value);
-  //   });
 
   this.epochSlider = figure
     .insert('input', ':first-child')
@@ -218,7 +206,7 @@ function TeaserOverlay(renderer, kwargs) {
   this.zoomLabel = this.zoomSliderDiv
     .append('label')
     .text('Zoom: ');
-  this.zoomSlider = this.zoomSliderDiv
+  this.zoomSlider = this.zoomLabel
     .append('input')
     .attr('type', 'range')
     .attr('class', 'slider zoomSlider')
