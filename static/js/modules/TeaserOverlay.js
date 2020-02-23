@@ -168,6 +168,7 @@ function TeaserOverlay(renderer, kwargs) {
       // renderer.shouldPlayGrandTour = !renderer.shouldPlayGrandTour;
     })
     .on('mousemove', ()=>{
+      //handle unsuccessful onscreen event
       if (renderer.shouldRender == false){
         renderer.shouldRender = true;
         if(renderer.animId === null){

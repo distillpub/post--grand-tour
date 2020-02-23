@@ -199,7 +199,16 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .insert('svg', ':first-child')
     .attr('class', 'overlay')
     .attr('width', width)
-    .attr('height', height);
+    .attr('height', height)
+    .on('mousemove', ()=>{
+      //handle unsuccessful onscreen event
+      if (renderer.shouldRender == false){
+        renderer.shouldRender = true;
+        if(renderer.animId === null){
+          renderer.play();
+        }
+      }
+    });
 
   this.layerIndicator = this.svg.append('text')
     .attr('id', 'layerIndicator')

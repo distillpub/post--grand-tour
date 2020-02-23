@@ -60,6 +60,8 @@ lt2Figure.addEventListener("ready", function() {
 
   lt2.onDatasetChange = function(dataset){
     dataset = dataset || utils.getDataset();
+    lt2.dataset = dataset;
+    
     lt2.pause();
     lt2.overlay.pause();
 

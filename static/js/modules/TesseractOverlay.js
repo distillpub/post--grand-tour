@@ -6,16 +6,16 @@ function TesseractOverlay(renderer) {
     .insert('svg', ':first-child')
     .attr('class', 'overlay')
     .attr('width', width)
-    .attr('height', height);
-
+    .attr('height', height)
+    .on('mousemove', ()=>{
+      //handle unsuccessful onscreen event
+      if(renderer.shouldPlay == false 
+        || renderer.animId === null 
+        || renderer.animId === undefined ){
+        renderer.play();
+      }
+    });
   this.init = function() {
-    this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames());
-    this.resize();
-    this.initAxisHandle();
   };
 
-  this.initAxisHandle = function() {
-    this.svg.sc = d3.interpolateGreys;
-    this.drawAxes();
-  };
 }

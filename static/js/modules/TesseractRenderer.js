@@ -6,12 +6,13 @@ function TesseractRenderer(gl, program, kwargs) {
     this[k] = kwargs[k];    
   });
 
+  this.overlay = new TesseractOverlay(this);
+
   this.init = function() {
     this.initData();
     this.initGL();
-    window.setInterval(()=>{
-      this.render();
-    }, 1000/60);
+    this.overlay.init();
+    this.render();
   };
 
 
@@ -89,7 +90,7 @@ function TesseractRenderer(gl, program, kwargs) {
     this.isDrawingLinesLoc = gl.getUniformLocation(program, 'isDrawingLines');
 
     this.gts = ([2, 3, 4]).map((d)=>new GrandTour(d));
-    this.gts.forEach((gt, i)=>gt.STEPSIZE=(3-i)*0.05);
+    this.gts.forEach((gt, i)=>gt.STEPSIZE=(3-i)*0.10);
   };
 
   this.shouldPlay = true;
@@ -97,16 +98,23 @@ function TesseractRenderer(gl, program, kwargs) {
 
   this.play = function() {
     thisRenderer.shouldPlay = true;
+    this.render();
+    this.animId = window.requestAnimFrame(this.play.bind(this));
   };
 
 
   this.pause = function() {
     thisRenderer.shouldPlay = false;
+    if(this.animId){
+      cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
     console.log('tesseract paused');
   };
 
 
   this.render = function() {
+    console.log('tesseract rendering...')
     if (this.shouldPlay) {
       let dataObj = this.dataObj;
       let gl = this.gl;

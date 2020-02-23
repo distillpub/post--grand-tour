@@ -159,9 +159,12 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
       // renderer.shouldPlayGrandTour = !renderer.shouldPlayGrandTour;
     })
     .on('mousemove', ()=>{
+      //handle unsuccessful onscreen event
       if (renderer.shouldRender == false){
         renderer.shouldRender = true;
-        renderer.play();
+        if(renderer.animId === null){
+          renderer.play();
+        }
       }
     });
 

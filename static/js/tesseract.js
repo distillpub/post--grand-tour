@@ -7,7 +7,7 @@ tesseractFigure.addEventListener("ready", function() {
     [['shaders/tesseract_vertex.glsl', 'shaders/tesseract_fragment.glsl']]
   );
   tesseract = new TesseractRenderer(gl, programs[0]);
-  allViews.push(tesseract);
+  // allViews.push(tesseract);
   tesseract.init();
 });
 
