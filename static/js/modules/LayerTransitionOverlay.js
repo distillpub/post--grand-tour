@@ -766,7 +766,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .attr('class', 'form-group zoomSliderDiv');
   this.zoomLabel = this.zoomSliderDiv
     .append('label')
-    .text('zoom: ');
+    .text('Zoom: ');
   this.zoomSlider = this.zoomSliderDiv
     .append('input')
     .attr('type', 'range')
