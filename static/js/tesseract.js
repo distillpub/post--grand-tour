@@ -23,9 +23,15 @@ tesseractFigure.addEventListener("onscreen", function() {
   }
 });
 
+
 tesseractFigure.addEventListener("offscreen", function() {
   console.log('offscreen');
   if(tesseract && tesseract.pause){
     tesseract.pause();
   }
+});
+
+
+window.addEventListener('resize', ()=>{
+  tesseract.resize();
 });

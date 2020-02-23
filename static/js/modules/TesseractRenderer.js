@@ -161,4 +161,10 @@ function TesseractRenderer(gl, program, kwargs) {
       }
     }
   };
+
+  this.resize = function(){
+    let canvas = this.gl.canvas;
+    utils.resizeCanvas(canvas);
+  };
+
 }
