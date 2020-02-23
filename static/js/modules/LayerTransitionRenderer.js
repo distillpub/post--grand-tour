@@ -259,8 +259,6 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       if(this.firstInit === undefined){
         this.dataset = this.init_dataset || utils.getDataset();
         this.firstInit = false;
-      }else{
-        this.dataset = utils.getDataset();
       }
       texture = utils.loadTexture(gl, utils.getLayerTransitionTextureURL(this.dataset));
     }

@@ -135,9 +135,8 @@ lt2Figure.addEventListener("onscreen", function() {
       view.pause();
     }
   }
-  
   if(lt2 && lt2.isDataReady && lt2.play){
-    if(lt2.datasetName !== 'fashion-mnist'){
+    if(lt2.dataset !== 'fashion-mnist'){
       // lt2.onDatasetChange('fashion-mnist');
       lt2.shouldRender = true;
       lt2.play();
@@ -145,23 +144,20 @@ lt2Figure.addEventListener("onscreen", function() {
       lt2.overlay.selectedClasses = new Set();
       lt2.overlay.onSelectLegend(d3.range(10));
     }else{
+      console.log('lt2, dataset Fashion-MNIST');
       lt2.shouldRender = true;
       lt2.overlay.isViewManipulated = false;
       
       lt2.play();
       lt2.overlay.play();
-      // lt2.overlay.onLayerSliderInput(5);
       lt2.overlay.onLayerSliderInput(0);
       lt2.overlay.selectedClasses = new Set([5,7,9]);
       lt2.overlay.onSelectLegend(lt2.overlay.selectedClasses);
-      // lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER5);
-      
       lt2.gt.setMatrix(EARLY_SEPARATION_MATRIX_LAYER0);
       lt2.overlay.onLayerSliderInput(5);
 
       lt2.overlay.layerPlayButton.on('click')();
     }
-    
   }
 
 });
