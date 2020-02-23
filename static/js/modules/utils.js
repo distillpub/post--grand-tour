@@ -313,9 +313,7 @@ utils.getNet = function(name) {
 
 
 utils.setDataset = function(datasetName, callback0) {
-  // if (this.dataset != datasetName){
     this.dataset = datasetName;
-    // document.getElementById('dataset-option').innerText = datasetName;
     for (let callback of utils.datasetListener) {
       callback(datasetName);
     }

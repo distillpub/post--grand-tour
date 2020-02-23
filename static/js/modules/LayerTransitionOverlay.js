@@ -90,20 +90,6 @@ function LayerTransitionOverlay(renderer, kwargs) {
     });
 
 
-  this.zoomSlider = figure
-    .insert('input', ':first-child')
-    .attr('type', 'range')
-    .attr('class', 'slider zoomSlider')
-    .attr('min', 0.1)
-    .attr('max', 2.0)
-    .attr('value', this.renderer.scaleFactor)
-    .attr('step', 0.01)
-    .on('input', function() {
-      let value = d3.select(this).property('value');
-      renderer.scaleFactor = +value;
-    });
-
-
   this.grandtourButton = d3.select('d-figure.'+renderer.gl.canvas.id)
     // .insert('div', ':first-child')
     .insert('i', ':first-child')
@@ -219,7 +205,6 @@ function LayerTransitionOverlay(renderer, kwargs) {
     .attr('id', 'epochIndicator')
     .attr('text-anchor', 'middle')
     .text('0');
-
 
   //developer options start =================
   let isDev = false;
@@ -776,22 +761,35 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.controlOptionGroup = d3.select('d-figure.'+renderer.gl.canvas.id)
     .insert('div', ':first-child');
 
+  this.zoomSliderDiv = this.controlOptionGroup
+    .insert('div', ':first-child')
+    .attr('class', 'form-group zoomSliderDiv');
+  this.zoomLabel = this.zoomSliderDiv
+    .append('label')
+    .text('zoom: ');
+  this.zoomSlider = this.zoomSliderDiv
+    .append('input')
+    .attr('type', 'range')
+    .attr('class', 'slider zoomSlider')
+    .attr('min', 0.5)
+    .attr('max', 2.0)
+    .attr('value', this.renderer.scaleFactor)
+    .attr('step', 0.01)
+    .on('input', function() {
+      let value = d3.select(this).property('value');
+      renderer.scaleFactor = +value;
+    });
 
   this.modeOption = this.controlOptionGroup
     .insert('div', ':first-child')
     .attr('class', 'form-group modeOption');
-
-  this.modeOption.append('label')
-    // .attr('for', 'modeOption')
+  this.modeLabel = this.modeOption.append('label')
     .text('Instances as: ');
-
-  let select = this.modeOption.append('select')
-    .attr('id', 'modeOption')
+  let select = this.modeLabel.append('select')
     .on('change', function() {
       let mode = d3.select(this).property('value');
       renderer.setMode(mode);
     });
-
   select.selectAll('option')
     .data(['point', 'image'])
     .enter()
@@ -804,10 +802,11 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.datasetOption = this.controlOptionGroup
     .insert('div', ':first-child')
     .attr('class', 'form-group datasetOption');
-  this.datasetOption.append('label')
+  this.datasetLabel = this.datasetOption
+    .append('label')
     .text('Dataset: ');
-  this.datasetSelection = this.datasetOption.append('select')
-    .attr('id', 'datasetSelection')
+  this.datasetSelection = this.datasetLabel
+    .append('select')
     .on('change', function() {
       let dataset = d3.select(this).property('value');
       utils.setDataset(dataset)

@@ -16,18 +16,18 @@ function TeaserOverlay(renderer, kwargs) {
     return this.renderer.fixed_dataset || utils.getDataset();
   };
 
-  this.zoomSlider = figure
-    .insert('input', ':first-child')
-    .attr('type', 'range')
-    .attr('class', 'slider zoomSlider')
-    .attr('min', 0.5)
-    .attr('max', 2.5)
-    .attr('value', 1.0)
-    .attr('step', 0.01)
-    .on('input', function() {
-      let value = +d3.select(this).property('value');
-      renderer.setScaleFactor(value);
-    });
+  // this.zoomSlider = figure
+  //   .insert('input', ':first-child')
+  //   .attr('type', 'range')
+  //   .attr('class', 'slider zoomSlider')
+  //   .attr('min', 0.5)
+  //   .attr('max', 2.5)
+  //   .attr('value', 1.0)
+  //   .attr('step', 0.01)
+  //   .on('input', function() {
+  //     let value = +d3.select(this).property('value');
+  //     renderer.setScaleFactor(value);
+  //   });
 
   this.epochSlider = figure
     .insert('input', ':first-child')
@@ -187,20 +187,61 @@ function TeaserOverlay(renderer, kwargs) {
   this.controlOptionGroup = figure
     .insert('div', ':first-child');
 
+  // this.datasetOption = this.controlOptionGroup
+  //   .insert('div', ':first-child')
+  //   .attr('class', 'form-group datasetOption');
+  // this.datasetOption.append('label')
+  //   .text('Dataset: ');
+  // this.datasetSelection = this.datasetOption.append('select')
+  //   .attr('class', 'datasetSelection')
+  //   .on('change', function() {
+  //     let dataset = d3.select(this).property('value');
+  //     utils.setDataset(dataset)
+  //   });
+  // this.datasetSelection.selectAll('option')
+  //   .data([
+  //     {value:'mnist',text:'MNIST'}, 
+  //     {value:'fashion-mnist',text:'fashion-MNIST'},
+  //     {value:'cifar10',text:'CIFAR-10'}])
+  //   .enter()
+  //   .append('option')
+  //   .text(d=>d.text)
+  //   .attr('value', d=>d.value)
+  //   .property('selected', d=>{
+  //     //show default selection
+  //       return d.value == this.getDataset();
+  //   });
+  //   
+  this.zoomSliderDiv = this.controlOptionGroup
+    .insert('div', ':first-child')
+    .attr('class', 'form-group zoomSliderDiv');
+  this.zoomLabel = this.zoomSliderDiv
+    .append('label')
+    .text('zoom: ');
+  this.zoomSlider = this.zoomSliderDiv
+    .append('input')
+    .attr('type', 'range')
+    .attr('class', 'slider zoomSlider')
+    .attr('min', 0.5)
+    .attr('max', 2.0)
+    .attr('value', this.renderer.scaleFactor)
+    .attr('step', 0.01)
+    .on('input', function() {
+      let value = +d3.select(this).property('value');
+      renderer.setScaleFactor(value);
+    });
+
   this.modeOption = this.controlOptionGroup
     .insert('div', ':first-child')
     .attr('class', 'form-group modeOption');
-  this.modeOption.append('label')
+  this.modeLabel = this.modeOption.append('label')
     .text('Instances as: ');
-
-  let select = this.modeOption.append('select')
-      .attr('id', 'modeOption')
-      .on('change', function() {
-        let mode = d3.select(this).property('value');
-        renderer.setMode(mode);
-        that.updateArchorRadius(mode);
-      });
-
+  let select = this.modeLabel.append('select')
+    .on('change', function() {
+      let mode = d3.select(this).property('value');
+      renderer.setMode(mode);
+      that.updateArchorRadius(mode);
+    });
   select.selectAll('option')
     .data(['point', 'image'])
     .enter()
@@ -210,17 +251,17 @@ function TeaserOverlay(renderer, kwargs) {
       return (d == this.renderer.mode) ? 'selected':null;
     });
 
-
   this.datasetOption = this.controlOptionGroup
     .insert('div', ':first-child')
     .attr('class', 'form-group datasetOption');
-  this.datasetOption.append('label')
+  this.datasetLabel = this.datasetOption
+    .append('label')
     .text('Dataset: ');
-  this.datasetSelection = this.datasetOption.append('select')
-    .attr('class', 'datasetSelection')
+  this.datasetSelection = this.datasetLabel
+    .append('select')
     .on('change', function() {
       let dataset = d3.select(this).property('value');
-      utils.setDataset(dataset)
+      utils.setDataset(dataset);
     });
   this.datasetSelection.selectAll('option')
     .data([
@@ -232,7 +273,6 @@ function TeaserOverlay(renderer, kwargs) {
     .text(d=>d.text)
     .attr('value', d=>d.value)
     .property('selected', d=>{
-      //show default selection
         return d.value == this.getDataset();
     });
 

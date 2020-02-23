@@ -43,6 +43,7 @@ function TeaserRenderer(gl, program, kwargs) {
   this.initData = function(buffer, url) {
     if (url.includes('labels')) {
       this.dataObj.labels = Array.from(new Int8Array(buffer));
+      this.shouldRecalculateColorRect = true;
     } else {
       let arr = new Float32Array(buffer);
       let nepoch = 100;
@@ -87,7 +88,7 @@ function TeaserRenderer(gl, program, kwargs) {
       && (this.animId==null 
         || this.shouldRender==false)){
         this.shouldRender = true;
-        this.shouldRecalculateColorRect = true;
+        // this.shouldRecalculateColorRect = true;
         this.play();
       }
 
@@ -178,7 +179,7 @@ function TeaserRenderer(gl, program, kwargs) {
     }
     
     let texture = utils.loadTexture(
-      gl, utils.getTextureURL(this.fixed_dataset));
+      gl, utils.getTextureURL(this.overlay.getDataset()));
     this.samplerLoc = gl.getUniformLocation(program, 'uSampler');
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -206,7 +207,7 @@ function TeaserRenderer(gl, program, kwargs) {
   };
 
   
-  this.shouldCentralizeOrigin = this.shouldPlayGrandTour;
+  // this.shouldCentralizeOrigin = this.shouldPlayGrandTour;
   
 
 
@@ -381,6 +382,7 @@ function TeaserRenderer(gl, program, kwargs) {
 
     if (this.mode == 'image') {
       if(this.colorRect===undefined || this.shouldRecalculateColorRect){
+        
         this.colorRect = utils.color2rect(colors, dataObj.npoint, dataObj.ndim);
         this.bgColorRect = utils.color2rect(bgColors, dataObj.npoint, dataObj.ndim);
         this.shouldRecalculateColorRect = false;

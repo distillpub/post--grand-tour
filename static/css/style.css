@@ -141,10 +141,11 @@ button.annotation{
 }
 
 
-.modeOption, .datasetOption, .grandtourButton{
+.modeOption, .datasetOption, .grandtourButton, .zoomSliderDiv{
   display: inline;
   margin-right: 1em;
 }
+
 label{
   margin-right: 0.3em;
 }
@@ -421,8 +422,9 @@ canvas.smallmultiple0{
 }
 
 .zoomSlider {
-  top: 10px; 
-  left: calc(100% - 80px);
+  position: relative;
+  /*margin-top: 10px; */
+  /*left: calc(100% - 80px);*/
   width: 80px;
 }
 

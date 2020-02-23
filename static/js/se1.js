@@ -18,15 +18,14 @@ seFigure1.addEventListener("ready", function() {
   allViews.push(se1);
   se1 = utils.loadDataToRenderer(urls, se1);
 
-  utils.addDatasetListener(function(){
+  utils.addDatasetListener(function(dataset){
     se1.pause();
-    // se1.dataObj.dataTensor = null;
-    // se1.dataObj.labels = null;
-
-    var urls = utils.getTeaserDataURL(utils.getDataset());
+    var urls = utils.getTeaserDataURL(dataset);
     se1 = utils.loadDataToRenderer(urls, se1);
     se1.overlay.initLegend(
-      utils.baseColors.slice(0,10), utils.getLabelNames());
+      utils.baseColors.slice(0,10), 
+      utils.getLabelNames(false, dataset)
+    );
     se1.overlay.repositionAll();
 
     if(utils.getDataset() == 'cifar10'){
@@ -37,7 +36,7 @@ seFigure1.addEventListener("ready", function() {
 
     se1.overlay.datasetSelection.selectAll('option')
     .property('selected', d=>{
-      return d.value == utils.getDataset();
+      return d.value == dataset;
     });
 
   });
