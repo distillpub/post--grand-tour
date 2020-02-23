@@ -133,7 +133,7 @@ class LossHistoryRenderer{
         .attr('class', 'x-label');
         xlabel = this.svg.selectAll('.x-label')
         .attr('x', this.sx(50))
-        .attr('y', this.sy.range()[0]+30)
+        .attr('y', this.sy.range()[0]+35)
         .attr('text-anchor', 'middle')
         .text('Training Epoch');
 
@@ -142,7 +142,7 @@ class LossHistoryRenderer{
         .enter()
         .append('text')
         .attr('class', 'y-label');
-        let ylabel_x = this.sx(0)-20;
+        let ylabel_x = this.sx(0)-30;
         let ylabel_y = (this.sy.range()[0]+this.sy.range()[1])/2 + 18;
         ylabel = this.svg.selectAll('.y-label')
         .attr('x', ylabel_x)

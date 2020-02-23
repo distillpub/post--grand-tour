@@ -309,10 +309,30 @@ function NeuralNetOverlay(svgid) {
         .data(utils.getLabelNames())
         .attr('x', (d,i)=>sx(i%2+0.5))
         .attr('y', (d,i)=>sy(Math.floor(i/2)+0.5))
+        .style('fill', '#a9a9a9')
         .style('font-size', 8)
         .style('text-anchor', 'middle')
         .style('alignment-baseline', 'middle')
-        .text(d=>(+this.svg.attr('width') > 1000) ? d:'');
+        .text(d=>d);
+        // .text(d=>(+this.svg.attr('width') > 1000) ? d:'');
+
+        let title = utils.legendTitle[utils.getDataset()];
+        this.svg.selectAll(`.${d.name}-classTitle`)
+        .data([title,])
+        .enter()
+        .append('text')
+        .attr('class', `${d.name}-classTitle`)
+        .style('text-anchor', 'middle')
+        .style('font-weight', 'bold');
+
+        this.svg.selectAll(`.${d.name}-classTitle`)
+        .data([title,])
+        .attr('x', sx(1.0))
+        .attr('y', sy(0)-5)
+        .text(d=>d);
+        // .text(d=>(+this.svg.attr('width') > 1000) ? d:'');
+
+
 
       }
     })
