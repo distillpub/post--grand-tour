@@ -340,6 +340,11 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
       .attr('x', renderer.sx(0) + this.xOffsetRight)
       .attr('y', 20);
 
+    if(this.banner){
+      this.banner.remove();
+    }
+    
+
   };
 
 
@@ -350,9 +355,9 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     );
     this.resize();
     this.initAxisHandle();
-    if(this.banner){
-      this.banner.remove();
-    }
+    // if(this.banner){
+    //   this.banner.remove();
+    // }
   };
 
 

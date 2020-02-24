@@ -358,7 +358,10 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('height', rectData.height+2*padding)
         .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
     }
-
+    if(this.banner){
+      this.banner.remove();
+    }
+    
   };
 
 
@@ -371,9 +374,9 @@ function TeaserOverlay(renderer, kwargs) {
     if (this.annotate !== undefined){
       this.annotate(this.renderer);
     }
-    if(this.banner){
-      this.banner.remove();
-    }
+    // if(this.banner){
+    //   this.banner.remove();
+    // }
   };
 
 
