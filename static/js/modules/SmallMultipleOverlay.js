@@ -1,9 +1,11 @@
-function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
+function SmallMultipleOverlay(renderer, dataset, responsiveLegend=true) {
   this.selectedClasses = new Set();
   this.isFullScreen = false;
   this.dataset = dataset;
   this.renderer = renderer;
- 
+  let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
+  this.figure = figure;
+
 
   this.init = function() {
     let canvas = renderer.gl.canvas;
@@ -253,6 +255,10 @@ function SmallMultipleOverlay(renderer, dataset, responsiveLegend) {
 
 
     this.initLegend(utils.baseColors.slice(0, 10), utils.getLabelNames(false, dataset));
+
+    // if(this.banner){
+    //   this.banner.remove();
+    // }
   };
 
   let that = this;

@@ -9,6 +9,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
   this.renderer = renderer;
 
   let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
+  this.figure = figure;
   let that = this;
 
   this.getDataset = function(){
@@ -244,6 +245,7 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
       }
     });
 
+  
 
   function clamp(min, max, v) {
     if (v>max){
@@ -348,6 +350,9 @@ function SoftmaxComparisonOverlay(renderer, [xOffsetLeft, xOffsetRight]) {
     );
     this.resize();
     this.initAxisHandle();
+    if(this.banner){
+      this.banner.remove();
+    }
   };
 
 

@@ -15,6 +15,11 @@ function TesseractRenderer(gl, program, kwargs) {
     this.render();
   };
 
+  this.setPointSize = function(s) {
+    this.pointSize = s;
+    gl.uniform1f(this.pointSizeLoc, s * window.devicePixelRatio);
+  };
+
 
   this.dataObj = {
     rectangle: {},
@@ -88,6 +93,8 @@ function TesseractRenderer(gl, program, kwargs) {
     this.positionBuffer = gl.createBuffer();
     this.positionLoc = gl.getAttribLocation(program, 'a_position');
     this.isDrawingLinesLoc = gl.getUniformLocation(program, 'isDrawingLines');
+    this.pointSizeLoc = gl.getUniformLocation(program, 'point_size');
+    this.setPointSize(3.0);
 
     this.gts = ([2, 3, 4]).map((d)=>new GrandTour(d));
     this.gts.forEach((gt, i)=>gt.STEPSIZE=(3-i)*0.10);

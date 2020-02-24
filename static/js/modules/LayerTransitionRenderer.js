@@ -393,6 +393,8 @@ function LayerTransitionRenderer(gl, program, kwargs) {
       this.overlay.redrawCentroidHandle();
       // this.overlay.redrawAxis();
     }
+
+    
     this.animId = requestAnimationFrame(this.play.bind(this));
   };
 

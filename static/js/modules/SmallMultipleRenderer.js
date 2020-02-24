@@ -12,7 +12,6 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     });
     this.nrow = kwargs.methods.length;
     this.ncol = kwargs.epochs.length;
-
   };
   this.setKwargs(kwargs);
 
@@ -32,6 +31,9 @@ function SmallMultipleRenderer(gl, program, kwargs) {
   this.top = 4;
   this.paddingBottom = 40;
 
+  this.overlay = new SmallMultipleOverlay(this, this.dataset);
+
+  
   this.updateBoundaries = function(width){
     this.width = width;
     this.legendLeft = utils.smLegendLeft[this.dataset];
@@ -49,7 +51,10 @@ function SmallMultipleRenderer(gl, program, kwargs) {
 
   };
 
-  
+  this.setPointSize = function(s) {
+    this.pointSize = s;
+    gl.uniform1f(this.pointSizeLoc, s * window.devicePixelRatio);
+  };
 
   this.initData = function(buffer, url) {
     if (url.includes('labels.bin')) {
@@ -133,6 +138,8 @@ function SmallMultipleRenderer(gl, program, kwargs) {
 
     this.textureCoordBuffer = gl.createBuffer();
     this.textureCoordLoc = gl.getAttribLocation(program, 'a_textureCoord');
+    this.pointSizeLoc = gl.getUniformLocation(program, 'point_size');
+
     
     let textureCoords = [];
     for (let i=0; i<dataObj.npoint; i++) {
@@ -160,6 +167,7 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     this.modeLoc = gl.getUniformLocation( program, 'mode' );
     this.setMode(this.mode);
 
+
     this.colorFactorLoc = gl.getUniformLocation(program, 'colorFactor');
     this.setColorFactor(this.colorFactor);
   };
@@ -172,6 +180,7 @@ function SmallMultipleRenderer(gl, program, kwargs) {
     } else if (mode === 'image') {
       gl.uniform1i(this.modeLoc, 1);
     }
+    this.setPointSize(3.0);
   };
 
   this.setColorFactor = function(f) {

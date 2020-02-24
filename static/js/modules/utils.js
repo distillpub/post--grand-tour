@@ -1,3 +1,9 @@
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
 let utils = {};
 
 // for deployment
@@ -443,7 +449,53 @@ utils.loadDataWithCallback = function(urls, callback) {
   }
 };
 
+
+function bannerAnimation(renderer){
+  let banner = renderer.overlay.banner;
+  let bannerText = renderer.overlay.bannerText;
+  function repeat(){
+    bannerText
+      .text('Loading')
+      .transition()
+      .duration(500)
+      .text('Loading.')
+      .transition()
+      .duration(500)
+      .text('Loading..')
+      .transition()
+      .duration(500)
+      .text('Loading...')
+      .on('end', repeat);
+  }
+  repeat();
+}
+
+
+function createBanner(renderer){
+  let overlay = renderer.overlay;
+  if(overlay.figure){
+    overlay.banner = overlay.figure.selectAll('.banner')
+      .data([0])
+      .enter()
+      .append('div')
+      .attr('class', 'banner')
+    overlay.banner = overlay.figure.selectAll('.banner');
+    overlay.bannerText = overlay.banner
+      .selectAll('.bannerText')
+      .data([0])
+      .enter()
+      .append('p')
+      .attr('class', 'bannerText');
+    overlay.bannerText = overlay.banner.selectAll('.bannerText');
+  }
+}
+
 utils.loadDataToRenderer = function(urls, renderer, onReadyCallback) {
+  if(renderer.overlay){
+    createBanner(renderer);
+    bannerAnimation(renderer);
+  }
+
   for (let i=0; i<urls.length; i++) {
     utils.loadDataBin(urls[i], (buffer, url)=>{
       renderer.initData(buffer, url, i, urls.length, onReadyCallback);

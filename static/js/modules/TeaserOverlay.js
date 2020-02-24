@@ -11,7 +11,8 @@ function TeaserOverlay(renderer, kwargs) {
 
   let that = this;
   let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
-
+  this.figure = figure;
+  
   this.getDataset = function(){
     return this.renderer.fixed_dataset || utils.getDataset();
   };
@@ -264,6 +265,21 @@ function TeaserOverlay(renderer, kwargs) {
         return d.value == this.getDataset();
     });
 
+  this.banner = figure.selectAll('.banner')
+    .data([0])
+    .enter()
+    .append('div')
+    .attr('class', 'banner')
+  this.banner = figure.selectAll('.banner');
+  this.bannerText = this.banner
+    .selectAll('.bannerText')
+    .data([0])
+    .enter()
+    .append('p')
+    .attr('class', 'bannerText');
+  this.bannerText = this.banner.selectAll('.bannerText');
+
+
   function clamp(min, max, v) {
     return Math.max(max, Math.min(min, v));
   }
@@ -342,6 +358,7 @@ function TeaserOverlay(renderer, kwargs) {
         .attr('height', rectData.height+2*padding)
         .attr('opacity', utils.legendTitle[this.getDataset()]? 1:0);
     }
+
   };
 
 
@@ -353,6 +370,9 @@ function TeaserOverlay(renderer, kwargs) {
     this.initAxisHandle();
     if (this.annotate !== undefined){
       this.annotate(this.renderer);
+    }
+    if(this.banner){
+      this.banner.remove();
     }
   };
 

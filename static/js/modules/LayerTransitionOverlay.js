@@ -6,6 +6,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   let that = this;
 
   let figure = d3.select('d-figure.'+renderer.gl.canvas.id);
+  this.figure = figure;
 
   // let directManipulationMode = 'rotation';
   this.directManipulationMode = 'rotation';
@@ -833,6 +834,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
   this.init = function(){
     this.initLegend();
     this.repositionAll();
+
   };
 
   
@@ -979,7 +981,7 @@ function LayerTransitionOverlay(renderer, kwargs) {
 
     this.epochIndicator
       .attr('x', sliderMiddle )
-      .attr('y', height-30);
+      .attr('y', height-33);
 
 
     this.layerMarkerSx = d3.scaleLinear()
@@ -1002,6 +1004,10 @@ function LayerTransitionOverlay(renderer, kwargs) {
       .attr('cy', height-this.layerSliderOffsetY - 30)
       .attr('r', d=>d)
       .attr('fill', '#d3d3d3');
+
+    if(this.banner){
+      this.banner.remove();
+    }
   };
 
 

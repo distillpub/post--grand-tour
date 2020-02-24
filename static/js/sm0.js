@@ -25,7 +25,7 @@ function createSmallMultiple(
     let urls = utils.getSmallMultipleDataURL(kwargs.methods, dataset);
 
     sm0 = new SmallMultipleRenderer(gl, programs[0], kwargs);
-    sm0.overlay = new SmallMultipleOverlay(sm0, dataset, responsiveLegend);
+    // sm0.overlay = new SmallMultipleOverlay(sm0, dataset, responsiveLegend);
     sm0 = utils.loadDataToRenderer(urls, sm0);
     allViews.push(sm0);
 
