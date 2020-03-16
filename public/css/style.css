@@ -1,0 +1,491 @@
+
+
+d-title p{
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+}
+
+figcaption a, d-article a{
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.4);
+}
+
+figcaption a:hover, d-article a:hover{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  color: inherit;
+  text-decoration: none;
+}
+
+figcaption{
+  margin-bottom: 2em;
+}
+
+
+d-article h4 {
+  margin-top: 1em;
+}
+
+/*d-article h5 {
+    margin-top: 1em;
+    font-size: 14px;
+    line-height: 1.4em;
+}*/
+
+.clickable{
+  cursor: pointer;
+}
+
+d-math{
+  pointer-events: none;
+}
+
+.img-center{
+  margin-left: auto; 
+  margin-right: auto; 
+  display: block;
+}
+
+.clickable:before { 
+  /*content: "";
+  border-color: transparent #ddd;
+  border-style: solid;
+  border-width: 0.35em 0 0.35em 0.45em;
+  display: block;
+  height: 0;
+  width: 0;
+  left: -1em;
+  top: 0.9em;
+  position: relative;*/
+
+  content: "\002B";
+  position: relative;
+}
+
+.clickable-active:before { 
+  content: "\2212";
+}
+
+.hidden{
+  display: none;
+}
+
+
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black;*/
+}
+
+/* Tooltip text */
+.tooltip .tooltipText{
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: sans-serif;
+  position: absolute;
+  z-index: 1;
+
+  bottom: 110%;
+  left: -80%; 
+}
+
+.tooltipTextBottom{
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 5px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: sans-serif;
+  position: absolute;
+  z-index: 1;
+  top: 110%;
+  left: -80%;
+}
+
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltipText{
+  visibility: visible;
+}
+.tooltip:hover .tooltipTextBottom{
+  visibility: visible;
+}
+/*--------------------------------------*/
+
+a, i, .legendMark, .legendText, button, select, option{
+    cursor: pointer;
+}
+
+.legendTitle{
+  font-weight: bold;
+}
+
+
+button.annotation{
+  background: #eee;
+  /*border: none;*/
+  font-size: 9px;
+  /*text-decoration: none;*/
+  border-radius: 3px;
+  height: 24px;
+  width: 85px;
+  /*left: calc(100% - 86px);*/
+  padding: 0;
+  border: 1px solid #ccc;
+}
+
+
+.modeOption, .datasetOption, .grandtourButton, .zoomSliderDiv{
+  display: inline;
+  margin-right: 1em;
+}
+
+label{
+  margin-right: 0.3em;
+}
+
+svg.confusionMatrix{
+    display: block;
+    margin: 0 auto;
+}
+
+
+.caption{
+    text-align: center;
+    color: #555;
+    font-size: .9em;
+    font-style: italic;
+    margin-bottom: 3em;
+    /*border: 3px solid green;*/
+}
+
+
+
+
+.options{
+    position: sticky;
+    top: 0;
+    color: rgba(255, 255, 255, 0.8);
+    /*background-color: hsl(200, 60%, 15%);*/
+    background-color: hsl(200, 30%, 30%);
+    width: 100%;
+    height: 60px;
+    z-index: 10;
+}
+
+.dropdown-menu{
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+
+
+svg text{
+-webkit-user-select: none;
+   -moz-user-select: none;
+    -ms-user-select: none;
+        user-select: none;
+        font-weight: normal;
+        font-size: 8.5pt;
+        fill: #333;
+}
+
+/*svg text.epoch, */
+svg text.method{
+  font-weight: bold;
+
+}
+
+:root {
+  --axis-color: #555;
+}
+
+.x-axis .tick > line,
+.y-axis .tick > line,
+.x-axis path,
+.y-axis path{
+  stroke: var(--axis-color);
+}
+.x-axis .tick > text,
+.y-axis .tick > text{
+  fill: var(--axis-color);
+  font-size: 8pt;
+}
+
+
+.x-grid line,
+.y-grid line{
+  stroke-width: 0.5;
+  stroke: #ccc;
+  opacity: 0.7;
+}
+
+.x-grid path.domain,
+.y-grid path.domain,
+.x-axis path.domain,
+.y-axis path.domain
+{
+  display: none;
+}
+
+.x-label, .y-label{
+  font-weight: bold;
+}
+
+d-figure{
+  position: relative;
+  grid-column: text;
+  /*margin: 1rem 0;*/
+}
+
+
+d-figure.nn2{
+  grid-column: page;
+}
+
+d-figure.fullscreen{
+  grid-column: screen;
+}
+
+d-figure.nngt2{
+  grid-column: page;
+}
+d-figure.nngt2.fullscreen{
+  grid-column: screen;
+}
+
+d-figure.teaser{
+  grid-column: text;
+  display: block;
+  width: 100%;
+  /*min-width: 500px;*/
+  height: 280px;
+  margin-left: auto; 
+  margin-right: auto; 
+}
+d-figure.teaser.fullscreen{
+  grid-column: screen;
+  width: 100%;
+  height: calc(100vh); /* viewport_height*/
+}
+#teaser{
+    width: 100%;     
+    height: 100%;
+}
+figcaption.teaser{
+  grid-column: text;
+}
+
+
+canvas.grandtour{
+    width: 100%; 
+    height: 400px;
+    /*height: 100%;*/
+}
+canvas.grandtour.fullscreen{
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    grid-column: page;
+}
+
+
+
+
+/*d-figure.smallmultiple, 
+d-figure.smallmultiple0{
+    grid-column: page;
+}*/
+
+canvas.smallmultiple, 
+canvas.smallmultiple0{
+    /*margin-top: 30px;*/
+    /*margin-left: 10%;*/
+    /*margin-right: 10%;*/
+    width: 100%; 
+}
+
+
+.smallmultiple.fullscreen, .smallmultiple0.fullscreen{
+    grid-column: screen;
+}
+
+
+.smallmultiple-fullscreenButton{
+    position: absolute;
+    top: 0;
+    left: 1px;
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.smallmultiple-clearBrushButton{
+    position: absolute;
+    top: 0;
+    left: 30px;
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+
+
+.overlay{
+    position: absolute;
+}
+
+.play-button{
+    position: absolute;
+    top: calc(100% - 40px);
+    left: 50px;
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.teaser-fullscreenButton{
+    position: absolute;
+    /*top: 48px;*/
+    left: 2px; /*77%;*/
+    font-size: 20px;
+    opacity: 0.3;
+}
+
+.teaser-grandtourButton{
+    position: absolute;
+    top: calc(100% - 40px);
+    left: 2px; /*77%;*/
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+/*button whose <d-figure> parent is in fullscreen*/
+.fullscreen .teaser-fullscreenButton{
+    left: 10px;
+}
+.fullscreen .teaser-grandtourButton{
+    left: 10px;
+}
+
+
+.slider {
+    position: absolute;
+    -webkit-appearance: none;
+    grid-column: middle;
+    height: 5px;
+    border-radius: 1px;   
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%; 
+    background: #4CAF50;
+    cursor: pointer;
+}
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+
+.epochSlider, .layerSlider {
+  left: 80px;
+  width: calc(100% - 80px - 80px)
+}
+
+.layerTransition {
+  left: 80px;
+  width: calc(100% - 80px - 50px)
+}
+
+.epochSlider{
+  top: calc(100% - 34px);
+}
+
+.layerSlider {
+  top: calc(100% - 69px);
+}
+
+.zoomSlider {
+  position: relative;
+  /*margin-top: 10px; */
+  /*left: calc(100% - 80px);*/
+  width: 80px;
+}
+
+
+
+
+canvas.layertransition {
+    width: 100%;
+    height: 400px;
+}
+
+.layerSliderLandmark {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+
+
+/*.caption > span{
+  font-style: normal;
+  font-weight: 550;
+}
+
+.caption > span:before{
+  content: "\2b24";
+  position: relative;
+  margin-right: 0.25em;
+}*/
+
+
+.form-group {
+  font-size: 0.87rem;
+}
+
+figcaption > span{
+  font-style: normal;
+  font-weight: 550;
+}
+
+figcaption > span:before{
+  content: "\2b24";
+  position: relative;
+  margin-right: 0.25em;
+}
+
+
+.bannerText{
+  border-bottom: none;
+  text-align: center;
+  font-size: 1.1rem;
+  position: absolute;
+  top: 25%;
+  left: 45%;
+}
+
+.banner{
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  opacity: 0.8;
+}

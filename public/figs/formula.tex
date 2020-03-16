@@ -1,0 +1,75 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz-cd}
+% \tikzcdset{every label/.append style = {font = \small}}
+
+\usepackage{amsmath}
+
+\title{Formula}
+\author{mwli }
+\date{December 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{axis mode}
+\subsection{}
+\begin{tikzcd}[]
+e_i \arrow[r, "GT"] & \tilde{e_i} \arrow[r, "\pi_2"] & (x_i,y_i)\\
+\end{tikzcd}
+
+\subsection{}
+\begin{tikzcd}[]
+e_i \arrow[r, "GT"] \arrow[d, "id"]
+        & \tilde{e_i} \arrow[r, "\pi_2"] 
+        & (x_i,y_i) \arrow[d, "\Delta"] \\
+e_i \ar[r, red, dashed, "GT^{(new)}"] 
+        & \tilde{e_i}^{(new)} \arrow[r, "\pi_2"] 
+        & (x_i^{(new)},y_i^{(new)})
+\end{tikzcd}
+
+\subsection{}
+\begin{tikzcd}[]
+e_i \arrow[r, "GT"] \arrow[dd, "id"]       & \tilde{e_i} \arrow[r, "\pi_2"] \arrow[d, "\tilde{\Delta}"]          & (x_i,y_i) \arrow[d, "\Delta"] \\
+                                           & \tilde{e_i}+(dx, dy, 0, 0, \cdots) \arrow[r, "\pi_2"] \arrow[d, "normalize"]     & (x_i+dx,y_i+dy) \arrow[d, dash, dashed, "\approx"] \\
+e_i \arrow[r, red, dashed, "GT^{(new)}"]   & \tilde{e_i}^{(new)} \arrow[r, "\pi_2"]                              & (x_i^{(new)},y_i^{(new)})
+\end{tikzcd}
+
+
+
+
+
+\section{data point mode: 2-subspace rotation}
+
+\subsection{}
+\begin{tikzcd}[]
+c \arrow[r, "GT"] \arrow[dd, "id"]       & \tilde{c} \arrow[r, "\pi_2"] \arrow[d, "\tilde{\Delta}"] \arrow[dd, shift right=1.5ex, bend right, near start, "\rho"]     & (x_c,y_c) \arrow[d, "\Delta"] \\
+                                         & \tilde{c}+\tilde{\Delta} \arrow[r, "\pi_2"] \arrow[d, "normalize"]                & (x_c+dx,y_c+dy) \arrow[d, dash, dashed, "\approx"] \\
+c \arrow[r, red, dashed, "GT^{(new)}"]   & \tilde{c}^{(new)} \arrow[r, "\pi_2"]                                                      & (x_c^{(new)},y_c^{(new)})
+\end{tikzcd}
+
+\section{data point mode: Procrustes problem}
+
+\subsection{}
+\begin{tikzcd}[]
+X \arrow[r, "GT"] \arrow[dd, "id"]       & \tilde{c} \arrow[r, "\pi_2"] \arrow[d, "\tilde{\Delta}"] \arrow[dd, shift right=1.5ex, bend right, near start, "\rho"]     & (x_c,y_c) \arrow[d, "\Delta"] \\
+                                         & \tilde{c}+\tilde{\Delta} \arrow[r, "\pi_2"] \arrow[d, "normalize"]                & (x_c+dx,y_c+dy) \arrow[d, dash, dashed, "\approx"] \\
+X \arrow[r, red, dashed, "GT^{(new)}"]   & \tilde{c}^{(new)} \arrow[r, "\pi_2"]                                                      & (x_c^{(new)},y_c^{(new)})
+\end{tikzcd}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
