@@ -256,62 +256,62 @@ utils.getNet = function(name) {
   let net;
   if (name == 'cifar10') {
     net = [
-      {type: 'data', name: 'input', size: [32, 32]},
+      {type: 'data', name: 'input', size: [32, 32], img_dimension: [1440, 32]},
 
       {type: 'function', name: 'conv1',
        blocks: ['conv_5x5(3->10)', 'ReLU', 'maxpool_2x2']},
-      {type: 'data', name: 'conv1', size: [28, 70]},
+      {type: 'data', name: 'conv1', size: [28, 70], img_dimension: [1260, 7000]},
 
       {type: 'function', name: 'conv2',
        blocks: ['conv_5x5(10->20)', 'ReLU', 'maxpool_2x2']},
-      {type: 'data', name: 'conv2', size: [20, 25]},
+      {type: 'data', name: 'conv2', size: [20, 25], img_dimension: [900, 2500]},
 
       {type: 'function', name: 'fc1',
        // blocks: ['flatten', 'linear(500->120)', 'ReLU', 'dropout(0.1)']},
        blocks: ['linear(500->120)', 'ReLU']},
-      {type: 'data', name: 'fc1', size: [10, 12]},
+      {type: 'data', name: 'fc1', size: [10, 12], img_dimension: [450, 1200]},
 
       {type: 'function', name: 'fc2',
        // blocks: ['linear(120->84)', 'ReLU', 'dropout(0.5)']},
        blocks: ['linear(120->84)', 'ReLU']},
-      {type: 'data', name: 'fc2', size: [7, 12]},
+      {type: 'data', name: 'fc2', size: [7, 12], img_dimension: [315, 1200]},
 
       {type: 'function', name: 'fc3',
        blocks: ['linear(84->10)']},
-      {type: 'data', name: 'fc3', size: [2, 5]},
+      {type: 'data', name: 'fc3', size: [2, 5], img_dimension: [90, 500]},
 
       {type: 'function', name: 'softmax', blocks: ['softmax']},
-      {type: 'data', name: 'softmax', size: [2, 5]},
+      {type: 'data', name: 'softmax', size: [2, 5], img_dimension: [90, 500]},
 
       {type: 'function', name: 'argmax', blocks: ['argmax']},
-      {type: 'data', name: 'argmax', size: [1, 1]},
+      {type: 'data', name: 'argmax', size: [1, 1], img_dimension: [0, 0]},
     ];
   } else {
     net = [
-      {type: 'data', name: 'input', size: [28, 28]},
+      {type: 'data', name: 'input', size: [28, 28], img_dimension: [1260, 28]},
 
       {type: 'function', name: 'conv1',
        blocks: ['conv_5x5(1->10)', 'maxpool_2x2', 'ReLU']},
-      {type: 'data', name: 'conv1', size: [24, 60]},
+      {type: 'data', name: 'conv1', size: [24, 60], img_dimension: [1080, 6000]},
 
       {type: 'function', name: 'conv2',
        // blocks: ['conv_5x5(10->20)', 'dropout2d(0.5)', 'maxpool_2x2', 'ReLU']},
        blocks: ['conv_5x5(10->20)', 'maxpool_2x2', 'ReLU']},
-      {type: 'data', name: 'conv2', size: [16, 20]},
+      {type: 'data', name: 'conv2', size: [16, 20], img_dimension: [720, 2000]},
 
       {type: 'function', name: 'fc1',
        // blocks: ['flatten', 'linear(320->50)', 'ReLU', 'dropout(0.2)']},
        blocks: ['linear(320->50)', 'ReLU']},
-      {type: 'data', name: 'fc1', size: [5, 10]},
+      {type: 'data', name: 'fc1', size: [5, 10], img_dimension: [225, 1000]},
 
       {type: 'function', name: 'fc2', blocks: ['linear(50->10)', 'ReLU']},
-      {type: 'data', name: 'fc2', size: [2, 5]},
+      {type: 'data', name: 'fc2', size: [2, 5], img_dimension: [90, 500]},
 
       {type: 'function', name: 'softmax', blocks: ['softmax']},
-      {type: 'data', name: 'softmax', size: [2, 5]},
+      {type: 'data', name: 'softmax', size: [2, 5], img_dimension: [90, 500]},
 
       {type: 'function', name: 'argmax', blocks: ['argmax']},
-      {type: 'data', name: 'argmax', size: [1, 1]},
+      {type: 'data', name: 'argmax', size: [1, 1], img_dimension: [0, 0]},
     ];
   }
   return net;

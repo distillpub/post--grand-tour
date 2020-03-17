@@ -139,6 +139,7 @@ function NeuralNetOverlay(svgid) {
       .attr('x', (d) => -(sx(d.i*ncols)))
       .attr('y', (d) => sy(d.i))
       .attr('height', sy(1)-sy(0))
+      .attr('width', (sy(1)-sy(0))*45)
       .attr('xlink:href', (d) => d.src)
       .attr('clip-path', d=>`url(#clip_${d.i}_${d.j})`)
       .on('mouseover', (d) => {
@@ -279,8 +280,8 @@ function NeuralNetOverlay(svgid) {
     this.svg.selectAll('.activation')
     .attr('x', d=>d.x-this.imageIndex * d.width)
     .attr('y', d=>d.y-d.height/2 - (d.name=='input'?0:this.epochIndex * d.height))
-    .attr('width', d=>d.width * 45)
-    // .attr('height', d=>d.height)
+    .attr('width', d=>d.width*45)
+    .attr('height', d=>d.width*45 / d.img_width * d.img_height)
     .attr('clip-path', d =>`url(#clip_${d.name})`);
 
     if(this.isFirst){
@@ -462,6 +463,8 @@ function NeuralNetOverlay(svgid) {
         d.x = x;
         d.y = sy(0.5);
         x += gap + d.width;
+        d.img_width = d.img_dimension[0];
+        d.img_height = d.img_dimension[1];
       }else{
         d.width = width_layer;
         d.height = 100;
