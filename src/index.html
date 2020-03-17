@@ -51,12 +51,17 @@
 
 <script>
   utils.cacheAll(constants.preloadUrls);
-  for (let url of constants.layerTransitionUrls['fashion-mnist']){
-    window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
+
+  //Note: safari does not support window.requestIdleCallback
+  if(window.requestIdleCallback){ 
+    for (let url of constants.layerTransitionUrls['fashion-mnist']){
+      window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
+    }
+    for (let url of constants.adversarialUrls){
+      window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
+    }
   }
-  for (let url of constants.adversarialUrls){
-    window.requestIdleCallback(()=>{utils.cacheAll([url,] )});
-  }
+  
   
   // window.requestIdleCallback(()=>{utils.cacheAll(constants.adversarialUrls)});
   // window.requestIdleCallback(()=>{utils.cacheAll(constants.layerTransitionUrls['fashion-mnist'])});
