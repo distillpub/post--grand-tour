@@ -392,7 +392,7 @@
 <figcaption>Softmax activations of the MNIST classifier with non-linear dimensionality reduction. Use the buttons on the right to highlight digits 1 and 7 in the plot, or drag rectangles around the charts to select particular point subsets to highlight in the other charts.</figcaption>
 
 <p>
-  One reason that non-linear embeddings fail in elucidating this phenomenon is that, for the particular change in the data, the fail the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>. More concretely, the principle states that specific visualization tasks should be modeled as functions that change the data; the visualization sends this change from data to visuals, and
+  One reason that non-linear embeddings fail in elucidating this phenomenon is that, for the particular change in the data, they fail the principle of <em>data-visual correspondence</em> <d-cite key="kindlmann2014algebraic"></d-cite>. More concretely, the principle states that specific visualization tasks should be modeled as functions that change the data; the visualization sends this change from data to visuals, and
   we can study the extent to which the visualization changes are easily perceptible.
   Ideally, we want the changes in data and visualization to <em>match in magnitude</em>: a barely noticeable change in visualization should be due to the smallest possible change in data, and a salient change in visualization should reflect a significant one in data.
   Here, a significant change happened in only a <em>subset</em> of data (e.g. all points of digit 1 from epoch 13 to 14), but <em>all</em> points in the visualization move dramatically.
@@ -637,7 +637,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
       In the same way that we've kept the projection fixed as the training data changed, we would like to "keep the projection fixed", as the data moves through the layers in the neural network. However, this is not straightforward. For example, different layers in a neural network have different dimensions. How do we connect rotations of one layer to rotations of the other?
     </li>
     <li>
-      The class "axis handles" in the softmax layer convenient, but that's only practical when the dimensionality of the layer is relatively small.
+      The class "axis handles" in the softmax layer are convenient, but that's only practical when the dimensionality of the layer is relatively small.
       With hundreds of dimensions, for example, there would be too many axis handles to naturally interact with.
       In addition, hidden layers do not have as clear semantics as the softmax layer, so manipulating them would not be as intuitive.
     </li>
@@ -668,7 +668,7 @@ Here are some examples of how Grand Tour acts on some (low-dimensional) objects:
 
 <p>
   This observation points to a more general strategy: when designing a visualization, we should be as explicit as possible about which parts of the input (or process) we seek to capture in our visualizations.
-  We should seek to explicitly articulate what are purely representational artifacts that we should discard, and what are the real features a visualization we should <em>distill</em> from the representation.
+  We should seek to explicitly articulate what are purely representational artifacts that we should discard, and what are the real features a visualization should <em>distill</em> from the representation.
   Here, we claim that rotational factors in linear transformations of neural networks are significantly less important than other factors such as scalings and nonlinearities.
   As we will show, the Grand Tour is particularly attractive in this case because it is can be made to be invariant to rotations in data.
   As a result, the rotational components in the linear transformations of a neural network will be explicitly made invisible.
